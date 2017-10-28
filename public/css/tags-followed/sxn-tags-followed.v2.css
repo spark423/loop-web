@@ -1,0 +1,36 @@
+#tags-followed{
+    padding: 0 30px;
+    margin: 30px 0 0;
+}
+#tags-followed h2{
+    font-weight: 400;
+    font-size: 20px;
+    margin: 0 0 30px 12px;
+}
+#tags-followed .uk-card{
+    padding: 20px;
+}
+#tags-followed .uk-subnav-pill>.uk-active>a {
+    background-color: #f9f9f9;
+    color: #999;
+}
+#tags-followed .uk-subnav-pill>.uk-active>a:hover {
+    color: #666;
+}
+#tags-followed .uk-subnav-pill>*>:first-child {
+    background: #f9f9f9;
+    border-radius: 20px;
+}
+#tags-followed .uk-subnav>*>:first-child {
+    text-transform: inherit;
+}
+#tags-followed .uk-subnav .uk-icon svg{
+    width: 15px;
+    height: 15px;
+    margin: 0 10px 0 0;
+    position: relative;
+    top: -1px;
+}
+#tags-followed .uk-subnav{
+    margin: 0 0 0 -20px;
+}

@@ -1,0 +1,32 @@
+{{>sidenav}}
+
+<div class="col-tog single-col">
+
+    <div class="app">
+        {{>topbar}}
+        {{>board-header}}
+        {{>sale-board-notifications-create}}
+        {{>filter-content}}
+    </div>
+
+</div>
+
+<div class="col-tog double-col" hidden>
+
+    <div class="side-col">
+        <div class="side-col-scroll">
+
+            <?php include 'side-sxn/scroll-title-home/sxn-scroll-title-home.php'; ?>
+
+        </div>
+    </div>
+
+    <div class="app double">
+        {{>topbar}}
+        {{>board-header}}
+        {{>sale-board-notifications-create}}
+        {{>filter-content}}
+    </div>
+
+</div>
+

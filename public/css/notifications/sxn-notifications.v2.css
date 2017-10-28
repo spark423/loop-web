@@ -1,0 +1,124 @@
+#notifications .notifications-item{
+    padding: 0 30px;
+    margin: 0 0 30px;
+}
+#notifications .notifications-item .uk-card{
+    padding: 20px;
+}
+#notifications .notifications-item .main-post,
+#notifications .notifications-item .reply {
+    position: relative;
+}
+#notifications .notifications-item .main-post .poster-avi img{
+    width: 70px;
+    height: 70px;
+    border-radius: 70px;
+    margin: 0 20px 0 0;
+}
+#notifications .notifications-item .main-post .poster-info{
+    position: relative;
+    top: 2px;
+}
+#notifications .notifications-item .main-post .more{
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+#notifications .notifications-item .main-post .approval{
+    font-size: 14px;
+}
+#notifications .notifications-item .main-post .more a.approval{
+    color: #58595b;
+    text-decoration: underline;
+    margin: 0 10px 0 0;
+}
+#notifications .notifications-item .main-post .more .uk-card a:hover{
+    text-decoration: none;
+}
+#notifications .notifications-item .main-post .more a.approval:hover{
+    text-decoration: none;
+}
+#notifications .notifications-item .main-post .more a.yes{
+    margin: 0 10px;
+}
+#notifications .notifications-item .main-post .more a.uk-icon-link{
+    margin: 0;
+}
+#notifications .notifications-item .main-post .more a.uk-icon-link:hover{
+    color: #00d283;
+}
+#notifications .notifications-item .main-post .post-content {
+    margin: 15px 0 0;
+}
+#notifications .notifications-item .main-post .tags {
+    margin: 10px 0 0;
+}
+#notifications .notifications-item .main-post .tags span {
+    color: #a7a9ac;
+    font-size: 14px;
+}
+#notifications .notifications-item .main-post .tags .uk-icon {
+    margin: 0 5px 0 0;
+}
+#notifications .notifications-item .main-post .poster-info span,
+#notifications .notifications-item .reply span.timestamp,
+#notifications .quote-post span.timestamp{
+    font-size: 14px;
+}
+#notifications .notifications-item .main-post .poster-info span.timestamp,
+#notifications .quote-post span.timestamp{
+    color: #a7a9ac;
+    margin: 0 0 0 10px;
+}
+#notifications .notifications-item .reply span.timestamp,
+#notifications .notifications-item .main-post .poster-info span.timestamp{
+    position: relative;
+    top: 3px;
+}
+#notifications .notifications-item .main-post .poster-info span.name,
+#notifications .notifications-item .reply span.name {
+    color: #58595b;
+    font-weight: 600;
+    font-size: 16px;
+    position: relative;
+    top: 3px;
+}
+#notifications .notifications-item .main-post .post-content div.img-wrap {
+    border-radius: 20px;
+    background-image: url('/loop-img/event.png');
+    background-position: center;
+    background-size: cover;
+    width: 100%;
+    height: 175px;
+}
+#notifications .notifications-item .main-post .post-content span.title {
+    font-weight: 600;
+}
+#notifications .quote-post {
+    padding: 15px 0 15px 95px;
+}
+#notifications .quote-post .name {
+    font-weight: 600;
+}
+#notifications .quote-post .poster-avi img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+    margin: 0 10px 0 0;
+}
+#notifications .timestamp a {
+    color: #a7a9ac;
+    text-decoration: underline;
+}
+#notifications .timestamp a:hover {
+    text-decoration: none;
+}
+#notifications h4.today {
+    width: 100%;
+    display: block;
+    color: #ccc;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    margin: 0 0 20px;
+}

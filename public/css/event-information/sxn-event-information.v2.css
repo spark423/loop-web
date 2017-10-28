@@ -1,0 +1,15 @@
+#event-information .event-information{
+    padding: 0 30px;
+    margin: 30px 0;
+}
+#event-information .uk-card-body{
+    padding: 20px;
+    margin: 0 30px;
+}
+#event-information .event-information.uk-grid>*{
+    padding-left: 0px;
+    width: 50%;
+}
+#event-information h4 {
+    margin: 30px;
+}

@@ -1,0 +1,14 @@
+#add-image{
+    padding: 0 30px;
+    margin: 0 0 30px;
+}
+#add-image .uk-icon{
+    margin: 0 10px 0 0;
+    position: relative;
+    top: -2px;
+}
+#add-image div{
+    background: #fff;
+    border-radius: 20px;
+    border-color: #d1d2d3;
+}

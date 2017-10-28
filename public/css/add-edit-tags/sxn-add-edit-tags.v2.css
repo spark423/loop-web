@@ -1,0 +1,48 @@
+#add-edit-tags{
+    padding: 0 30px;
+    margin: 30px 0 0;
+}
+#add-edit-tags h2{
+    font-weight: 400;
+    font-size: 20px;
+    margin: 0 0 30px 12px;
+}
+#add-edit-tags .uk-card{
+    padding: 20px;
+}
+#add-edit-tags .uk-card div.uk-inline{
+    width: calc(100% - 40px);
+}
+#add-edit-tags .uk-card input{
+    border-radius: 20px;
+    width: 100%;
+}
+#add-edit-tags .uk-subnav-pill>.uk-active>a {
+    background-color: #f9f9f9;
+    color: #999;
+}
+#add-edit-tags .uk-subnav-pill>.uk-active>a:hover {
+    color: #666;
+}
+#add-edit-tags .uk-subnav-pill>*>:first-child {
+    background: #f9f9f9;
+    border-radius: 20px;
+}
+#add-edit-tags .uk-subnav>*>:first-child {
+    text-transform: inherit;
+}
+#add-edit-tags .uk-subnav .uk-icon svg{
+    width: 15px;
+    height: 15px;
+    margin: 0 10px 0 0;
+    position: relative;
+    top: -1px;
+}
+#add-edit-tags .uk-subnav{
+    margin: 20px 0 0 -20px;
+}
+#add-edit-tags .divider{
+    border-top: 1px solid #d1d2d3;
+    width: calc(100% + 40px);
+    margin: 20px 0 20px -20px;
+}

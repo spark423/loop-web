@@ -1,0 +1,50 @@
+<link rel="stylesheet" href="/css/login.v5.min.css" />
+<style>
+.alert {display:inline-block;}
+</style>
+<section id="login">
+    <div class="login-header">
+        <img class="uk-float-left" src="/img/loop_logo_white.png" alt="Loop" />
+        <ul class="uk-list uk-link-text">
+            <li><a href="#">Help</a></li>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">About</a></li>
+        </ul>
+    </div>
+
+    <h1>Welcome to Loop</h1>
+    <p>Create your account by completing the fields below:</p>
+    {{#if message}}
+      <script> alert("{{message}}"); </script>
+    {{/if}}
+    <div class="inputs">
+
+            <div class="uk-margin">
+                <select class="uk-select" name="university">
+                    <option value="">Select your university</option>
+                    <option value="Hogwarts">Hogwarts</option>
+                    <option value="Charles">Charles Xavier's School for Gifted Youngsters</option>
+                    <option value="Monsters">Monster's University</option>
+                </select>
+            </div>
+            <form action="/signup" method="post" id="register">
+            <div class="uk-margin">
+                <input class="uk-input uk-form-width-medium" type="" name="adminID" placeholder="Administrative ID">
+            </div>
+            <div class="uk-margin">
+                <input class="uk-input uk-form-width-medium" type="" name="username" placeholder="Email">
+            </div>
+            <a type="button" class="uk-button uk-button-default" onclick="document.getElementById('register').submit();">
+                Next
+            </a>
+            <a href="/index" class="uk-button uk-button-secondary">
+                Cancel
+            </a>
+        </form>
+    </div>
+
+    <div class="uk-position-bottom-center">
+        <span><a class="underlined" href="#">Help me</a> register my account.</span>
+    </div>
+
+</div>

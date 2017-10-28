@@ -1,0 +1,19 @@
+#board-name-close{
+    width: calc(100% - 40px);
+    margin: 0 20px 0 0;
+}
+#board-name-close .uk-first-column{
+    padding-left: 30px;
+}
+#board-name-close h4{
+    padding: 0;
+    margin: 30px 0;
+    font-weight: 400;
+}
+#board-name-close h3{
+    margin: 0 0 30px;
+}
+#board-name-close .uk-icon-link{
+    margin: 30px 0;
+    float: right;
+}

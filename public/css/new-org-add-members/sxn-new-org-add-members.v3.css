@@ -1,0 +1,100 @@
+#new-org-add-members{
+    padding: 0 30px;
+    margin: 0 0 30px;
+}
+#new-org-add-members .uk-card-body{
+    padding: 0;
+    position: relative;
+}
+#new-org-add-members p{
+    margin: 0;
+}
+#new-org-add-members .uk-button{
+    border-radius: 20px;
+}
+#new-org-add-members .uk-button-primary{
+    margin: 0 10px 0 0;
+}
+#new-org-add-members ul.add-members-row-wrap{
+    padding: 0;
+    margin: 0;
+}
+#new-org-add-members li.add-members-row{
+    list-style-type: none;
+    border-bottom: 1px solid #d1d2d3;
+    min-height: 40px;
+    padding: 20px;
+}
+#new-org-add-members li.add-members-row:last-child{
+    border: none;
+}
+#new-org-add-members ul.add-members-row-wrap li.inner-list-wrap{
+    padding: 0;
+}
+#new-org-add-members ul.add-members-row-wrap li .inner-list{
+    min-height: 275px;
+    overflow-y: scroll;
+}
+#new-org-add-members ul.add-members-row-wrap li .inner-list ul{
+    padding: 0;
+    margin: 0;
+}
+#new-org-add-members li.add-members-row .inner-list ul li{
+    list-style-type: none;
+    border-bottom: 1px solid #d1d2d3;
+    min-height: 40px;
+    padding: 20px;
+}
+#new-org-add-members li.add-members-row .inner-list ul li:last-child{
+    border: none;
+}
+#new-org-add-members h5{
+    list-style-type: none;
+    line-height: 40px;
+    margin: 0 20px 0 0;
+    display: block;
+}
+#new-org-add-members form{
+    width: 100%;
+    margin: 0 20px 0 0;
+}
+#new-org-add-members input{
+    width: 100%;
+    border-radius: 20px;
+}
+#new-org-add-members ul.uk-subnav.uk-subnav-pill {
+    position: relative;
+    top: 5px;
+    margin-bottom: 0;
+}
+#new-org-add-members .uk-subnav-pill>.uk-active>a {
+    background-color: #00d283;
+    color: #fff;
+}
+#new-org-add-members .uk-subnav-pill>*>:first-child {
+    background: #f9f9f9;
+    border-radius: 20px;
+}
+#new-org-add-members .member .img-wrap{
+    width: 70px;
+    height: 70px;
+    border-radius: 70px;
+    margin: 0;
+    background-position: center;
+    background-size: cover;
+}
+#new-org-add-members .member .img-wrap.one{
+    background-image: url('/loop-img/avi.jpeg');
+}
+#new-org-add-members .member .img-wrap.two{
+    background-image: url('/loop-img/gg.png');
+}
+#new-org-add-members .member .name{
+    font-weight: 600;
+    margin: 10px 0 0;
+}
+#new-org-add-members .member .invite-icon svg{
+    width: 30px;
+    height: 30px;
+    margin: 20px 20px 0 0;
+}

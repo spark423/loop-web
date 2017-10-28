@@ -1,0 +1,56 @@
+#edit-profile-top-admin-view{
+    padding: 0 30px;
+    margin: 30px 0 0;
+}
+#edit-profile-top-admin-view .edit-profile-top-admin-view{
+    width: 100%;
+    margin: 0;
+}
+#edit-profile-top-admin-view .edit-profile-top-admin-view div.col{
+    padding: 20px;
+}
+#edit-profile-top-admin-view .edit-profile-top-admin-view .right{
+    border-left: 1px solid #d1d2d3;
+}
+#edit-profile-top-admin-view .edit-profile-top-admin-view .img-wrap{
+    width: 200px;
+    height: 200px;
+    border-radius: 200px;
+    margin: 0;
+    background-position: center;
+    background-size: cover;
+    background-image: url('/loop-img/avi.jpeg');
+}
+#edit-profile-top-admin-view .edit-profile-top-admin-view .name{
+    font-weight: 400;
+    font-size: 30px;
+    border-bottom: 1px solid #d1d2d3;
+    padding: 0 0 30px;
+    margin: 30px 0 30px;
+}
+#edit-profile-top-admin-view .edit-profile-top-admin-view .name svg{
+    width: 30px;
+    height: 30px;
+    position: relative;
+    top: -1px;
+}
+#edit-profile-top-admin-view .uk-icon{
+    margin: 0 10px 0 0;
+    position: relative;
+    top: -1px;
+}
+#edit-profile-top-admin-view .edit-profile-top-admin-view .uk-position-center .uk-icon{
+    margin: 0 10px 0 0;
+    position: relative;
+    top: -1px;
+}
+#edit-profile-top-admin-view .edit-profile-top-admin-view .uk-overlay-default {
+    background: rgba(0,0,0,.5);
+    border-radius: 200px;
+}
+#edit-profile-top-admin-view .edit-profile-top-admin-view .uk-position-center a{
+    color: #fff;
+}
+#edit-profile-top-admin-view .edit-profile-top-admin-view .uk-position-center a:hover{
+    text-decoration: underline;
+}

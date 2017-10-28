@@ -1,0 +1,148 @@
+#events-overview-board-notifications-add-members{
+    padding: 0 30px;
+    margin: 0 0 30px;
+}
+#events-overview-board-notifications-add-members .uk-grid-match svg:not(:root) {
+    width: 100%;
+    height: 100%;
+    color: #00d283;
+}
+#events-overview-board-notifications-add-members .uk-card-body{
+    padding: 20px;
+    position: relative;
+}
+#events-overview-board-notifications-add-members div.slide-link{
+    position: absolute;
+}
+#events-overview-board-notifications-add-members div.slide-link.left{
+    left: 20px;
+    top: 95px;
+}
+#events-overview-board-notifications-add-members div.slide-link.right{
+    right: 20px;
+    top: 95px;
+}
+#events-overview-board-notifications-add-members div.slide-link .uk-slidenav-large.disabled svg{
+    color: #a7a9ac;
+}
+#events-overview-board-notifications-add-members .uk-grid-match{
+    padding: 10px;
+}
+#events-overview-board-notifications-add-members .triple-wrap{
+    width: calc(100% - 40px);
+    margin: 0 0 20px -10px;
+}
+#events-overview-board-notifications-add-members p{
+    margin: 0;
+}
+#events-overview-board-notifications-add-members .title{
+    margin: 0;
+    font-weight: 600;
+}
+#events-overview-board-notifications-add-members a.green{
+    text-decoration: underline;
+}
+#events-overview-board-notifications-add-members .approval{
+    color: #58585b;
+    text-decoration: underline;
+}
+#events-overview-board-notifications-add-members .approval:hover,
+#events-overview-board-notifications-add-members a.green:hover{
+    text-decoration: none;
+}
+#events-overview-board-notifications-add-members .approval.yes{
+    margin: 0 10px;
+}
+#events-overview-board-notifications-add-members .add-members-wrap{
+    border: 1px solid #d1d2d3;
+    width: 100%;
+    border-radius: 20px;
+}
+#events-overview-board-notifications-add-members .add-members-wrap .uk-button{
+    border-radius: 20px;
+}
+#events-overview-board-notifications-add-members .add-members-wrap .uk-button-primary{
+    margin: 0 10px 0 0;
+}
+#events-overview-board-notifications-add-members .add-members-wrap ul.add-members-row-wrap{
+    padding: 0;
+    margin: 0;
+}
+#events-overview-board-notifications-add-members .add-members-wrap li.add-members-row{
+    list-style-type: none;
+    border-bottom: 1px solid #d1d2d3;
+    min-height: 40px;
+    padding: 20px;
+}
+#events-overview-board-notifications-add-members .add-members-wrap li.add-members-row:last-child{
+    border: none;
+}
+#events-overview-board-notifications-add-members .add-members-wrap ul.add-members-row-wrap li.inner-list-wrap{
+    padding: 0;
+}
+#events-overview-board-notifications-add-members .add-members-wrap ul.add-members-row-wrap li .inner-list{
+    height: 275px;
+    overflow-y: scroll;
+}
+#events-overview-board-notifications-add-members .add-members-wrap ul.add-members-row-wrap li .inner-list ul{
+    padding: 0;
+    margin: 0;
+}
+#events-overview-board-notifications-add-members .add-members-wrap li.add-members-row .inner-list ul li{
+    list-style-type: none;
+    border-bottom: 1px solid #d1d2d3;
+    min-height: 40px;
+    padding: 20px;
+}
+#events-overview-board-notifications-add-members .add-members-wrap li.add-members-row .inner-list ul li:last-child{
+    border: none;
+}
+#events-overview-board-notifications-add-members .add-members-wrap h5{
+    list-style-type: none;
+    line-height: 40px;
+    margin: 0 20px 0 0;
+    display: block;
+}
+#events-overview-board-notifications-add-members .add-members-wrap form{
+    width: inherit;
+    margin: 0 20px 0 0;
+}
+#events-overview-board-notifications-add-members .add-members-wrap input{
+    width: 300px;
+    border-radius: 20px;
+}
+#events-overview-board-notifications-add-members .add-members-wrap ul.uk-subnav.uk-subnav-pill {
+    position: relative;
+    top: 5px;
+}
+#events-overview-board-notifications-add-members .add-members-wrap .uk-subnav-pill>.uk-active>a {
+    background-color: #00d283;
+    color: #fff;
+}
+#events-overview-board-notifications-add-members .add-members-wrap .uk-subnav-pill>*>:first-child {
+    background: #f9f9f9;
+    border-radius: 20px;
+}
+#events-overview-board-notifications-add-members .member .img-wrap{
+    width: 70px;
+    height: 70px;
+    border-radius: 70px;
+    margin: 0;
+    background-position: center;
+    background-size: cover;
+}
+#events-overview-board-notifications-add-members .member .img-wrap.one{
+    background-image: url('/loop-img/avi.jpeg');
+}
+#events-overview-board-notifications-add-members .member .img-wrap.two{
+    background-image: url('/loop-img/gg.png');
+}
+#events-overview-board-notifications-add-members .member .name{
+    font-weight: 600;
+    margin: 10px 0 0;
+}
+#events-overview-board-notifications-add-members .member .invite-icon svg{
+    width: 30px;
+    height: 30px;
+    margin: 20px 20px 0 0;
+}

@@ -1,0 +1,59 @@
+#add-edit-members{
+    padding: 0 30px;
+    margin: 30px 0 0;
+}
+#add-edit-members h2{
+    font-weight: 400;
+    font-size: 20px;
+    margin: 0 0 30px 12px;
+}
+#add-edit-members .uk-card{
+    padding: 0;
+}
+#add-edit-members .uk-card div.uk-inline{
+    width: calc(100% - 40px);
+    margin: 20px;
+}
+#add-edit-members .uk-card input{
+    border-radius: 20px;
+    width: 100%;
+}
+#add-edit-members .admins{
+    border-top: 1px solid #d1d2d3;
+    width: 100%;
+    margin: 0;
+}
+#add-edit-members .admins div.col{
+    padding: 20px;
+    position: relative;
+    margin: 0;
+}
+#add-edit-members .admins .img-wrap{
+    width: 70px;
+    height: 70px;
+    border-radius: 70px;
+    margin: 0;
+    background-position: center;
+    background-size: cover;
+    background-image: url('/loop-img/avi.jpeg');
+}
+#add-edit-members .admins .name{
+    font-weight: 600;
+    margin: 10px 0 0;
+}
+#add-edit-members .admins .major{
+    color: #a7a9ac;
+}
+#add-edit-members .admins a:hover{
+    text-decoration: none;
+}
+#add-edit-members .admins .more{
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+#add-edit-members .divider{
+    border-top: 1px solid #d1d2d3;
+    width: 100%;
+    margin: 0;
+}

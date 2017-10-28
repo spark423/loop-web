@@ -1,0 +1,44 @@
+#inbox-message{
+    padding: 0 30px;
+    margin: 30px 0;
+}
+#inbox-message h3{
+    margin: 0 0 30px;
+    font-weight: 400;
+}
+#inbox-message div.from-wrap{
+    margin: 0 0 30px;
+}
+#inbox-message div.from-wrap .uk-first-column{
+    padding: 0;
+}
+#inbox-message p{
+    margin: 0 0 50px;
+}
+#inbox-message img.message-avi{
+    margin: 0 10px 0 0;
+    width: 75px;
+    height: 75px;
+    border-radius: 75px;
+}
+#inbox-message .uk-card{
+    padding: 0;
+    position: relative;
+}
+#inbox-message .uk-card span{
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 200;
+}
+#inbox-message .uk-card span a{
+    color: #58595b;
+    text-decoration: underline;
+}
+#inbox-message .uk-card span a:hover{
+    text-decoration: none;
+}
+#inbox-message .uk-card textarea{
+    min-height: 150px;
+    padding: 50px 20px 20px;
+}

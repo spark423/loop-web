@@ -1,0 +1,62 @@
+#drafts .drafts{
+    padding: 0 30px;
+    margin: 30px 0;
+}
+#drafts .drafts.top .uk-icon svg{
+    height: 30px;
+    width: 30px;
+    position: relative;
+    top: -2px;
+    margin: 0 10px 0 0;
+    color: #58595b;
+}
+#drafts .drafts.uk-grid>*{
+    padding-left: 0px;
+    width: 50%;
+}
+#drafts .drafts.top .uk-float-right{
+    position: relative;
+    top: 15px;
+}
+#drafts .button-nav{
+    margin: 0 0 30px 30px;
+}
+#drafts .button-nav .uk-button.grey{
+    background-color: #eee;
+    margin: 0 5px 0 0;
+    box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1);
+    padding: 0 15px;
+}
+#drafts .button-nav .uk-button.grey:hover{
+    background-color: #00d283;
+    color: #fff;
+}
+#drafts .uk-card{
+    margin: 0 30px 30px;
+    padding: 0;
+}
+#drafts .uk-card ul{
+    padding: 0;
+    margin: 0;
+}
+#drafts .uk-card ul li{
+    width: calc(100% - 40px);
+    list-style-type: none;
+    margin: 0;
+    padding: 20px;
+    border-bottom: 1px solid #d1d2d3;
+}
+#drafts .uk-card ul li:last-child{
+    border-bottom: none;
+}
+#drafts .uk-card .uk-checkbox:checked,
+#drafts .uk-card .uk-checkbox:indeterminate,
+#drafts .uk-card .uk-radio:checked {
+    background-color: #00d283;
+    border-color: transparent;
+}
+#drafts .uk-card .uk-checkbox:focus,
+#drafts .uk-card .uk-radio:focus {
+    outline: 0;
+    border-color: #00d283;
+}

@@ -1,0 +1,21 @@
+#edit-bio .edit-bio{
+    padding: 0 30px;
+    margin: 30px 0;
+}
+#edit-bio .uk-card-body{
+    padding: 20px;
+    margin: 0 30px;
+}
+#edit-bio .edit-bio.uk-grid>*{
+    padding-left: 0px;
+    width: 50%;
+}
+#edit-bio h4 {
+    margin: 30px;
+    font-weight: 400;
+}
+#edit-bio h4 .uk-icon{
+    margin: 0 10px 0 0;
+    position: relative;
+    top: -2px;
+}

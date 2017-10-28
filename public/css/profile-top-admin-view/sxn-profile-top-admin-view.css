@@ -1,0 +1,35 @@
+#profile-top-admin-view{
+    padding: 0 30px;
+    margin: 30px 0 0;
+}
+#profile-top-admin-view .profile-top-admin-view{
+    width: 100%;
+    margin: 0;
+}
+#profile-top-admin-view .profile-top-admin-view div.col{
+    padding: 20px;
+}
+#profile-top-admin-view .profile-top-admin-view .right{
+    border-left: 1px solid #d1d2d3;
+}
+#profile-top-admin-view .profile-top-admin-view .img-wrap{
+    width: 200px;
+    height: 200px;
+    border-radius: 200px;
+    margin: 0;
+    background-position: center;
+    background-size: cover;
+    background-image: url('/loop-img/avi.jpeg');
+}
+#profile-top-admin-view .profile-top-admin-view .name{
+    font-weight: 400;
+    font-size: 30px;
+    border-bottom: 1px solid #d1d2d3;
+    padding: 0 0 30px;
+    margin: 30px 0 30px;
+}
+#profile-top-admin-view .uk-icon{
+    margin: 0 10px 0 0;
+    position: relative;
+    top: -1px;
+}

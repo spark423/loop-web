@@ -1,0 +1,110 @@
+<div class="sidenav-wrap">
+    <div id="sidenav">
+        <div class="img-wrap">
+            <img class="uk-float-left" src="/img/loop_logo_white.png" alt="Loop" />
+        </div>
+        <div class="avi-wrap">
+            <img src="/img/avi.jpeg" alt="Alex Reekie" />
+            <div class="name-link">
+                <span>Alex</span><br />
+                <span>Reekie</span><br />
+                <span class="name-below">Haverford College
+                    <a href=""><span class="white" uk-icon="icon: chevron-down"></span></a>
+                    <div uk-drop="mode: click">
+                        <div class="uk-card uk-card-body uk-card-default">
+                            <ul>
+                                <li>
+                                    <a href="profile-admin-view.php">
+                                        <span uk-icon="icon: user"></span>Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="settings.php">
+                                        <span uk-icon="icon: cog"></span>Settings
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="index.php">
+                                        <span uk-icon="icon: sign-out"></span>Logout / Sign in as..
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </span>
+            </div>
+            <div class="uk-clearfix"></div>
+        </div>
+        <ul class="uk-nav-default uk-nav-parent-icon" uk-nav>
+            <li class="uk-active"><a href="home.php"><span uk-icon="icon: home"></span>Home</a></li>
+            <li><a href="inbox.php"><span uk-icon="icon: mail"></span>Inbox (5)</a></li>
+            <li><a href="feed.php"><span uk-icon="icon: rss"></span>Feed</a></li>
+            <li class="uk-parent">
+                <a href="#"><span uk-icon="icon: album"></span>Boards</a>
+                <ul class="uk-nav-sub" id="side-boards">
+                    <li><a href="board-overview.php"><span uk-icon="icon: calendar"></span>Events</a></li>
+                    <li><a href="board-overview.php"><span uk-icon="icon: album"></span>Challenges</a></li>
+                    <li><a href="board-overview.php"><span uk-icon="icon: album"></span>Campus Updates</a></li>
+                    <li><a href="board-overview.php"><span uk-icon="icon: album"></span>Resources</a></li>
+                    <script>
+                    var side_boards = $('#side-boards');
+                    $.getJSON('/boardinfo', function(data) {
+                      for(var i=0; i<data.length; i++) {
+                        var board = "<li><a href=/boards/" + data[i]._id + "><span uk-icon='icon: album'></span>" + data[i].name + "</a></li>";
+                        side_boards.append(board);
+                      }
+                    });
+                    </script>
+                </ul>
+            </li>
+            <li class="uk-parent">
+                <a href="#"><span uk-icon="icon: users"></span>Organizations</a>
+                <ul class="uk-nav-sub" id="side-groups">
+                    <li><a href="org-detail.php"><span uk-icon="icon: users"></span>Haverford Jazz Ensemble</a></li>
+                    <script>
+                    var side_groups = $('#side-groups');
+                    $.getJSON('/groupinfo', function(data) {
+                      for(var i=0; i<data.length; i++) {
+                        var group = "<li><a href=/groups/" + data[i]._id + "><span uk-icon='icon: users'></span>" + data[i].name + "</a></li>";
+                        side_groups.append(group);
+                      }
+                    });
+                    </script>
+                </ul>
+            </li>
+        </ul>
+        <div class="uk-position-bottom-center">
+            <div class="create-list" hidden>
+                <ul>
+                    <li>
+                        <a href="create-a-new-post.php">
+                            Post
+                        </a>
+                    </li>
+                    <li>
+                        <a href="create-a-new-challenge.php">
+                            Challenge
+                        </a>
+                    </li>
+                    <li>
+                        <a href="create-a-new-event.php">
+                            Event
+                        </a>
+                    </li>
+                    <li>
+                        <a href="create-a-new-org.php">
+                            Organization
+                        </a>
+                    </li>
+                    <li>
+                        <a href="">
+                            Board
+                        </a>
+                    </li>
+                </li>
+            </div>
+            <a class="tog create" uk-toggle="target: .create-list, .tog; animation: uk-animation-fade"><span uk-icon="icon: plus"></span>Create New</a>
+            <a class="tog create" uk-toggle="target: .create-list, .tog; animation: uk-animation-fade" hidden><span uk-icon="icon: close"></span>Cancel</a>
+        </div>
+    </div>
+</div>

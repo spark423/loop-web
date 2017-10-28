@@ -1,0 +1,66 @@
+#challenges{
+    padding: 0 30px;
+    margin: 0 0 30px;
+}
+#challenges h4.today {
+    width: 100%;
+    display: block;
+    color: #ccc;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    margin: 0 0 20px;
+}
+#challenges .uk-card-body{
+    position: relative;
+    padding: 0;
+}
+#challenges ul{
+    padding: 0;
+}
+#challenges li{
+    list-style-type: none;
+    border-bottom: 1px solid #d1d2d3;
+    padding: 20px;
+}
+#challenges li:last-child{
+    border: none;
+}
+#challenges div.img-wrap{
+    width: 100%;
+    height: 180px;
+    border-radius: 20px;
+    background-image: url('/loop-img/challenge.png');
+    background-position: center;
+    background-size: cover;
+}
+#challenges p{
+    margin: 0;
+}
+#challenges .title{
+    font-weight: 600;
+}
+#challenges .timestamp{
+    font-size: 14px;
+    color: #a7a9ac;
+    margin: 0 0 10px;
+}
+#challenges .timestamp a{
+    color: #a7a9ac;
+    text-decoration: underline;
+}
+#challenges .timestamp a:hover{
+    text-decoration: none;
+}
+#challenges .description{
+    margin: 0 0 10px;
+}
+#challenges .deadline{
+    font-size: 14px;
+    font-weight: 600;
+}
+#challenges .deadline .uk-icon{
+    margin: 0 10px 0 0;
+    position: relative;
+    top: -1px;
+}

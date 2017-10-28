@@ -1,0 +1,10 @@
+#board-traffic h4 {
+    margin: 0 0 0 30px;
+}
+#board-traffic .board-traffic-item{
+    padding: 0 30px;
+    margin: 0 0 30px;
+}
+#board-traffic .board-traffic-item .uk-card{
+    padding: 20px 10px;
+}

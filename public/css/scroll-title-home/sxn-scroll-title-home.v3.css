@@ -1,0 +1,15 @@
+#scroll-title-home{
+    width: calc(100% - 40px);
+    margin: 0 20px 0 0;
+}
+#scroll-title-home .uk-first-column{
+    padding-left: 30px;
+}
+#scroll-title-home h4{
+    padding: 0;
+    margin: 30px 0;
+}
+#scroll-title-home .uk-icon-link{
+    margin: 30px 0;
+    float: right;
+}

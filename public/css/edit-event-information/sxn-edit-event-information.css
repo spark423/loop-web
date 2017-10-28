@@ -1,0 +1,52 @@
+#edit-event-information .edit-event-information{
+    padding: 0 30px;
+    margin: 30px 0;
+}
+#edit-event-information .uk-card-body{
+    padding: 20px;
+    margin: 0 30px;
+}
+#edit-event-information .edit-event-information.uk-grid>*{
+    padding-left: 0px;
+    width: 50%;
+}
+#edit-event-information .edit-event-information form,
+#edit-event-information .edit-event-information input{
+    width: 100%;
+}
+#edit-event-information .edit-event-information .uk-button {
+    border-radius: 20px;
+}
+#edit-event-information .edit-event-information .uk-icon {
+    margin: 0 10px 0 0;
+    position: relative;
+    top: -1px;
+}
+#edit-event-information .org-name-header .green {
+    position: relative;
+    top: 6px;
+}
+#edit-event-information .org-name-header h3 {
+    margin: 0;
+    font-weight: 400;
+}
+#edit-event-information .edit-event-information a {
+    color: #404041;
+    margin: 15px 0 0;
+}
+#edit-event-information .edit-event-information a:hover {
+    text-decoration: underline;
+}
+#edit-event-information .edit-event-information .uk-button-primary {
+    margin: 0 15px 0 0;
+}
+#edit-event-information .edit-event-information a.uk-float-right {
+    margin: 0;
+    text-decoration: underline;
+}
+#edit-event-information .edit-event-information a.uk-float-right:hover {
+    text-decoration: none;
+}
+#edit-event-information .edit-event-information a.uk-float-right.yes {
+    margin: 0 10px;
+}

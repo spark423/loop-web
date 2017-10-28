@@ -1,0 +1,12 @@
+#profile-info{
+    padding: 0 30px;
+}
+#profile-info a{
+    display: inline-block;
+    margin: 0 0 10px;
+}
+#profile-info .uk-icon{
+    margin: 0 10px 0 0;
+    position: relative;
+    top: -3px;
+}

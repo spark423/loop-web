@@ -1,0 +1,52 @@
+#admins{
+    padding: 0 30px;
+    margin: 30px 0 0;
+}
+#admins h2{
+    font-size: 20px;
+    margin: 0 0 30px;
+    font-weight: 400;
+}
+#admins .uk-card{
+    padding: 0;
+}
+#admins .uk-card div.uk-inline{
+    width: calc(100% - 40px);
+    margin: 20px;
+}
+#admins .uk-card input{
+    border-radius: 20px;
+    width: calc(100% - 40px);
+}
+#admins .admins{
+    width: 100%;
+    margin: 0;
+}
+#admins .admins div.col{
+    padding: 20px;
+}
+#admins .admins .right{
+    border-left: 1px solid #d1d2d3;
+}
+#admins .admins .img-wrap{
+    width: 70px;
+    height: 70px;
+    border-radius: 70px;
+    margin: 0;
+    background-position: center;
+    background-size: cover;
+    background-image: url('/loop-img/avi.jpeg');
+}
+#admins .admins .name{
+    font-weight: 600;
+    margin: 10px 0 0;
+}
+#admins .admins a{
+    margin: 0;
+    color: #404041;
+    text-decoration: underline;
+    font-size: 14px;
+}
+#admins .admins a:hover{
+    text-decoration: none;
+}

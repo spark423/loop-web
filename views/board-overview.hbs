@@ -1,0 +1,28 @@
+{{>sidenav}}
+<div class="col-tog single-col">
+    <div class="app">
+    {{>topbar}}
+    {{>board-header}}
+    {{>board-notifications}}
+    {{>filter-content}}
+    {{>feed}}
+    {{>feed-event}}
+ </div>
+</div>
+<div class="col-tog double-col" hidden>
+    <div class="side-col">
+        <div class="side-col-scroll">
+        {{>board-name-close}}
+        {{>text}}
+        {{>feed}}
+        {{>board-traffic}}
+        </div>
+    </div>
+    <div class="app double">
+        {{>topbar}}
+        {{>board-header}}
+        {{>board-notifications}}
+        {{>filter-content}}
+        {{>feed}}
+    </div>
+</div>

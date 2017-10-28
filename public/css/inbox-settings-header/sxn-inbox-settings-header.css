@@ -1,0 +1,24 @@
+#inbox-settings-header .inbox-settings-header{
+    padding: 0 30px;
+    margin: 30px 0;
+}
+#inbox-settings-header h4{
+    margin: 0 0 30px 30px;
+    font-weight: 400;
+}
+#inbox-settings-header .inbox-settings-header.top .uk-icon svg{
+    height: 30px;
+    width: 30px;
+    position: relative;
+    top: -2px;
+    margin: 0 10px 0 0;
+    color: #58595b;
+}
+#inbox-settings-header .inbox-settings-header.uk-grid>*{
+    padding-left: 0px;
+    width: 50%;
+}
+#inbox-settings-header .inbox-settings-header.top .uk-float-right{
+    position: relative;
+    top: 15px;
+}

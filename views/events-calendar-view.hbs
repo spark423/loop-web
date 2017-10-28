@@ -1,0 +1,36 @@
+{{>sidenav}}
+<div class="col-tog single-col">
+
+    <div class="app">
+
+        {{>topbar}}
+        {{>events-overview-header}}
+        {{>events-overview-board-notifications}}
+        {{>calendar}}
+
+    </div>
+
+</div>
+
+<div class="col-tog double-col" hidden>
+
+    <div class="side-col">
+        <div class="side-col-scroll">
+            {{>side-event-details}}
+            {{>side-event}}
+
+        </div>
+    </div>
+
+    <div class="app double">
+
+        {{>topbar}}
+        {{>events-overview-header}}
+        {{>events-overview-board-notifications}}
+        {{>calendar}}
+
+    </div>
+
+</div>
+
+<?php include 'sxn/ftr/sxn-ftr.php'; ?>

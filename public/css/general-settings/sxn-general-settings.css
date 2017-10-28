@@ -1,0 +1,36 @@
+#general-settings{
+    padding: 0 30px;
+    margin: 30px 0;
+}
+#general-settings h3{
+    margin: 0 0 30px;
+    font-weight: 400;
+}
+#general-settings .divider{
+    width: 100%;
+    border-top: 1px solid #d1d2d3;
+    margin: 0 0 30px;
+}
+#general-settings ul{
+    margin: 0;
+    padding: 0;
+}
+#general-settings ul li{
+    list-style-type: none;
+    float: left;
+    margin: 0 50px 30px 0;
+}
+#general-settings ul li:last-child{
+    margin: 0 0 30px;
+}
+#general-settings ul li a{
+    color: #58595b;
+    margin: 0 0 0 5px;
+}
+#general-settings ul li a:hover{
+    text-decoration: underline;
+}
+#general-settings ul li a svg{
+    position: relative;
+    top: -2px;
+}

@@ -1,0 +1,20 @@
+#event{
+    padding: 0 30px;
+}
+#event h3{
+    margin: 0 0 30px;
+}
+#event .tags{
+    margin: 0 0 30px;
+}
+#event .tags span {
+    color: #a7a9ac;
+    font-size: 14px;
+}
+#event .tags .uk-icon {
+    margin: 0 5px 0 0;
+}
+#event img {
+    margin: 0 0 20px;
+    border-radius: 20px;
+}

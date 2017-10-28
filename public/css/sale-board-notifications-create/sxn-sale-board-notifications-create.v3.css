@@ -1,0 +1,152 @@
+#sale-board-notifications-create{
+    padding: 0 30px;
+    margin: 0 0 30px;
+}
+#sale-board-notifications-create .uk-grid-match svg:not(:root) {
+    width: 100%;
+    height: 100%;
+    color: #00d283;
+}
+#sale-board-notifications-create .uk-card-body{
+    padding: 20px;
+    position: relative;
+}
+#sale-board-notifications-create div.slide-link{
+    position: absolute;
+}
+#sale-board-notifications-create div.slide-link.left{
+    left: 20px;
+    top: 18%;
+}
+#sale-board-notifications-create div.slide-link.right{
+    right: 20px;
+    top: 18%;
+}
+#sale-board-notifications-create div.slide-link .uk-slidenav-large.disabled svg{
+    color: #a7a9ac;
+}
+#sale-board-notifications-create .uk-grid-match{
+    padding: 10px;
+}
+#sale-board-notifications-create .triple-wrap{
+    width: calc(100% - 40px);
+    margin: 0 0 20px -10px;
+}
+#sale-board-notifications-create p{
+    margin: 0;
+}
+#sale-board-notifications-create .title{
+    margin: 0;
+    font-weight: 600;
+}
+#sale-board-notifications-create a.green{
+    text-decoration: underline;
+}
+#sale-board-notifications-create .approval{
+    color: #58585b;
+    text-decoration: underline;
+}
+#sale-board-notifications-create .approval:hover,
+#sale-board-notifications-create a.green:hover{
+    text-decoration: none;
+}
+#sale-board-notifications-create .approval.yes{
+    margin: 0 10px;
+}
+#sale-board-notifications-create .create-wrap{
+    border: 1px solid #d1d2d3;
+    width: 100%;
+    border-radius: 20px;
+}
+#sale-board-notifications-create h4.inner{
+    margin: 0 30px 0 30px;
+    padding: 20px 0;
+    font-weight: 400;
+    color: #00d283;
+}
+#sale-board-notifications-create .divider{
+    border-top: 1px solid #d1d2d3;
+    width: 100%;
+}
+#sale-board-notifications-create .form-wrap{
+    padding: 20px;
+}
+#sale-board-notifications-create .create-grid{
+    margin: 0;
+}
+#sale-board-notifications-create .poll-wrap{
+    padding: 0;
+}
+#sale-board-notifications-create .poll-wrap span{
+    margin: 0 0 10px;
+}
+#sale-board-notifications-create .poll-wrap a.add{
+    color: #404041;
+    position: relative;
+    top: 15px;
+}
+#sale-board-notifications-create .poll-wrap a.add:hover{
+    text-decoration: underline;
+}
+#sale-board-notifications-create .poll-wrap a.add .uk-icon{
+    margin: 0 10px 0 0;
+    position: relative;
+    top: -1px;
+}
+#sale-board-notifications-create input:not(.uk-checkbox),
+#sale-board-notifications-create textarea{
+    width: 100%;
+}
+#sale-board-notifications-create .uk-checkbox{
+    margin: 0 5px 0 0;
+    position: relative;
+    top: -2px;
+}
+#sale-board-notifications-create textarea{
+    margin: 0 0 20px;
+    height: 169px;
+}
+#sale-board-notifications-create .uk-button{
+    border-radius: 20px;
+}
+#sale-board-notifications-create .uk-button-primary{
+    margin: 0 10px 0 0;
+}
+#sale-board-notifications-create .list-wrap ul{
+    padding: 0;
+    margin: 0;
+}
+#sale-board-notifications-create .list-wrap ul li{
+    list-style-type: none;
+    border-bottom: 1px solid #d1d2d3;
+    padding: 20px;
+}
+#sale-board-notifications-create .list-wrap ul li:last-child{
+    border: none;
+}
+#sale-board-notifications-create .list-wrap ul li .uk-icon{
+    margin: 0 10px 0 0;
+    position: relative;
+    top: -2px;
+}
+#sale-board-notifications-create .list-wrap ul li a{
+    color: #58595b;
+}
+#sale-board-notifications-create .list-wrap ul li a:hover{
+    color: #00d283;
+    text-decoration: none;
+}
+#sale-board-notifications-create .poll{
+    margin: 0 0 30px 10px;
+}
+#sale-board-notifications-create .uk-checkbox:checked,
+#sale-board-notifications-create .uk-checkbox:indeterminate,
+#sale-board-notifications-create .uk-radio:checked {
+    background-color: #00d283;
+    border-color: transparent;
+}
+#sale-board-notifications-create .uk-checkbox:focus,
+#sale-board-notifications-create .uk-radio:focus {
+    outline: 0;
+    border-color: #00d283;
+}

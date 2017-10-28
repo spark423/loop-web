@@ -1,0 +1,16 @@
+#filter-content{
+    padding: 0 30px;
+    margin: 0 0 30px;
+}
+#filter-content .uk-card-body{
+    padding: 20px;
+    position: relative;
+}
+#filter-content .uk-subnav-pill>.uk-active>a {
+    background-color: #00d283;
+    color: #fff;
+}
+#filter-content .uk-subnav-pill>*>:first-child {
+    background: #f9f9f9;
+    border-radius: 20px;
+}

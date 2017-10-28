@@ -1,0 +1,30 @@
+#add-org-name .add-org-name{
+    padding: 0 30px;
+    margin: 30px 0 0;
+}
+#add-org-name .add-org-name.uk-grid>*{
+    padding-left: 0px;
+    width: 50%;
+}
+#add-org-name .add-org-name form,
+#add-org-name .add-org-name input{
+    width: 100%;
+}
+#add-org-name .add-org-name .uk-button {
+    border-radius: 20px;
+}
+#add-org-name .add-org-name .uk-icon {
+    margin: 0 10px 0 0;
+    position: relative;
+    top: -1px;
+}
+#add-org-name .add-org-name a {
+    color: #404041;
+    margin: 15px 0 0;
+}
+#add-org-name .add-org-name a:hover {
+    text-decoration: underline;
+}
+#add-org-name .add-org-name .uk-button-primary {
+    margin: 0 15px 0 0;
+}

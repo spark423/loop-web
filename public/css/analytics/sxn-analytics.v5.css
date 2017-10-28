@@ -1,0 +1,21 @@
+#analytics{
+    padding: 0 30px;
+    margin: 0 0 30px;
+}
+#analytics .chart {
+    height: calc(54vw - 220px);
+    margin: 0 auto;
+    width: calc(98vw - 400px);
+    position: relative;
+    max-width: 800px;
+    max-height: 450px;
+}
+#analytics .uk-grid>* {
+    padding-left: 0;
+}
+#analytics .uk-align-right {
+    padding: 0 15px 0 0;
+}
+#analytics h3 {
+    font-weight: 400;
+}

@@ -1,0 +1,101 @@
+#challenge-overview-board-notifications-create{
+    padding: 0 30px;
+    margin: 0 0 30px;
+}
+#challenge-overview-board-notifications-create .uk-grid-match svg:not(:root) {
+    width: 100%;
+    height: 100%;
+    color: #00d283;
+}
+#challenge-overview-board-notifications-create .uk-card-body{
+    padding: 20px;
+    position: relative;
+}
+#challenge-overview-board-notifications-create div.slide-link{
+    position: absolute;
+}
+#challenge-overview-board-notifications-create div.slide-link.left{
+    left: 20px;
+    top: 95px;
+}
+#challenge-overview-board-notifications-create div.slide-link.right{
+    right: 20px;
+    top: 95px;
+}
+#challenge-overview-board-notifications-create div.slide-link .uk-slidenav-large.disabled svg{
+    color: #a7a9ac;
+}
+#challenge-overview-board-notifications-create .uk-grid-match{
+    padding: 10px;
+}
+#challenge-overview-board-notifications-create .triple-wrap{
+    width: calc(100% - 40px);
+    margin: 0 0 20px -10px;
+}
+#challenge-overview-board-notifications-create p{
+    margin: 0;
+}
+#challenge-overview-board-notifications-create .title{
+    margin: 0;
+    font-weight: 600;
+}
+#challenge-overview-board-notifications-create a.green{
+    text-decoration: underline;
+}
+#challenge-overview-board-notifications-create .approval{
+    color: #58585b;
+    text-decoration: underline;
+}
+#challenge-overview-board-notifications-create .approval:hover,
+#challenge-overview-board-notifications-create a.green:hover{
+    text-decoration: none;
+}
+#challenge-overview-board-notifications-create .approval.yes{
+    margin: 0 10px;
+}
+#challenge-overview-board-notifications-create .create-wrap{
+    border: 1px solid #d1d2d3;
+    width: 100%;
+    border-radius: 20px;
+}
+#challenge-overview-board-notifications-create .form-wrap{
+    padding: 20px;
+}
+#challenge-overview-board-notifications-create input,
+#challenge-overview-board-notifications-create textarea{
+    width: 100%;
+}
+#challenge-overview-board-notifications-create textarea{
+    height: 234px;
+    margin: 0 0 20px;
+}
+#challenge-overview-board-notifications-create .uk-button{
+    border-radius: 20px;
+}
+#challenge-overview-board-notifications-create .uk-button-primary{
+    margin: 0 10px 0 0;
+}
+#challenge-overview-board-notifications-create .list-wrap ul{
+    padding: 0;
+    margin: 0;
+}
+#challenge-overview-board-notifications-create .list-wrap ul li{
+    list-style-type: none;
+    border-bottom: 1px solid #d1d2d3;
+    padding: 20px;
+}
+#challenge-overview-board-notifications-create .list-wrap ul li:last-child{
+    border: none;
+}
+#challenge-overview-board-notifications-create .list-wrap ul li .uk-icon{
+    margin: 0 10px 0 0;
+    position: relative;
+    top: -2px;
+}
+#challenge-overview-board-notifications-create .list-wrap ul li a{
+    color: #58595b;
+}
+#challenge-overview-board-notifications-create .list-wrap ul li a:hover{
+    color: #00d283;
+    text-decoration: none;
+}

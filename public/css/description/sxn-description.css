@@ -1,0 +1,16 @@
+#description .description{
+    padding: 0 30px;
+    margin: 30px 0;
+}
+#description .uk-card-body{
+    padding: 20px;
+    margin: 0 30px;
+}
+#description .description.uk-grid>*{
+    padding-left: 0px;
+    width: 50%;
+}
+#description h4 {
+    margin: 30px;
+    font-weight: 400;
+}

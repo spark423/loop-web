@@ -1,0 +1,72 @@
+#events-list{
+    padding: 0 30px;
+    margin: 0 0 30px;
+}
+#events-list h4{
+    font-weight: 400;
+}
+#events-list .uk-float-right.green {
+    position: relative;
+    top: -45px;
+    font-weight: 400;
+}
+#events-list .uk-float-right.green .uk-icon,
+#events-list span.green span.uk-icon {
+    margin: 0 5px 0 0;
+    position: relative;
+    top: -1px;
+}
+#events-list h4.today {
+    width: 100%;
+    display: block;
+    color: #ccc;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    margin: 0 0 20px;
+}
+#events-list .uk-card-body{
+    position: relative;
+    padding: 0;
+}
+#events-list ul{
+    padding: 0;
+}
+#events-list li{
+    list-style-type: none;
+    border-bottom: 1px solid #d1d2d3;
+    padding: 20px;
+}
+#events-list li:last-child{
+    border: none;
+}
+#events-list div.img-wrap{
+    width: 100%;
+    height: 152px;
+    border-radius: 20px;
+    background-image: url('/loop-img/challenge.png');
+    background-position: center;
+    background-size: cover;
+}
+#events-list p{
+    margin: 0;
+}
+#events-list .title{
+    font-weight: 600;
+}
+#events-list .timestamp{
+    font-size: 14px;
+    color: #a7a9ac;
+    margin: 0 0 10px;
+}
+#events-list .timestamp a{
+    color: #a7a9ac;
+    text-decoration: underline;
+}
+#events-list .timestamp a:hover{
+    text-decoration: none;
+}
+#events-list .description{
+    margin: 20px 0 0;
+    font-size: 14px;
+}

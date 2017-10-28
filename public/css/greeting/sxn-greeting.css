@@ -1,0 +1,7 @@
+#greeting{
+    padding: 0 30px;
+    margin: 30px 0;
+}
+#greeting.uk-grid>*{
+    padding-left: 0px;
+}

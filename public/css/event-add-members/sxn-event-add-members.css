@@ -1,0 +1,134 @@
+#event-add-members{
+    padding: 0 30px;
+    margin: 0 0 30px;
+}
+#event-add-members .uk-card-body{
+    padding: 0;
+    position: relative;
+}
+#event-add-members p{
+    margin: 0;
+}
+#event-add-members .uk-button{
+    border-radius: 20px;
+}
+#event-add-members .uk-button-primary{
+    margin: 0 10px 0 0;
+}
+#event-add-members ul.add-members-row-wrap{
+    padding: 0;
+    margin: 0;
+}
+#event-add-members li.add-members-row{
+    list-style-type: none;
+    border-bottom: 1px solid #d1d2d3;
+    min-height: 40px;
+    padding: 20px;
+}
+#event-add-members li.add-members-row:last-child{
+    border: none;
+}
+#event-add-members ul.add-members-row-wrap li.inner-list-wrap{
+    padding: 0;
+}
+#event-add-members ul.add-members-row-wrap li .inner-list{
+    min-height: 275px;
+    overflow-y: scroll;
+}
+#event-add-members ul.add-members-row-wrap li .inner-list ul.row{
+    padding: 0;
+    margin: 0;
+}
+#event-add-members li.add-members-row .inner-list ul li.row{
+    list-style-type: none;
+    border-bottom: 1px solid #d1d2d3;
+    min-height: 40px;
+    padding: 20px;
+}
+#event-add-members li.add-members-row .inner-list ul li.row:last-child{
+    border: none;
+}
+#event-add-members h5{
+    list-style-type: none;
+    line-height: 40px;
+    margin: 0 20px 0 0;
+    display: block;
+}
+#event-add-members form{
+    width: 100%;
+    margin: 0 20px 0 0;
+}
+#event-add-members input{
+    width: 100%;
+    border-radius: 20px;
+}
+#event-add-members ul.uk-subnav.uk-subnav-pill {
+    position: relative;
+    top: 5px;
+    margin-bottom: 0;
+}
+#event-add-members .uk-subnav-pill>.uk-active>a {
+    background-color: #00d283;
+    color: #fff;
+}
+#event-add-members .uk-subnav-pill>*>:first-child {
+    background: #f9f9f9;
+    border-radius: 20px;
+}
+#event-add-members .member .img-wrap{
+    width: 70px;
+    height: 70px;
+    border-radius: 70px;
+    margin: 0;
+    background-position: center;
+    background-size: cover;
+}
+#event-add-members .member .img-wrap.one{
+    background-image: url('/loop-img/avi.jpeg');
+}
+#event-add-members .member .img-wrap.two{
+    background-image: url('/loop-img/gg.png');
+}
+#event-add-members .member .name{
+    font-weight: 600;
+    margin: 10px 0 0;
+}
+#event-add-members .member .major{
+    color: #a7a9ac;
+}
+#event-add-members .member .invite-icon svg{
+    width: 30px;
+    height: 30px;
+    margin: 20px 20px 0 0;
+}
+#event-add-members .grid-remainder,
+#event-add-members .grid-limit{
+    float: left;
+}
+#event-add-members .grid-remainder{
+    width: calc(100% - 220px);
+}
+#event-add-members .grid-limit{
+    width: 220px;
+}
+#event-add-members .grid-limit a{
+    float: right;
+    margin: 10px 0 0 0;
+}
+#event-add-members .grid-limit a .uk-icon{
+    position: relative;
+    top: -1px;
+    margin: 0 5px 0 0;
+}
+#event-add-members .more{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 50;
+}
+#event-add-members .inner-list li{
+    position: relative;
+}
+#event-add-members .more .uk-drop{
+    z-index: 50;
+}
