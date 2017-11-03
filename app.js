@@ -22,6 +22,7 @@ var request = require('./routes/request');
 var notification = require('./routes/notification')
 var practice = require('./routes/practice')
 var imgProc = require('./routes/images')
+var feed = require('./routes/feed')
 var fileUpload = require('express-fileupload');
 
 
@@ -77,16 +78,16 @@ app.use(comment)
 app.use(request)
 app.use(notification)
 app.use(practice)
+app.use(feed)
 
 
-app.get('/test/:id', function(req, res) {
+app.get('/board', function(req, res) {
 	res.render('board-overview');
 });
-
-
-app.get('/feed', function(req, res) {
-	res.render('feed');
+app.get('/admin', function(req, res) {
+	res.render('profile-admin-view');
 })
+
 app.get('/test', function(req, res) {
   if(req.user) {
     res.render('create-a-new-post', {user: req.user});
@@ -108,10 +109,10 @@ app.get('/event', function(req, res) {
 app.get('/events', function(req, res) {
 	res.render("event-detail");
 })
-app.get('/home', function(req ,res) {
-	res.render('home');
-})
 
+app.get('/user', function(req, res) {
+	res.render('profile-user');
+})
 
 //Error handling =====================================================================================================================================================================
 app.use(function(req, res, next) {

@@ -34,7 +34,14 @@ function(req, username, password, done) {
       } else if(!username.includes("@haverford.edu")) {
         return done(null, false, req.flash('signupMessage', 'Your username must be a valid Haverford email address.'));
       } else {
-        var newUser = new User()
+        var newUser = new User({
+          username : username,
+          firstName : req.body.firstName,
+          lastName : req.body.lastName
+        })
+        console.log(newUser);
+        return done(null, newUser);
+        /*var newUser = new User()
           newUser.username = username,
           newUser.password = "temp",
           newUser.firstName = "temp",
@@ -43,7 +50,7 @@ function(req, username, password, done) {
           	if (err)
               throw err;
             return done(null, newUser);
-        });
+        });*/
       }
     });
   });
@@ -59,14 +66,11 @@ passport.use('local-signup', new LocalStrategy({
     // User.findOne wont fire unless data is sent back
     process.nextTick(function() {
       // Find a user whose email is the same as the forms email and check to see if the user trying to login has made an account
-        if(!req.user) {
-          return done(null, false, req.flash('signupMessage', 'That email is already taken.'));
-        }
-        else if (req.body.password !== req.body.confirmPassword) {
+        if (req.body.password !== req.body.confirmPassword) {
       	  return done(null, false, req.flash('signupMessage', 'Passwords do not match.'));
         } else {
           //If there is no user with the credential, create the user and set the credential
-          User.findById(req.user._id, function (err, user) {
+          /*User.findById(req.user._id, function (err, user) {
             if (err)
               return done(err);
             user.password = user.hashPassword(password);
@@ -75,6 +79,16 @@ passport.use('local-signup', new LocalStrategy({
                 return done(err);
               return done(null, updatedUser);
             });
+          });*/
+          var newUser = new User()
+            newUser.username = req.body.username,
+            newUser.password = newUser.hashPassword(req.body.password),
+            newUser.firstName = req.body.firstName,
+            newUser.lastName = req.body.lastName
+            newUser.save(function(err) {
+              if (err)
+                throw err;
+              return done(null, newUser);
           });
         }
       });

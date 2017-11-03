@@ -4,6 +4,122 @@ var User = require('../models/user');
 var Board = require('../models/board');
 var Event = require('../models/event');
 var Comment = require('../models/comment');
+var Notification = require('../models/notification')
+
+router.get('/events/create', function(req, res) {
+	Board.find({}, function(err, boards) {
+		if(err) throw err;
+		var info = [];
+		for(var i=0; i<boards.length; i++) {
+			info.push({"name": boards[i].name, "_id": boards[i]._id});
+		}
+		res.render("create-a-new-event", {boards: info});
+	})
+})
+
+router.post('/events/create', function(req, res) {
+  var deleteFiles = req.body.deleteFiles.split(" ");
+  deleteFiles.splice(deleteFiles.length-1, 1);
+  for(var i=0; i<deleteFiles.length; i++) {
+    for(var j=0; j<req.files.images.length; j++) {
+      if(req.files.images[j].name == deleteFiles[i]) {
+        req.files.images.splice(j,1);
+        break;
+      }
+    }
+  }
+  if(req.files.images && req.files.images != '') {
+    imgProc.convertImgs(req.files.images).then((imageStringArray)=>{
+      var newEvent = new Event({
+        postedBy: req.user._id,
+        name: req.body.name,
+        board: req.body.board,
+        startTime: req.body.startTime,
+        endTime: req.body.endTime,
+        location: req.body.location,
+        text: req.body.text,
+        date: req.body.date,
+        images: imageStringArray
+      });
+      var newNotification = new Notification({
+        recipient: req.user._id,
+        message: 'Your event has been made on Loop. Please assign it to a board.'
+      })
+      newEvent.save(function(error, newEvent) {
+        if (error)
+          throw error;
+        newNotification.save(function(error, newNotification) {
+          if (error)
+            throw error;
+          User.findById(req.user._id, function(error, user) {
+            if (error)
+              throw error;
+            user.createdEvents.push(newEvent._id)
+            user.notifications.push(newNotification._id)
+            user.save(function(error, updatedUser) {
+              if (error)
+                throw error
+              Board.findById(newEvent.board, function(error, board) {
+                if (error)
+                  throw error
+                board.events.push(newEvent._id);
+                board.save(function(error, updatedBoard) {
+                  if (error)
+                    throw error
+                  res.redirect('/boards/'+updatedBoard._id)
+                })
+              })
+            })
+          })
+        })
+      })
+    });
+  } else {
+    var newEvent = new Event({
+      postedBy: req.user._id,
+      name: req.body.name,
+      board: req.body.board,
+      startTime: req.body.startTime,
+      endTime: req.body.endTime,
+      location: req.body.location,
+      text: req.body.text,
+      date: req.body.date
+    })
+    console.log(newEvent);
+    var newNotification = new Notification({
+      recipient: req.user._id,
+      message: 'Your event has been made on Loop. Please assign it to a board.'
+    })
+    newEvent.save(function(error, newEvent) {
+      if (error)
+        throw error;
+      newNotification.save(function(error, newNotification) {
+        if (error)
+          throw error;
+        User.findById(req.user._id, function(error, user) {
+          if (error)
+            throw error;
+          user.createdEvents.push(newEvent._id)
+          user.notifications.push(newNotification._id)
+          user.save(function(error, updatedUser) {
+            if (error)
+              throw error
+            Board.findById(newEvent.board, function(error, board) {
+              if (error)
+                throw error
+              board.events.push(newEvent._id);
+              board.save(function(error, updatedBoard) {
+                if (error)
+                  throw error
+                res.redirect('/boards/'+updatedBoard._id)
+              })
+            })
+          })
+        })
+      })
+    })
+  }
+})
 
 //Editing event
 router.post('/events/:id/edit', function(req, res) {

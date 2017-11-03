@@ -7,33 +7,45 @@ module.exports = function(passport) {
 
   // Retrieve registration page
   router.get('/signup', function(req, res) {
-    res.render('register', {message: req.flash('signupMessage')});
+    res.render('register', {message: req.query.message});
   });
 
-  router.post('/signup', passport.authenticate('local-register', {
-      successRedirect : '/signup-password', // redirect to the create password page
-      failureRedirect : '/signup', // redirect back to the signup page if there is an error
-      failureFlash : true // allow flash messages
+  router.post('/signup', function(req, res) {
+    User.findOne({'username': req.body.username}, function(err, user) {
+      if (err)
+        return done(err);
+      if (user) {
+        var message = encodeURIComponent('That email is already taken');
+        res.redirect('/signup/?message=' + message)
+      } else if(req.body.adminID != 100) {
+        var message = encodeURIComponent('You must enter a valid Administrator ID.');
+        res.redirect('/signup/?message=' + message)
+      } else if(!req.body.username.includes("@haverford.edu")) {
+        var message = encodeURIComponent('Your username must be a valid Haverford email address.');
+        res.redirect('/signup/?message=' + message)
+      } else {
+        res.redirect('/signup-password/?username=' + req.body.username + '&firstName=' + req.body.firstName + '&lastName=' + req.body.lastName);
+      }
     })
-  );
+  });
 
 
   // Retrieve create password page
   router.get('/signup-password', function(req, res) {
-    res.render('create-password', {user: req.user, firstName: req.user.firstName, message: req.flash('signupMessage')});
+    res.render('create-password', {username: req.query.username, firstName: req.query.firstName, lastName: req.query.lastName, message: req.flash('signupMessage')});
   });
 
   router.post('/signup-password', passport.authenticate('local-signup', {
-      successRedirect : '/home',
+      successRedirect : '/',
       failureRedirect : '/signup-password',
       failureFlash : true // allow flash messages
     })
   );
 
   // Retrieve login page
-  router.get('/login', function(req, res) {
+  router.get('/', function(req, res) {
     if(req.user) {
-      res.redirect('home');
+      res.render('home');
     }
     else {
       res.render('index', {message: req.flash('loginMessage')});
@@ -43,13 +55,13 @@ module.exports = function(passport) {
   // Processs the login form
   router.post('/login', passport.authenticate('local-login', {
     successRedirect : '/home', // redirect to the main page
-    failureRedirect : '/login' // redirect back to the login page if there is an error
+    failureRedirect : '/' // redirect back to the login page if there is an error
   }));
 
   // Logout
   router.get('/logout', function(req, res) {
     req.logout();
-    res.redirect('/login');
+    res.redirect('/');
   });
 
   // Retrieve settings page
@@ -59,7 +71,7 @@ module.exports = function(passport) {
 
   // Process settings page
   router.post('/settings', passport.authenticate('local-settings', {
-    successRedirect : '/login', // redirect to the login page
+    successRedirect : '/', // redirect to the login page
     failureRedirect : '/settings', // redirect back to the login page if there is an error
     failureFlash : true // allow flash messages
   }));

@@ -260,6 +260,7 @@ router.get('/boards/:id', function(req, res) {
                             "_id": board.posts[board.posts.length-1-i].postedBy._id,
                             "name": board.posts[board.posts.length-1-i].postedBy.firstName + ' ' + board.posts[board.posts.length-1-i].postedBy.lastName
                           },
+                          "board": board,
                           "createdAt": moment(board.posts[board.posts.length-1-i].createdAt).format('LLL'),
                           "text": board.posts[board.posts.length-1-i].text,
                           "comments": comments
@@ -409,8 +410,7 @@ router.post('/boards/:id/post', function(req, res) {
               board.save(function(error, updatedBoard) {
                 if (error)
                   throw error;
-                //res.redirect('/boards/' + updatedBoard._id)
-                res.redirect('/home');
+                res.redirect('/boards/' + updatedBoard._id)
               })
             })
           })
@@ -450,8 +450,7 @@ router.post('/boards/:id/post', function(req, res) {
                 board.save(function(error, updatedBoard) {
                   if (error)
                     throw error;
-                  //res.redirect('/boards/' + updatedBoard._id)
-                  res.redirect('/home');
+                  res.redirect('/boards/' + updatedBoard._id);
                 })
               })
             })

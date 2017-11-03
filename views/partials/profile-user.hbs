@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="css/profile-user/sxn-profile-user.min.css" />
+<link rel="stylesheet" href="/css/profile-user/sxn-profile-user.min.css" />
 
 <div id="profile-user">
 
@@ -10,10 +10,20 @@
                 </div>
                 <div class="uk-width-expand@m">
                     <p class="name">
-                        Georgina Reekie<br/>
-                        <span class="major">English Literature, 2017</span>
+                        {{firstName}} {{lastName}}<br/>
+                        <span class="major">
+                          {{#if major}}
+                          {{major}}
+                          {{else}}
+                          N/A
+                          {{/if}}
+                          {{#if classYear}}
+                          {{classYear}}
+                          {{else}}
+                          , N/A
+                          {{/if}}
+                        </span>
                     </p>
-                    <a href=""><span class="uk-icon" uk-icon="icon: mail"></span>Message User</a>
                 </div>
             </div>
         </div>

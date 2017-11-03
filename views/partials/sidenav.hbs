@@ -4,27 +4,41 @@
             <img class="uk-float-left" src="/img/loop_logo_white.png" alt="Loop" />
         </div>
         <div class="avi-wrap">
-            <img src="/img/avi.jpeg" alt="Alex Reekie" />
+            <img />
             <div class="name-link">
-                <span>Alex</span><br />
-                <span>Reekie</span><br />
+              <div id="name">
+              </div>
+                <script>
+                var name_info = $('#name');
+                $.getJSON('/userinfo', function(data) {
+                  var firstName = "<span>" + data[0].firstName + "</span><br />";
+                  var lastName = "<span>" + data[0].lastName + "</span><br />";
+                  name_info.append(firstName);
+                  name_info.append(lastName);
+                });
+                </script>
                 <span class="name-below">Haverford College
-                    <a href=""><span class="white" uk-icon="icon: chevron-down"></span></a>
+                    <a><span class="white" uk-icon="icon: chevron-down"></span></a>
                     <div uk-drop="mode: click">
                         <div class="uk-card uk-card-body uk-card-default">
                             <ul>
-                                <li>
-                                    <a href="profile-admin-view.php">
-                                        <span uk-icon="icon: user"></span>Profile
-                                    </a>
+                                <li id="profile">
+                                  <script>
+                                  //var profile_info = $('#profile');
+                                  $.getJSON('/userinfo', function(data) {
+                                    var link = "<a href='/users/" + data[0]._id + "'><span uk-icon='icon: user'></span>Profile</a>";
+                                    document.getElementById('profile').innerHTML = link;
+                                    //profile_info.append(link);
+                                  });
+                                  </script>
                                 </li>
                                 <li>
-                                    <a href="settings.php">
+                                    <a href="/settings">
                                         <span uk-icon="icon: cog"></span>Settings
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="index.php">
+                                    <a href="/logout">
                                         <span uk-icon="icon: sign-out"></span>Logout / Sign in as..
                                     </a>
                                 </li>
@@ -36,9 +50,8 @@
             <div class="uk-clearfix"></div>
         </div>
         <ul class="uk-nav-default uk-nav-parent-icon" uk-nav>
-            <li class="uk-active"><a href="home.php"><span uk-icon="icon: home"></span>Home</a></li>
-            <li><a href="inbox.php"><span uk-icon="icon: mail"></span>Inbox (5)</a></li>
-            <li><a href="feed.php"><span uk-icon="icon: rss"></span>Feed</a></li>
+            <li class="uk-active"><a href="/home"><span uk-icon="icon: home"></span>Home</a></li>
+            <li><a href="/feed"><span uk-icon="icon: rss"></span>Feed</a></li>
             <li class="uk-parent">
                 <a href="#"><span uk-icon="icon: album"></span>Boards</a>
                 <ul class="uk-nav-sub" id="side-boards">
@@ -60,7 +73,6 @@
             <li class="uk-parent">
                 <a href="#"><span uk-icon="icon: users"></span>Organizations</a>
                 <ul class="uk-nav-sub" id="side-groups">
-                    <li><a href="org-detail.php"><span uk-icon="icon: users"></span>Haverford Jazz Ensemble</a></li>
                     <script>
                     var side_groups = $('#side-groups');
                     $.getJSON('/groupinfo', function(data) {
@@ -77,28 +89,13 @@
             <div class="create-list" hidden>
                 <ul>
                     <li>
-                        <a href="create-a-new-post.php">
+                        <a href="/posts/create">
                             Post
                         </a>
                     </li>
                     <li>
-                        <a href="create-a-new-challenge.php">
-                            Challenge
-                        </a>
-                    </li>
-                    <li>
-                        <a href="create-a-new-event.php">
+                        <a href="/events/create">
                             Event
-                        </a>
-                    </li>
-                    <li>
-                        <a href="create-a-new-org.php">
-                            Organization
-                        </a>
-                    </li>
-                    <li>
-                        <a href="">
-                            Board
                         </a>
                     </li>
                 </li>

@@ -40,14 +40,14 @@ router.get('/groups/:id', function(req, res) {
 		for (var i=0; i<group.members.length; i++) {
 			memberIds.push(group.members[i]._id.toString())
 		}
-		if (group.admin._id.toString() === req.user._id.toString()) {
+		/*if (group.admin._id.toString() === req.user._id.toString()) {
 			adminOfGroup = true
-		}
+		}*/
 
 		if (memberIds.indexOf(req.user._id.toString()) > -1) {
 			member = true
 		}
-		res.render('groupProfile', {name: group.name, _id: group._id, description: group.description, admin: group.admin, adminOfGroup: adminOfGroup, member: member, members: group.members})
+		res.render('org-detail', {name: group.name, _id: group._id, description: group.description, admin: group.admin, adminOfGroup: adminOfGroup, member: member, members: group.members})
 	})
 })
 

@@ -23,6 +23,7 @@
                 </div>
                 <div class="uk-clearfix"></div>
                 <div class="post-content">
+                  <h2>Textbook Supplies</h2>
                     <p>Does anyone know the cheapest place to buy textbook supplies off campus? I'm looking for this specifically!</p>
                 </div>
                 <div class="tags">
@@ -47,7 +48,44 @@
                 </div>
                 <div class="uk-clearfix"></div>
             </div>
+            <div class="divider"></div>
 
+
+            <div class="add-comment add-comment-reply" uk-grid>
+                <div class="uk-width-expand@m">
+            <div class="reply">
+                <div class="poster-avi uk-float-left">
+                    <img src="/img/gg.png" alt="Georgina Reekie" />
+                </div>
+                <div class="poster-info uk-float-left">
+                    <span class="name">Georgina Reekie</span>&nbsp;<span class="timestamp">Today at 8:12am</span><br />
+                    <span>I'd try checking out Discount Textbooks on Horne Street!</span>
+                </div>
+                <div class="more">
+                    <div class="uk-inline">
+                        <a class="uk-icon-link" uk-icon="icon: more-vertical" uk-toggle="target: .reply-one"></a>
+                    </div>
+                </div>
+                <div class="uk-clearfix"></div>
+            </div>
+            <div class="divider"></div>
+            <div class="reply">
+                <div class="poster-avi uk-float-left">
+                    <img src="/img/gg.png" alt="Georgina Reekie" />
+                </div>
+                <div class="poster-info uk-float-left">
+                    <span class="name">Georgina Reekie</span>&nbsp;<span class="timestamp">Today at 8:12am</span><br />
+                    <span>I'd try checking out Discount Textbooks on Horne Street!</span>
+                </div>
+                <div class="more">
+                    <div class="uk-inline">
+                        <a class="uk-icon-link" uk-icon="icon: more-vertical" uk-toggle="target: .reply-one"></a>
+                    </div>
+                </div>
+                <div class="uk-clearfix"></div>
+            </div>
+          </div>
+        </div>
             <div class="divider reply-one" hidden></div>
 
             <div class="add-comment add-comment-reply reply-one" uk-grid hidden>
@@ -60,9 +98,6 @@
                             </a>
                         </div>
                     </form>
-                </div>
-                <div class="uk-width-auto@m">
-                    <a href="#image-upload" class="uk-icon-link" uk-icon="icon: image" uk-toggle></a>
                 </div>
             </div>
 
@@ -231,15 +266,14 @@
                         </div>
                     </form>
                 </div>
-                <div class="uk-width-auto@m">
-                    <a href="#image-upload" class="uk-icon-link" uk-icon="icon: image" uk-toggle></a>
-                </div>
             </div>
 
         </div>
     </div>
 <p style="display:none" id="boardName">{{boardName}}</p>
     {{#each posts}}
+    <form id='delete-post-{{@index}}' style="display: none" method="post" action="/posts/{{post._id}}/delete">
+    </form>
     <div class="feed-item">
         <div class="uk-card uk-card-default uk-card-body">
             <div class="main-post">
@@ -248,7 +282,7 @@
                 </div>
                 <div class="poster-info uk-float-left">
                     <span class="name">{{post.postedBy.name}}</span><br />
-                    <span>Posted at {{post.createdAt}} in <a href="#" id="board-name-{{@index}}"></a></span>
+                    <span>Posted at {{post.createdAt}} in <a href="/boards/{{post.board._id}}" id="board-name-{{@index}}"></a></span>
                     <script> document.getElementById('board-name-{{@index}}').innerHTML = document.getElementById('boardName').innerHTML</script>
                 </div>
                 <div class="more">
@@ -259,14 +293,18 @@
                 </div>
                 <div class="uk-clearfix"></div>
                 <div class="post-content">
+                  <h2>{{post.title}}</h2>
                     <p>{{post.text}}</p>
                 </div>
                 <div class="tags">
                     <span href="#" class="uk-icon" uk-icon="icon: tag"></span><span>Campus Resources, Information</span>
                 </div>
             </div>
-            <p style="display: none" id="comment-length">{{post.comments.length}}</p>
+            <p style="display: none" id="comment-length-{{@index}}">{{post.comments.length}}</p>
+            {{#if post.comments}}
             {{#each post.comments}}
+            <form id='delete-comment-{{@index}}' style="display: none" method="post" action="/comments/{{comment._id}}/delete">
+            </form>
             {{#compare @index 0 operator="=="}}
             <div class="divider"></div>
             <div class="reply">
@@ -279,26 +317,66 @@
                 </div>
                 <div class="more">
                     <div class="uk-inline">
-                        <a class="uk-icon-link" uk-icon="icon: more-vertical" uk-toggle="target: .reply-0"></a>
+                      <a href="#" class="uk-icon-link" uk-icon="icon: more-vertical"></a>
+                      {{>comment-menu}}
                     </div>
                 </div>
                 <div class="uk-clearfix"></div>
             </div>
-            <div class="divider reply-0" hidden></div>
+            {{#if comment.comments}}
+            <div class="divider"></div>
+            <div class="add-comment add-comment-reply" uk-grid>
+              <div class="uk-width-expand@m">
+                {{#each comment.comments}}
+                <form id='delete-comment-{{@../index}}-{{@index}}' style="display: none" method="post" action="/comments/{{comment._id}}/delete">
+                </form>
+                {{#compare @index 0 operator=">"}}
+                <div class="divider"></div>
+                {{/compare}}
+                    <div class="reply">
+                        <div class="poster-avi uk-float-left">
+                            <img src="/img/gg.png" alt="Georgina Reekie" />
+                        </div>
+                        <div class="poster-info uk-float-left">
+                            <span class="name">{{comment.postedBy.name}}</span>&nbsp;<span class="timestamp">{{comment.createdAt}}</span><br />
+                            <span>{{comment.text}}</span>
+                        </div>
+                        <div class="more">
+                            <div class="uk-inline">
+                              <a href="#" class="uk-icon-link" uk-icon="icon: more-vertical"></a>
+                              <div uk-drop="mode: click">
+                                  <div class="uk-card uk-card-body uk-card-default">
+                                      <ul>
+                                          <li>
+                                            <a href="#" onclick="document.getElementById('delete-comment-{{@../index}}-{{@index}}').submit();">
+                                              Delete Comment
+                                            </a>
+                                          </li>
+                                      </ul>
+                                  </div>
+                              </div>
 
-            <div class="add-comment add-comment-reply reply-0" uk-grid hidden>
+                            </div>
+                        </div>
+                        <div class="uk-clearfix"></div>
+                    </div>
+                {{/each}}
+              </div>
+            </div>
+            {{/if}}
+
+            <div class="divider reply-{{@index}}" hidden></div>
+
+            <div class="add-comment add-comment-reply reply-{{@index}}" uk-grid hidden>
                 <div class="uk-width-expand@m">
-                    <form id="comment-comment" method="post" action="/comments/{{comment._id}}/comment">
+                    <form id="comment-{{@../index}}-{{@index}}" method="post" action="/comments/{{comment._id}}/comment">
                         <div>
                             <input class="uk-input" type="text" name="text" placeholder="Add comment...">
-                            <a class="uk-button uk-button-default" onclick="document.getElementById('comment-comment').submit();">
+                            <a class="uk-button uk-button-default" onclick="document.getElementById('comment-{{@../index}}-{{@index}}').submit();">
                                 Comment
                             </a>
                         </div>
                     </form>
-                </div>
-                <div class="uk-width-auto@m">
-                    <a href="#image-upload" class="uk-icon-link" uk-icon="icon: image" uk-toggle></a>
                 </div>
             </div>
 
@@ -315,28 +393,68 @@
                     <span>{{comment.text}}</span>
                 </div>
                 <div class="more">
-                    <div class="uk-inline">
-                        <a class="uk-icon-link" uk-icon="icon: more-vertical" uk-toggle="target: .reply-1"></a>
-                    </div>
+                  <div class="uk-inline">
+                    <a href="#" class="uk-icon-link" uk-icon="icon: more-vertical"></a>
+                    {{>comment-menu}}
+                  </div>
                 </div>
                 <div class="uk-clearfix"></div>
             </div>
 
-            <div class="divider reply-1" hidden></div>
-
-            <div class="add-comment add-comment-reply reply-1" uk-grid hidden>
-                <div class="uk-width-expand@m">
-                    <form>
-                        <div>
-                            <input class="uk-input" type="text" placeholder="Add comment...">
-                            <a class="uk-button uk-button-default">
-                                Comment
-                            </a>
+            {{#if comment.comments}}
+            <div class="divider"></div>
+            <div class="add-comment add-comment-reply" uk-grid>
+              <div class="uk-width-expand@m">
+                {{#each comment.comments}}
+                <form id='delete-comment-{{@../index}}-{{@index}}' style="display: none" method="post" action="/comments/{{comment._id}}/delete">
+                </form>
+                {{#compare @index 0 operator=">"}}
+                <div class="divider"></div>
+                {{/compare}}
+                    <div class="reply">
+                        <div class="poster-avi uk-float-left">
+                            <img src="/img/gg.png" alt="Georgina Reekie" />
                         </div>
-                    </form>
-                </div>
-                <div class="uk-width-auto@m">
-                    <a href="#image-upload" class="uk-icon-link" uk-icon="icon: image" uk-toggle></a>
+                        <div class="poster-info uk-float-left">
+                            <span class="name">{{comment.postedBy.name}}</span>&nbsp;<span class="timestamp">{{comment.createdAt}}</span><br />
+                            <span>{{comment.text}}</span>
+                        </div>
+                        <div class="more">
+                            <div class="uk-inline">
+                              <a href="#" class="uk-icon-link" uk-icon="icon: more-vertical"></a>
+                              <div uk-drop="mode: click">
+                                  <div class="uk-card uk-card-body uk-card-default">
+                                      <ul>
+                                          <li>
+                                            <a href="#" onclick="document.getElementById('delete-comment-{{@../index}}-{{@index}}').submit();">
+                                              Delete Comment
+                                            </a>
+                                          </li>
+                                      </ul>
+                                  </div>
+                              </div>
+
+                            </div>
+                        </div>
+                        <div class="uk-clearfix"></div>
+                    </div>
+                {{/each}}
+              </div>
+            </div>
+            {{/if}}
+
+            <div class="divider reply-{{@index}}" hidden></div>
+
+            <div class="add-comment add-comment-reply reply-{{@index}}" uk-grid hidden>
+                <div class="uk-width-expand@m">
+                  <form id="comment-comment-{{@index}}" method="post" action="/comments/{{comment._id}}/comment">
+                      <div>
+                          <input class="uk-input" type="text" name="text" placeholder="Add comment...">
+                          <a class="uk-button uk-button-default" onclick="document.getElementById('comment-comment-{{@index}}').submit();">
+                              Comment
+                          </a>
+                      </div>
+                  </form>
                 </div>
             </div>
             {{/compare}}
@@ -344,10 +462,10 @@
             {{#compare @index 2 operator=">="}}
             {{#compare @index 2 operator="=="}}
             <div class="load-more more-comments-{{post._id}}">
-                <a id="more-comments" uk-toggle="target: .more-comments-{{post._id}}"></a>
+                <a id="more-comments-{{@../index}}" uk-toggle="target: .more-comments-{{post._id}}"></a>
             </div>
             <script>
-            document.getElementById('more-comments').innerHTML = document.getElementById('comment-length').innerHTML - 2 + " more comments";
+            document.getElementById('more-comments-{{@../index}}').innerHTML = document.getElementById('comment-length-{{@../index}}').innerHTML - 2 + " more comments";
             </script>
 
             <div class="more-comments-{{post._id}}" hidden>
@@ -363,28 +481,68 @@
                         <span>{{comment.text}}</span>
                     </div>
                     <div class="more">
-                        <div class="uk-inline">
-                            <a class="uk-icon-link" uk-icon="icon: more-vertical" uk-toggle="target: .reply-{{@index}}"></a>
-                        </div>
+                      <div class="uk-inline">
+                        <a href="#" class="uk-icon-link" uk-icon="icon: more-vertical"></a>
+                        {{>comment-menu}}
+                      </div>
                     </div>
                     <div class="uk-clearfix"></div>
                 </div>
+
+                {{#if comment.comments}}
+                <div class="divider"></div>
+                <div class="add-comment add-comment-reply" uk-grid>
+                  <div class="uk-width-expand@m">
+                    {{#each comment.comments}}
+                    <form id='delete-comment-{{@../index}}-{{@index}}' style="display: none" method="post" action="/comments/{{comment._id}}/delete">
+                    </form>
+                    {{#compare @index 0 operator=">"}}
+                    <div class="divider"></div>
+                    {{/compare}}
+                        <div class="reply">
+                            <div class="poster-avi uk-float-left">
+                                <img src="/img/gg.png" alt="Georgina Reekie" />
+                            </div>
+                            <div class="poster-info uk-float-left">
+                                <span class="name">{{comment.postedBy.name}}</span>&nbsp;<span class="timestamp">{{comment.createdAt}}</span><br />
+                                <span>{{comment.text}}</span>
+                            </div>
+                            <div class="more">
+                                <div class="uk-inline">
+                                  <a href="#" class="uk-icon-link" uk-icon="icon: more-vertical"></a>
+                                  <div uk-drop="mode: click">
+                                      <div class="uk-card uk-card-body uk-card-default">
+                                          <ul>
+                                              <li>
+                                                <a href="#" onclick="document.getElementById('delete-comment-{{@../index}}-{{@index}}').submit();">
+                                                  Delete Comment
+                                                </a>
+                                              </li>
+                                          </ul>
+                                      </div>
+                                  </div>
+
+                                </div>
+                            </div>
+                            <div class="uk-clearfix"></div>
+                        </div>
+                    {{/each}}
+                  </div>
+                </div>
+                {{/if}}
 
                 <div class="divider reply-{{@index}}" hidden></div>
 
                 <div class="add-comment add-comment-reply reply-{{@index}}" uk-grid hidden>
                     <div class="uk-width-expand@m">
-                        <form>
-                            <div>
-                                <input class="uk-input" type="text" placeholder="Add comment...">
-                                <a class="uk-button uk-button-default">
-                                    Comment
-                                </a>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="uk-width-auto@m">
-                        <a href="#image-upload" class="uk-icon-link" uk-icon="icon: image" uk-toggle></a>
+                      <form id="comment-comment-{{@index}}" method="post" action="/comments/{{comment._id}}/comment">
+                          <div>
+                              <input class="uk-input" type="text" name="text" placeholder="Add comment...">
+                              <a class="uk-button uk-button-default" onclick="document.getElementById('comment-comment-{{@index}}').submit();">
+                                  Comment
+                              </a>
+                          </div>
+                      </form>
                     </div>
                 </div>
 
@@ -401,28 +559,68 @@
                         <span>{{comment.text}}</span>
                     </div>
                     <div class="more">
-                        <div class="uk-inline">
-                            <a class="uk-icon-link" uk-icon="icon: more-vertical" uk-toggle="target: .reply-{{@index}}"></a>
-                        </div>
+                      <div class="uk-inline">
+                        <a href="#" class="uk-icon-link" uk-icon="icon: more-vertical"></a>
+                        {{>comment-menu}}
+                      </div>
                     </div>
                     <div class="uk-clearfix"></div>
                 </div>
+
+                {{#if comment.comments}}
+                <div class="divider"></div>
+                <div class="add-comment add-comment-reply" uk-grid>
+                  <div class="uk-width-expand@m">
+                    {{#each comment.comments}}
+                    <form id='delete-comment-{{@../index}}-{{@index}}' style="display: none" method="post" action="/comments/{{comment._id}}/delete">
+                    </form>
+                    {{#compare @index 0 operator=">"}}
+                    <div class="divider"></div>
+                    {{/compare}}
+                        <div class="reply">
+                            <div class="poster-avi uk-float-left">
+                                <img src="/img/gg.png" alt="Georgina Reekie" />
+                            </div>
+                            <div class="poster-info uk-float-left">
+                                <span class="name">{{comment.postedBy.name}}</span>&nbsp;<span class="timestamp">{{comment.createdAt}}</span><br />
+                                <span>{{comment.text}}</span>
+                            </div>
+                            <div class="more">
+                                <div class="uk-inline">
+                                  <a href="#" class="uk-icon-link" uk-icon="icon: more-vertical"></a>
+                                  <div uk-drop="mode: click">
+                                      <div class="uk-card uk-card-body uk-card-default">
+                                          <ul>
+                                              <li>
+                                                <a href="#" onclick="document.getElementById('delete-comment-{{@../index}}-{{@index}}').submit();">
+                                                  Delete Comment
+                                                </a>
+                                              </li>
+                                          </ul>
+                                      </div>
+                                  </div>
+
+                                </div>
+                            </div>
+                            <div class="uk-clearfix"></div>
+                        </div>
+                    {{/each}}
+                  </div>
+                </div>
+                {{/if}}
 
                 <div class="divider reply-{{@index}}" hidden></div>
 
                 <div class="add-comment add-comment-reply reply-{{@index}}" uk-grid hidden>
                     <div class="uk-width-expand@m">
-                        <form>
-                            <div>
-                                <input class="uk-input" type="text" placeholder="Add comment...">
-                                <a class="uk-button uk-button-default">
-                                    Comment
-                                </a>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="uk-width-auto@m">
-                        <a href="#image-upload" class="uk-icon-link" uk-icon="icon: image" uk-toggle></a>
+                      <form id="comment-comment-{{@index}}" method="post" action="/comments/{{comment._id}}/comment">
+                          <div>
+                              <input class="uk-input" type="text" name="text" placeholder="Add comment...">
+                              <a class="uk-button uk-button-default" onclick="document.getElementById('comment-comment-{{@index}}').submit();">
+                                  Comment
+                              </a>
+                          </div>
+                      </form>
                     </div>
                 </div>
 
@@ -433,24 +631,35 @@
             {{#compare post.comments.length 2 operator=">"}}
           </div>
           {{/compare}}
-            <div class="add-comment" uk-grid>
+              <div class="add-comment" uk-grid>
                 <div class="uk-width-expand@m">
-                    <form id="comment" method="post" action="/posts/{{post._id}}/comment">
+                    <form id="comment-{{@index}}" method="post" action="/posts/{{post._id}}/comment">
                         <div>
                             <input class="uk-input" type="text" name="text" placeholder="Add comment...">
-                            <a class="uk-button uk-button-default" onclick="document.getElementById('comment').submit();">
+                            <a class="uk-button uk-button-default" onclick="document.getElementById('comment-{{@index}}').submit();">
                                 Comment
                             </a>
                         </div>
                     </form>
                 </div>
-                <div class="uk-width-auto@m">
-                    <a href="#image-upload" class="uk-icon-link" uk-icon="icon: image" uk-toggle></a>
-                </div>
             </div>
+            {{else}}
+            <div class="divider"></div>
+            <div class="add-comment" uk-grid>
+              <div class="uk-width-expand@m">
+                  <form id="comment-{{@index}}" method="post" action="/posts/{{post._id}}/comment">
+                      <div>
+                          <input class="uk-input" type="text" name="text" placeholder="Add comment...">
+                          <a class="uk-button uk-button-default" onclick="document.getElementById('comment-{{@index}}').submit();">
+                              Comment
+                          </a>
+                      </div>
+                  </form>
+              </div>
+          </div>
+          {{/if}}
         </div>
     </div>
   {{/each}}
-
 </div>
  {{>image-upload-modal}}

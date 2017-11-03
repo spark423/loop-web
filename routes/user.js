@@ -7,6 +7,11 @@ var Post = require('../models/post');
 var Event = require('../models/event');
 var Challenge = require('../models/challenge');
 
+router.get('/userinfo', function(req, res) {
+	var info = [];
+	info.push({"firstName": req.user.firstName, "lastName": req.user.lastName, "_id": req.user._id});
+	res.send(info);
+})
 
 //Retrieve User Page
 router.get('/users/:id', function(req, res) {
@@ -15,7 +20,7 @@ router.get('/users/:id', function(req, res) {
 		User.findById(req.user._id).populate('joinedGroups').populate('hiddenGroups').populate('acceptedChallenges').populate('hiddenChallenges').exec(function(error, user) {
 			if (error)
 				throw error;
-			var hiddenGroupsId = []			
+			var hiddenGroupsId = []
 			var groups = [];
 			for (var i=0; i<user.hiddenGroups.length; i++) {
 				hiddenGroupsId.push(user.hiddenGroups[i]._id.toString())
@@ -28,7 +33,7 @@ router.get('/users/:id', function(req, res) {
 					groups.push({"public": false, "group": user.joinedGroups[i]})
 				}
 			}
-			var hiddenChallengesId = []			
+			var hiddenChallengesId = []
 			var challenges = [];
 			for (var i=0; i<user.hiddenChallenges.length; i++) {
 				hiddenChallengesId.push(user.hiddenChallenges[i]._id.toString())
@@ -40,11 +45,11 @@ router.get('/users/:id', function(req, res) {
 				} else {
 					challenges.push({"public": false, "challenge": user.acceptedChallenges[i]})
 				}
-			}							
-			res.render('profile', {
+			}
+			res.render('profile-user', {
 				                  self: true,
 				                  _id: req.user._id,
-				                  firstName: user.firstName, 
+				                  firstName: user.firstName,
 				                  lastName: user.lastName,
 				                  email: user.username,
 				                  description: user.description,
@@ -84,10 +89,10 @@ router.get('/users/:id', function(req, res) {
 					publicChallenges.push(user.acceptedChallenges[i])
 				}
 				console.log(hiddenChallengesId.indexOf(user.acceptedChallenges[i]._id.toString()) === -1)
-			}			
-			res.render('profile', {
+			}
+			res.render('profile-user', {
 				                  self: false,
-				                  firstName: user.firstName, 
+				                  firstName: user.firstName,
 				                  lastName: user.lastName,
 				                  email: user.username,
 				                  description: user.description,
