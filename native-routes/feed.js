@@ -102,8 +102,10 @@ module.exports = function(passport) {
                   "postedBy": {
                     "id": postCreator._id,
                     "firstName": postCreator.firstName,
-                    "lastName": postCreator.lastName
-                  },
+                    "lastName": postCreator.lastName,
+                    "postCreator": postCreator.username,
+                    "isLoopUser": true
+                  },                  
                   "title": item.title,
                   "text": item.text,
                   "comments": comments
@@ -123,8 +125,10 @@ module.exports = function(passport) {
                     "postedBy": {
                       "id": eventCreator._id,
                       "firstName": eventCreator.firstName,
-                      "lastName": eventCreator.lastName
-                    },
+                      "lastName": eventCreator.lastName,
+                      "username": eventCreator.username,
+                    	"isLoopUser": true
+                    },                             
                     "title": item.title,
                     "date": item.date,
                     "startTime": item.startTime,
@@ -141,7 +145,13 @@ module.exports = function(passport) {
                     "attending": req.user.attendedEvents.indexOf(item._id) > -1,               
                     "id": item._id,
                     "createdAt": item.createdAt,
-                    "postedBy": item.contact,
+                    "postedBy": {
+                    	"id": "",
+                    	"firstName": "",
+                    	"lastName": "",
+                    	"username": item.contact,
+                    	"isLoopUser": false
+                    },                    
                     "title": item.title,
                     "date": item.date,
                     "startTime": item.startTime,

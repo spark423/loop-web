@@ -8,16 +8,22 @@ var Group = require('../models/group');
 
 module.exports = function(passport) {
   router.put('/subscription', passport.authenticate('jwt', { session: false }), function(req, res) {
-    let subscribedBoards = req.body.subscribedBoards.map(function(boardId) {
-      return mongoose.Types.ObjectId(boardId);
-    })
-    User.findOneAndUpdate({_id: req.user._id}, {$set: {subscribedBoards: subscribedBoards}},function(err,user) {
+    Time.findOneAndUpdate({}, {$push: {follows: {createdAt: Date.now(), board: req.params.id, user:req.user._id}}}, function(err, time) {
       if (err) {
         throw err;
       } else {
-        res.json({"success": true})
+        let subscribedBoards = req.body.subscribedBoards.map(function(boardId) {
+          return mongoose.Types.ObjectId(boardId);
+        })
+        User.findOneAndUpdate({_id: req.user._id}, {$set: {subscribedBoards: subscribedBoards}},function(err,user) {
+          if (err) {
+            throw err;
+          } else {
+            res.json({"success": true})
+          }
+        })        
       }
-    })
+    })    
   }); 
 
   router.get('/drawer', passport.authenticate('jwt', { session: false }), function(req, res) {

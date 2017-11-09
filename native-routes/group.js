@@ -18,7 +18,7 @@ module.exports = function(passport) {
 					if (err) {
 						throw err;
 					} else if (user) {
-						let admin = {id: user._id, username: user.username, firstName: user.firstName, lastName: user.lastName};
+						let admin = {"id": user._id, "firstName": user.firstName, "lastName": user.lastName, "username": user.username, "isLoopUser": true};
 						res.json({
 							admin: req.user.username === admin.username,
 						  member: req.user.joinedGroups.indexOf(group._id) > -1, 
@@ -26,7 +26,7 @@ module.exports = function(passport) {
 							  "id": group._id,
 							  "name": group.name,
 							  "description": group.description,
-							  "admin": user,
+							  "admin": admin,
 							  "members": members
               }
 			      })							
@@ -38,7 +38,7 @@ module.exports = function(passport) {
 							  "id": group._id,
 							  "name": group.name,
 							  "description": group.description,
-							  "admin": adminUsername,
+							  "admin": {"id": "", "firstName": "", "lastName": "", "username": adminUsername, "isLoopUser": false},
 							  "members": members
               }
 			      })		
