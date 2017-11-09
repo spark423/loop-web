@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../models/user');
-var Request = require('../models/request')
 
 module.exports = function(passport) {
 
@@ -45,7 +44,7 @@ module.exports = function(passport) {
   // Retrieve login page
   router.get('/', function(req, res) {
     if(req.user) {
-      res.render('home');
+      res.redirect('/home');
     }
     else {
       res.render('index', {message: req.flash('loginMessage')});
@@ -75,6 +74,107 @@ module.exports = function(passport) {
     failureRedirect : '/settings', // redirect back to the login page if there is an error
     failureFlash : true // allow flash messages
   }));
+
+  router.get('/reset', function(req, res) {
+    res.render('reset');
+  })
+
+/*
+  router.post('/forgot', function(req, res) {
+    async.waterfall([
+      function(done) {
+        crypto.randomBytes(20, function(err, buf) {
+          var token = buf.toString('hex');
+          done(err, token);
+        });
+      },
+      function(token, done) {
+        User.findOne({ username: req.body.username }, function(err, user) {
+          if (!user) {
+            res.send(401, {success: false, message: 'No account with that email address exists.'});
+           return;
+          }
+
+          user.resetPasswordToken = token;
+          user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+          user.save(function(err) {
+            done(err, token, user);
+          });
+        });
+      },
+      function(token, user, done) {
+        let options = {
+    	    auth: {
+    		    api_user: username,
+            api_key: password
+          }
+        }
+
+        let client = nodemailer.createTransport(sgTransport(options));
+
+        let email = {
+          from: 'support@theuniversityloop.com',
+          to: user.username,
+          subject: ' Password Reset',
+          text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+            'Paste the following token ' + token + ' into the token field to set a new password.\n\n' +
+            'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+         };
+        client.sendMail(email, function(err){
+      	  done(err)
+        });
+      }
+    ], function(err) {
+      if (err) throw err;
+      res.send({success: true})
+    });
+  })
+
+  router.put('/reset', function(req, res) {
+    async.waterfall([
+      function(done) {
+        User.findOne({ resetPasswordToken: req.body.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+          if (!user) {
+            res.json(401, {success: false, message: 'Password reset token is invalid or has expired.'});
+          } else if (req.body.newPassword !== req.body.confirmNewPassword) {
+          	res.json(401, {success: false, message: "Passwords don't match."})
+          } else {
+            user.password = req.body.newPassword;
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpires = undefined;
+            user.save(function(err) {
+              done(err, user);
+            });
+          }
+        });
+      },
+      function(user, done) {
+        let options = {
+          auth: {
+    		    api_user: username,
+            api_key: password
+          }
+        }
+
+        let client = nodemailer.createTransport(sgTransport(options));
+
+        let email = {
+          from: 'support@theuniversityloop.com',
+          to: user.username,
+          subject: 'Successful Password Reset',
+          text: 'Hello,\n\n' +
+          'This is a confirmation that the password for your account ' + user.username + ' has just been changed. Login with your new password\n'
+        };
+        client.sendMail(email, function(err){
+      	  done(err)
+        });
+      }
+    ], function(err) {
+      if (err) throw err;
+      res.send({success: true});
+    });
+  });*/
 
   return router;
 };

@@ -5,7 +5,6 @@ var Group = require('../models/group');
 var Board = require('../models/board');
 var Post = require('../models/post');
 var Event = require('../models/event');
-var Challenge = require('../models/challenge');
 
 router.post('/groups/create', function(req, res) {
   var newGroup = new Group({
@@ -31,6 +30,49 @@ router.get('/groupinfo', function(req, res) {
 
 //Retrieve group page
 router.get('/groups/:id', function(req, res) {
+  Group.findById(req.params.id).populate('members').exec(function(err, group) {
+    if (err) {
+      throw err;
+    } else {
+      let members = group.members.map(function(member) {
+        return {id: member._id, username: member.username, firstName: member.firstName, lastName: member.lastName};
+      })
+      let adminUsername = group.admin;
+      User.find({username: adminUsername}, function(err, user) {
+        if (err) {
+          throw err;
+        } else if (user) {
+          let admin = {id: user._id, username: user.username, firstName: user.firstName, lastName: user.lastName};
+          res.json({
+            admin: req.user.username === admin.username,
+            member: req.user.joinedGroups.indexOf(group._id) > -1,
+            group: {
+              "id": group._id,
+              "name": group.name,
+              "description": group.description,
+              "admin": user,
+              "members": members
+            }
+          })
+        }	 else {
+          res.json({
+            admin: req.user.username === admin.username,
+            member: req.user.joinedGroups.indexOf(group._id) > -1,
+            group: {
+              "id": group._id,
+              "name": group.name,
+              "description": group.description,
+              "admin": adminUsername,
+              "members": members
+            }
+          })
+        }
+      })
+    }
+  })
+})
+/*
+router.get('/groups/:id', function(req, res) {
 	Group.findById(req.params.id).populate('admin').populate('members').exec(function(error, group) {
 		if (error)
 			throw error;
@@ -40,16 +82,16 @@ router.get('/groups/:id', function(req, res) {
 		for (var i=0; i<group.members.length; i++) {
 			memberIds.push(group.members[i]._id.toString())
 		}
-		/*if (group.admin._id.toString() === req.user._id.toString()) {
+		if (group.admin._id.toString() === req.user._id.toString()) {
 			adminOfGroup = true
-		}*/
+		}
 
 		if (memberIds.indexOf(req.user._id.toString()) > -1) {
 			member = true
 		}
 		res.render('org-detail', {name: group.name, _id: group._id, description: group.description, admin: group.admin, adminOfGroup: adminOfGroup, member: member, members: group.members})
 	})
-})
+})*/
 
 //Edit group page
 router.post('/groups/:id/edit', function(req, res) {
@@ -68,6 +110,22 @@ router.post('/groups/:id/edit', function(req, res) {
 })
 
 //Join group
+router.put('/groups/:id/join', function(req, res) {
+  Group.findOneAndUpdate({_id: req.params.id}, {$push: {members: req.user._id}}, function(err, group) {
+    if (err) {
+      throw err;
+    } else {
+      User.findOneAndUpdate({_id: req.user._id}, {$push: {joinedGroups: group._id}}, function(err, user) {
+        if (err) {
+          throw err;
+        } else {
+          res.json({success: true});
+        }
+      })
+    }
+  })
+})
+/*
 router.post('/groups/:id/join', function(req, res) {
 	Group.findById(req.params.id, function(error, group) {
 		if (error)
@@ -86,9 +144,25 @@ router.post('/groups/:id/join', function(req, res) {
 			})
 		})
 	})
-})
+})*/
 
 //Leave group
+router.put('/groups/:id/leave', function(req, res) {
+  Group.findOneAndUpdate({_id: req.params.id}, {$pull: {members: req.user._id}}, function(err, group) {
+    if (err) {
+      throw err;
+    } else {
+      User.findOneAndUpdate({_id: req.user._id}, {$pull: {joinedGroups: group._id}}, function(err, user) {
+        if (err) {
+          throw err;
+        } else {
+          res.json({success: true});
+        }
+      })
+    }
+  })
+})
+/*
 router.post('/groups/:id/leave', function(req, res) {
 	Group.findById(req.params.id, function(error, group) {
 		if (error)
@@ -113,36 +187,6 @@ router.post('/groups/:id/leave', function(req, res) {
 			})
 		})
 	})
-})
-
-//Hide group
-router.post('/groups/:id/hide', function(req, res) {
-	User.findById(req.user._id, function(error, user) {
-		if (error)
-			throw error;
-		user.hiddenGroups.push(req.params.id)
-		user.save(function(error, updatedUser) {
-			if (error)
-				throw error;
-			res.redirect('/users/' + req.user._id)
-		})
-	})
-})
-
-//Make group public
-router.post('/groups/:id/public', function(req, res) {
-	User.findById(req.user._id, function(error, user) {
-		if (error)
-			throw error;
-		var hiddenGroups = user.hiddenGroups
-		var index = hiddenGroups.indexOf(req.params.id)
-		user.hiddenGroups = hiddenGroups.slice(0, index).concat(hiddenGroups.slice(index+1, hiddenGroups.length))
-		user.save(function(error, updatedUser) {
-			if (error)
-				throw error;
-			res.redirect('/users/' + req.user._id)
-		})
-	})
-})
+})*/
 
 module.exports = router;

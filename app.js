@@ -16,12 +16,8 @@ var group = require('./routes/group');
 var board = require('./routes/board');
 var post = require('./routes/post');
 var event = require('./routes/event');
-var challenge = require('./routes/challenge');
 var comment = require('./routes/comment');
-var request = require('./routes/request');
 var notification = require('./routes/notification')
-var practice = require('./routes/practice')
-var imgProc = require('./routes/images')
 var feed = require('./routes/feed')
 var fileUpload = require('express-fileupload');
 
@@ -73,11 +69,8 @@ app.use(group)
 app.use(board)
 app.use(post)
 app.use(event)
-app.use(challenge)
 app.use(comment)
-app.use(request)
 app.use(notification)
-app.use(practice)
 app.use(feed)
 
 

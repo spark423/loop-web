@@ -1,12 +1,12 @@
 var mongoose = require('mongoose');
 
-// Define schema =====================================================================================================================================================================
-var notificationSchema = mongoose.Schema({
-	recipent: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
-	message: {type: String}
-})
+var notificationSchema = new mongoose.Schema({
+	type: {type: String},
+	message: {type: String},
+	routeID: {
+		kind: String,
+		item: { type: mongoose.Schema.Types.ObjectId, refPath: 'source.kind' }
+	}
+});
 
-// Define methods ====================================================================================================================================================================
-
-// Export schema =====================================================================================================================================================================
 module.exports = mongoose.model('Notification', notificationSchema);

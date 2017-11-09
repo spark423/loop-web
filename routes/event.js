@@ -149,7 +149,68 @@ router.post('/events/:id/edit', function(req, res) {
 	})
 })
 
+//New attendee
+router.put('/events/:id', function(req, res) {
+	Event.findOneAndUpdate({_id: req.params.id}, {$push: {attendees: req.user._id}}, function(err, event) {
+		if (err) {
+			throw err;
+		} else {
+			User.findOneAndUpdate({_id: req.user._id}, {$push: {attendedEvents: req.params.id}}, function(err, currentUser) {
+				if (err) {
+					throw err;
+				} else {
+					User.findOne({username: event.postedBy}, function(err, eventCreator) {
+						if (err) {
+							throw err;
+						} else if (eventCreator) {
+							let notificationToCreator = new Notification({
+								type: 'Attend Event',
+								message: currentUser.firstName + " " + currentUser.lastName + " is attending your event: " + event.title,
+								routeID: {
+									kind: 'Event',
+									item: event._id
+								}
+							})
+							notificationToCreator.save(function(err, notificationToCreator){
+								if (err) {
+									throw err;
+								} else {
+									User.findOneAndUpdate({_id: eventCreator._id}, {$push: {notifications: notificationToCreator._id}}, function(err) {
+										if (err) {
+											throw err;
+										} else {
+											res.json({success: true});
+										}
+									})
+								}
+							})
+						} else {
+							res.json({success: true});
+						}
+					})
+				}
+			})
+		}
+	})
+})
+
 //Deleting event from event board
+router.delete('/events/:id', function(req, res) {
+	Event.findById(req.params.id, function(err, event) {
+		if (err)  {
+			throw err;
+		} else {
+			Board.findOneAndUpdate({_id: event.board}, {$pull: {contents: {item: req.params.id}}}, function(err) {
+				if (err) {
+					throw err;
+				} else {
+					res.json({success: true});
+				}
+			})
+		}
+	})
+})
+/*
 router.post('/events/:id/delete-event', function(req, res) {
 	Event.findById(req.params.id, function(error, event) {
 		if (error)
@@ -168,32 +229,33 @@ router.post('/events/:id/delete-event', function(req, res) {
 		})
 	})
 })
-
-router.post('/events/:id/delete-from-board', function(req, res) {
-	Event.findById(req.params.id, function(error, event) {
-		if (error)
-			throw error;
-		Board.findById(event.board, function(error, board) {
-		  if (error)
-			  throw error;
-		  var boardEvents = board.events
-	    var index = boardEvents.indexOf(req.params.id)
-		  board.events = boardEvents.slice(0, index).concat(boardEvents.slice(index+1, boardEvents.length))
-	    board.save(function(error, updatedBoard) {
-			  if (error)
-			    throw error;
-			  Event.update({ _id: req.params.id },{ $unset: {"board": ""}}, function(error, updatedEvent) {
-			  	if (error)
-			  		throw error;
-			  	console.log("updatedEvent", updatedEvent)
-			  	res.redirect('/boards/'+updatedBoard._id)
-			  })
-			})
-		})
-	})
-})
+*/
 
 //Commenting on event
+router.post('/events/:id/comment', function(req, res) {
+	let newComment = new Comment({
+		postedBy: req.user._id,
+		source: {"kind": 'Event', "item": req.params.id},
+		text: req.body.text
+	})
+	newComment.save(function(err, newComment) {
+		if (err) {
+			throw err;
+		}
+		Event.findOneAndUpdate({_id: req.params.id}, {$push: {comments: newComment._id}}, function(err) {
+			if (err) {
+				throw err;
+			}
+			User.findOneAndUpdate({_id: req.user._id}, {$push: {comments: newComment._id}}, function(err) {
+				if (err) {
+					throw err;
+				}
+				res.json({success: true})
+			})
+		});
+	})
+})
+/*
 router.post('/events/:id/comment', function(req, res) {
 	var newComment = new Comment({
 		postedBy: {"name": req.user.firstName + " " + req.user.lastName, "_id": req.user._id},
@@ -222,7 +284,7 @@ router.post('/events/:id/comment', function(req, res) {
 		})
 	})
 })
-
+*/
 
 
 //Attend event
@@ -271,29 +333,6 @@ router.post('/events/:id/unattend', function(req, res) {
 					res.redirect('back')
 				})
 			})
-		})
-	})
-})
-
-//Assign event to a board
-router.post('/events/:id/assign', function(req, res) {
-	Board.findOne({name: req.body.board}, function(error, board) {
-		if (error)
-			throw error;
-		board.events.push(req.params.id)
-		board.save(function(error, updatedBoard) {
-			if (error)
-				throw error;
-	    Event.findById(req.params.id, function(error, event) {
-		    if (error)
-			    throw error;
-		    event.board = board._id
-		    event.save(function(error, updatedEvent) {
-		  	  if (error)
-		  		  throw error;
-			    res.redirect('/boards/' + event.board)
-		    })
-	    })
 		})
 	})
 })

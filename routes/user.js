@@ -5,7 +5,6 @@ var Group = require('../models/group');
 var Board = require('../models/board');
 var Post = require('../models/post');
 var Event = require('../models/event');
-var Challenge = require('../models/challenge');
 
 router.get('/userinfo', function(req, res) {
 	var info = [];
@@ -13,7 +12,42 @@ router.get('/userinfo', function(req, res) {
 	res.send(info);
 })
 
-//Retrieve User Page
+//View Own user page
+router.get('/user', function(err, user) {
+	User.findById(req.user._id, function(err, user) {
+		if (err)  {
+			throw err;
+		} else {
+			res.json({
+				"user": {
+					username: user.username,
+					firstName: user.firstName,
+					lastName: user.lastName,
+					major: user.major,
+					classYear: user.classYear
+				}
+			})
+		}
+	})
+})
+
+//View someone else's page
+router.get('/users/:id', function(req, res) {
+	User.findById(req.params.id, function(err, user) {
+		if (err) throw err;
+		res.json({
+			"user": {
+				username: user.username,
+				firstName: user.firstName,
+				lastName: user.lastName,
+				major: user.major,
+				classYear: user.classYear
+			}
+		})
+	})
+})
+
+/*
 router.get('/users/:id', function(req, res) {
 	if (req.user._id.toString() === req.params.id) {
 		//Viewing one's own page
@@ -101,7 +135,7 @@ router.get('/users/:id', function(req, res) {
 				                })
 		})
 	}
-})
+})*/
 
 //update user page
 router.post('/users/:id/edit', function(req, res) {

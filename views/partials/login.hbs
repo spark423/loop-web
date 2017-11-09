@@ -19,24 +19,24 @@
     <div class="inputs">
         <form action="/login" method="post" id="loginform">
             <div class="uk-margin">
-                <input class="uk-input uk-form-width-medium" type="text" name="username" placeholder="username">
+                <input required class="uk-input uk-form-width-medium" type="text" name="username" placeholder="username" onkeydown = "if (event.keyCode == 13)document.getElementById('submit_button').click()">
             </div>
             <div class="uk-margin">
-                <input class="uk-input uk-form-width-medium" type="password" name="password" placeholder="password">
+                <input required class="uk-input uk-form-width-medium" type="password" name="password" placeholder="password" onkeydown = "if (event.keyCode == 13)document.getElementById('submit_button').click()">
             </div>
 
-        <a class="uk-button uk-float-right uk-button-default new-margin" onclick="document.getElementById('loginform').submit();">
+        <a class="uk-button uk-button-default new-margin" id="submit_button" onclick="document.getElementById('loginform').submit();">
             Login
         </a>
         </form>
         <div class="uk-clearfix"></div>
     </div>
 
-    <a class="underlined" href="#">Forgot password?</a>
+    <a class="underlined" href="/reset">Forgot password?</a>
 
     <div class="uk-position-bottom-center">
         <span>First time?</span><br />
-        <span><a class="underlined" href="#">Register now</a> with your school or university.</span>
+        <span><a class="underlined" href="/signup">Register now</a> with your school or university.</span>
     </div>
 
 </div>
