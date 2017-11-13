@@ -6,22 +6,25 @@
         <div class="col uk-width-1-1@m">
             <div class="member" uk-grid>
                 <div class="uk-width-auto@m">
-                    <div class="img-wrap"></div>
                 </div>
                 <div class="uk-width-expand@m">
                     <p class="name">
-                        {{firstName}} {{lastName}}<br/>
+                        {{user.firstName}} {{user.lastName}}<br/>
                         <span class="major">
-                          {{#if major}}
-                          {{major}}
+                          {{#if user.major}}
+                          {{user.major}},
                           {{else}}
                           N/A
                           {{/if}}
-                          {{#if classYear}}
-                          {{classYear}}
+                          {{#if user.classYear}}
+                          {{user.classYear}}
                           {{else}}
                           , N/A
                           {{/if}}
+                        </span>
+                        <br>
+                        <span class="major">
+                          {{user.username}}
                         </span>
                     </p>
                 </div>

@@ -1,0 +1,35 @@
+<link rel="stylesheet" href="/css/event-add-members/sxn-event-add-members.min.css" />
+
+<div id="event-add-members">
+    <div class="uk-card uk-card-default uk-card-body">
+        <div class="add-members-wrap">
+            <ul class="add-members-row-wrap">
+                <li class="add-members-row inner-list-wrap">
+                    <div class="inner-list" style="overflow: auto">
+                        <ul class="row">
+                          <li class ="row">
+                            <div class="member" uk-grid>
+                              <h2>Attendees</h2>
+                            </div>
+                          </li>
+                          {{#each event.attendees}}
+                            <li class="row">
+                                <div class="member" uk-grid>
+                                    <div class="uk-width-auto@m">
+                                        <div class="img-wrap one"></div>
+                                    </div>
+                                    <div class="uk-width-expand@m">
+                                        <p class="name"><a href="/users/{{_id}}" style="color: gray">{{firstName}} {{lastName}}</a></p>
+                                        <p class="major">{{#if major}}{{major}}{{else}}N/A{{/if}}, {{#if classYear}}{{classYear}}{{else}}N/A{{/if}}</p>
+                                    </div>
+                                </div>
+                            </li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+</div>

@@ -5,6 +5,7 @@ var Board = require('../models/board');
 var Post = require('../models/post');
 var Comment = require('../models/comment');
 var Notification = require('../models/notification')
+var Time = require('../models/time')
 
 router.get('/posts/create', function(req, res) {
 	Board.find({}, function(err, boards) {
@@ -17,7 +18,14 @@ router.get('/posts/create', function(req, res) {
 	})
 })
 
-router.post('/posts/create', function(req, res) {
+router.get('/post/:id', function(req, res) {
+	Post.findById(req.params.id, function(err, post) {
+		Board.findById(post.board, function(err, board) {
+			res.redirect('/boards/' + board._id + '#' + post._id);
+		})
+	})
+})
+/*router.post('/posts/create', function(req, res) {
   if (req.user) {
     var deleteFiles = req.body.deleteFiles.split(" ");
     deleteFiles.splice(deleteFiles.length-1, 1);
@@ -135,6 +143,31 @@ router.post('/posts/create', function(req, res) {
       })
     })
   }
+})*/
+
+router.post('/posts/create', function(req, res) {
+  let newPost = new Post({
+    postedBy: req.user._id,
+    board: req.body.board,
+    title: req.body.title,
+    text: req.body.text
+  })
+  newPost.save(function(err, newPost) {
+    if (err) {
+      throw err;
+    }
+    Board.findOneAndUpdate({_id: req.body.board}, {$push: {contents: {"kind": "Post", "item": newPost._id}}}, function(err) {
+      if (err) {
+        throw err;
+      }
+      User.findOneAndUpdate({_id: req.user._id}, {$push: {posts: newPost._id}}, function(err) {
+        if (err) {
+          throw err;
+        }
+        res.redirect('/boards/' + req.body.board);
+      })
+    });
+  });
 })
 
 //Editing post
@@ -157,7 +190,7 @@ router.post('/posts/:id/edit', function(req, res) {
 })
 
 //Deleting post
-router.delete('/posts/:id', function(req, res) {
+router.post('/posts/:id', function(req, res) {
 	Post.findById(req.params.id, function(err, post) {
 		if (err) {
 			throw err;
@@ -166,7 +199,7 @@ router.delete('/posts/:id', function(req, res) {
 				if (err) {
 					throw err;
 				} else {
-					res.json({success: true});
+					res.redirect('/boards/' + board._id);
 				}
 			})
 		}
@@ -193,22 +226,49 @@ router.post('/posts/:id/delete', function(req, res) {
 })*/
 
 //Follow a post
-router.put('/posts/:id/follow', function(req, res) {
-	Post.findOneAndUpdate({_id: req.params.id}, {$push: {followers: req.user._id}}, function(err, post) {
+router.post('/posts/:id/follow', function(req, res) {
+	Time.findOneAndUpdate({}, {$push: {follows: {createdAt: Date.now(), post: req.params.id, user:req.user._id}}}, function(err, time) {
 		if (err) {
 			throw err;
 		} else {
-			User.findOneAndUpdate({_id: req.user._id}, {$push: {followingPosts: post._id}}, function(err, user) {
+			Post.findOneAndUpdate({_id: req.params.id}, {$push: {followers: req.user._id}}, function(err, post) {
 				if (err) {
 					throw err;
 				} else {
-					res.json({success: true});
+					User.findOneAndUpdate({_id: req.user._id}, {$push: {followingPosts: post._id}}, function(err, user) {
+						if (err) {
+							throw err;
+						} else {
+							res.redirect('back');
+						}
+					})
 				}
 			})
 		}
 	})
 })
 
+router.post('/posts/:id/unfollow', function(req, res) {
+	Time.findOneAndUpdate({}, {$pull: {follows: {post: req.params.id, user:req.user._id}}}, function(err, time) {
+		if (err) {
+			throw err;
+		} else {
+			Post.findOneAndUpdate({_id: req.params.id}, {$pull: {followers: req.user._id}}, function(err, post) {
+				if (err) {
+					throw err;
+				} else {
+					User.findOneAndUpdate({_id: req.user._id}, {$pull: {followingPosts: post._id}}, function(err, user) {
+						if (err) {
+							throw err;
+						} else {
+							res.redirect('back');
+						}
+					})
+				}
+			})
+		}
+	})
+})
 //Commenting on post
 router.post('/posts/:id/comment', function(req, res) {
 	let newComment = new Comment({
@@ -224,7 +284,37 @@ router.post('/posts/:id/comment', function(req, res) {
 				User.findOneAndUpdate({_id: req.user._id}, {$push: {comments: comment._id}}, function(err, currentUser) {
 					if (err) {
 						throw err;
-					} else {
+					} else if (req.user._id==post.postedBy) {
+						let notificationToFollowers = new Notification({
+							type: 'Comment on Following Post',
+							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the post \"" + post.title + "\" that you are following.",
+							routeID: {
+								kind: 'Post',
+								item: post._id
+							}
+						})
+						notificationToFollowers.save(function(err, notificationToFollowers) {
+							if (err) {
+								throw err;
+							} else {
+								let promises = post.followers.map(function(followerID) {
+									return new Promise(function(resolve, reject) {
+										User.findOneAndUpdate({_id: followerID}, {$push: {notifications: notificationToFollowers._id}}, function(err) {
+											if (err) {
+												throw reject(err);
+											} else {
+												resolve();
+											}
+										})
+									});
+								});
+								Promise.all(promises).then(function() {
+									res.redirect('/boards/' + post.board);
+								}).catch(console.error);
+							}
+						})
+					}
+					else {
 						let notificationToPoster = new Notification({
 							type: 'Comment on Created Post',
 							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on your post titled \"" + post.title + "\".",
@@ -262,7 +352,7 @@ router.post('/posts/:id/comment', function(req, res) {
 												});
 											});
 											Promise.all(promises).then(function() {
-												res.json({success: true})
+												res.redirect('/boards/' + post.board);
 											}).catch(console.error);
 										}
 									})

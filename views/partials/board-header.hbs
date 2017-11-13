@@ -1,14 +1,34 @@
 <link rel="stylesheet" href="/css/board-header/sxn-board-header.v2.min.css" />
+<script>
+function subscribe() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/boards/{{board.id}}/subscribe", true);
+  xhttp.send();
+  document.getElementById("subscribe").innerHTML = "<a onclick='unsubscribe()' class='uk-float-right uk-link'>Subscribed ✔</a>";
+}
+function unsubscribe() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/boards/{{board.id}}/unsubscribe", true);
+  xhttp.send();
+  document.getElementById("subscribe").innerHTML = "<a onclick='subscribe()' class='uk-float-right uk-link'>Subscribe</a>";
+
+}
+</script>
 <div id="board-header">
 
     <div class="board-header" class="uk-child-width-1-2@m" uk-grid>
         <div>
-            <h2>{{boardName}}<a href="" class="green" uk-icon="icon: pencil"></a></h2>
-            <span class="text-light">{{boardDescription}}</span>
+            <h2>{{board.name}}<a href="/boards/{{board.id}}/edit" class="green" uk-icon="icon: pencil"></a></h2>
+            <span class="text-light">{{board.description}}</span>
         </div>
-        <div>
-            <a class="uk-float-right uk-link">Board Settings</a>
-        </div>
+        {{#compare board.unsubscribable true operator="=="}}
+        <div id="subscribe">
+          {{#compare board.subscribed false operator="=="}}
+            <a onclick="subscribe()" class="uk-float-right uk-link">Subscribe</a>
+            {{else}}
+            <a onclick="unsubscribe()" class="uk-float-right uk-link">Subscribed ✔</a>
+            {{/compare}}
+        {{/compare}}
     </div>
 
 </div>

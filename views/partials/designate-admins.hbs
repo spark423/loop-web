@@ -1,41 +1,65 @@
-<link rel="stylesheet" href="css/designate-admins/sxn-designate-admins.v2.min.css" />
-
+<link rel="stylesheet" href="/css/designate-admins/sxn-designate-admins.v2.min.css" />
+<script>
+function search() {
+  var input, filter, table, tr, td, i;
+  input = document.getElementById("input");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("admins");
+  tr = table.getElementsByClassName("member");
+  for (i = 0; i < tr.length; i++) {
+    p = tr[i].getElementsByTagName("p")[0];
+    if (p.innerHTML.toUpperCase().indexOf(filter) > -1) {
+      tr[i].style.display = "";
+    } else {
+      tr[i].style.display = "none";
+    }
+  }
+}
+function makeAdmin(index) {
+  var name_tag = "name-" + index;
+  var username_tag = "username-" + index;
+  for(var i=0; i<{{users.length}}; i++) {
+    if(document.getElementById("name-" + i).innerHTML.indexOf('✔')!=-1) {
+      document.getElementById("name-" + i).innerHTML = document.getElementById("name-" + i).innerHTML.substring(0, document.getElementById("name-" + i).innerHTML.length-2);
+    }
+  }
+  if(document.getElementById(name_tag).innerHTML.indexOf('✔')==-1) {
+    document.getElementById(name_tag).innerHTML += " ✔";
+    document.getElementById("admin").value = document.getElementById(username_tag).innerHTML;
+  }
+}
+</script>
 <div id="designate-admins">
 
-    <h2>Designate Admin(s)</h2>
+    <h2>Designate Admin</h2>
 
     <div class="uk-card uk-card-default uk-card-body">
-
+      <input id="admin" type="text" name="admin" style="display: none">
         <div class="uk-inline">
             <span class="uk-form-icon" uk-icon="icon: hashtag"></span>
-            <input class="uk-input" placeholder="Search to add another admin">
+            <input id="input" class="uk-input" type="text" placeholder="Search to add another admin" onkeyup="search()">
         </div>
 
-        <div class="admins" uk-grid>
+        <div class="admins" id="admins" uk-grid>
             <div class="col uk-width-1-2@m">
+              {{#each users}}
                 <div class="member" uk-grid>
                     <div class="uk-width-auto@m">
                         <div class="img-wrap"></div>
                     </div>
                     <div class="uk-width-expand@m">
-                        <p class="name">Alex Reekie</p>
-                        <a href="">Delete Admin</a>
+                        <p class="name" id="name-{{@index}}">{{firstName}} {{lastName}}</p>
+                        <p id="username-{{@index}}" style="display:none">{{username}}</p>
+                        <a onclick="makeAdmin({{@index}})">Make Admin</a>
                     </div>
                 </div>
+              {{/each}}
             </div>
-            <div class="col right uk-width-1-2@m">
-                <div class="member" uk-grid>
-                    <div class="uk-width-auto@m">
-                        <div class="img-wrap"></div>
-                    </div>
-                    <div class="uk-width-expand@m">
-                        <p class="name">Alex Reekie</p>
-                        <a href="">Delete Admin</a>
-                    </div>
-                </div>
-            </div>
+
+
         </div>
 
     </div>
 
 </div>
+</form>

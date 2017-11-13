@@ -1,106 +1,62 @@
+<script>
+var notifications = $('#notifications')
+$.getJSON('/notifications', function(data) {
+  document.getElementById('notifications-number').innerHTML = data.length;
+  var createdPostCount=0;
+  var followingPostCount=0;
+  var createdEventCount=0;
+  var attendingEventCount=0;
+  var addedOrganizationCount=0;
+  for(var i=0; i<data.length; i++) {
+    if(data.notifications[i].type=="Comment on Created Post") {
+      createdPostCount++;
+    }
+    else if(data.notifications[i].type=="Comment on Following Post") {
+      followingPostCount++;
+    }
+    else if(data.notifications[i].type=="Comment on Created Event") {
+      createdEventCount++;
+    }
+    else if(data.notifications[i].type=="Comment on Attending Event") {
+      attendingEventCount++;
+    }
+    else if(data.notifications[i].type=="Added to Organization") {
+      addedOrganizationCount++;
+    }
+  }
+  if(createdPostCount!=0) {
+    var notification="<li><a href='/all-notifications'><span uk-icon='icon: comment'></span>" + "<b>" + createdPostCount + "</b> people commented on a post you created</a></li>";
+    notifications.append(notification);
+  }
+  if(followingPostCount!=0) {
+    var notification="<li><a href='/all-notifications'><span uk-icon='icon: comment'></span>" + "<b>" + followingPostCount + "</b> people commented on a post you are following</a></li>";
+    notifications.append(notification);
+  }
+  if(createdEventCount!=0) {
+    var notification="<li><a href='/all-notifications'><span uk-icon='icon: comment'></span>" + "<b>" + createdEventCount + "</b> people commented on a post you are following</a></li>";
+    notifications.append(notification);
+  }
+  if(attendingEventCount!=0) {
+    var notification="<li><a href='/all-notifications'><span uk-icon='icon: comment'></span>" + "<b>" + attendingEventCount + "</b> people commented on a post you are following</a></li>";
+    notifications.append(notification);
+  }
+  if(addedOrganizationCount!=0) {
+    var notification="<li><a href='/all-notifications'><span uk-icon='icon: comment'></span>You have been added to " + "<b>" + addedOrganizationCount + "</b> organization(s)</a></li>";
+    notifications.append(notification);
+  }
+  notifications.append("<li><a class='green' href='/all-notifications'>See all notifications</a></li>");
+});
+</script>
 <div id="topbar">
-    <div class="uk-float-left">
-        <form class="uk-search uk-search-default">
-            <span uk-search-icon></span>
-            <input class="search-drop-input uk-search-input" type="search" placeholder="Search for anything">
-            <div class="search-drop">
-
-                <ul class="uk-subnav uk-subnav-pill" uk-switcher>
-                    <li><a href="#">All</a></li>
-                    <li><a href="#">Posts</a></li>
-                    <li><a href="#">Challenges</a></li>
-                    <li><a href="#">Events</a></li>
-                    <li><a href="#">Polls</a></li>
-                    <li><a href="#">Sales</a></li>
-                </ul>
-
-                <div class="divider"></div>
-
-                <div class="search-row">
-                    <img src="/loop-img/avi.jpeg"></img>
-                    <span>
-                        <b>Alex Reekie</b><br/>
-                        English Literature, 2017
-                    </span>
-                    <div class="more">
-                        <div class="uk-inline">
-                            <a href="#" class="uk-icon-link" uk-icon="icon: more-vertical"></a>
-                            <?php include 'elements/element-user-menu.php'; ?>
-                        </div>
-                    </div>
-                    <div class="uk-clearfix"></div>
-                </div>
-                <div class="divider"></div>
-
-                <div class="search-row">
-                    <img class="event" src="/loop-img/event.png"></img>
-                    <span>
-                        <b>Event Name</b><br/>
-                        July 7, 2017<br/>
-                        8:30pm to 10:30pm
-                    </span>
-                    <div class="more">
-                        <div class="uk-inline">
-                            <a href="#" class="uk-icon-link" uk-icon="icon: more-vertical"></a>
-                            <?php include 'elements/element-user-menu.php'; ?>
-                        </div>
-                    </div>
-                    <div class="uk-clearfix"></div>
-                </div>
-                <div class="divider"></div>
-
-                <div class="search-row">
-                    <img src="/loop-img/avi.jpeg"></img>
-                    <span>
-                        <b>Alex Reekie</b><br/>
-                        English Literature, 2017
-                    </span>
-                    <div class="more">
-                        <div class="uk-inline">
-                            <a href="#" class="uk-icon-link" uk-icon="icon: more-vertical"></a>
-                            <?php include 'elements/element-user-menu.php'; ?>
-                        </div>
-                    </div>
-                    <div class="uk-clearfix"></div>
-                </div>
-
-            </div>
-        </form>
-    </div>
     <div class="uk-float-right">
         <div class="uk-inline">
             <a href="#">
-                <span class="uk-badge" type="button">15</span>
+                <span class="uk-badge" type="button" id="notifications-number">0</span>
                 <span class="uk-icon uk-margin-small-right" uk-icon="icon: bell"></span>
             </a>
             <div uk-drop="mode: click">
                 <div class="uk-card uk-card-body uk-card-default">
-                    <ul>
-                        <li>
-                            <a href="inbox.php">
-                                <span uk-icon="icon: mail"></span>You have <b>5</b> new messages
-                            </a>
-                        </li>
-                        <li>
-                            <a href="notifications.php">
-                                <span uk-icon="icon: check"></span><b>6</b> orgs need your approval
-                            </a>
-                        </li>
-                        <li>
-                            <a href="notifications.php">
-                                <span uk-icon="icon: bookmark"></span><b>2</b> posts have been flagged
-                            </a>
-                        </li>
-                        <li>
-                            <a href="notifications.php">
-                                <span uk-icon="icon: user"></span><b>3</b> new members
-                            </a>
-                        </li>
-                        <li>
-                            <a class="green" href="notifications.php">
-                                See all notifications
-                            </a>
-                        </li>
+                    <ul id="notifications">
                     </ul>
                 </div>
             </div>

@@ -1,0 +1,101 @@
+#board-edit{
+    padding: 0 30px;
+    margin: 0 0 30px;
+}
+#board-edit .uk-card-body{
+    padding: 20px;
+    position: relative;
+}
+#board-edit p{
+    margin: 0;
+}
+#board-edit .title{
+    margin: 0;
+    font-weight: 600;
+}
+#board-edit a.green{
+    text-decoration: none;
+}
+#board-edit .create-wrap{
+    border: 1px solid #d1d2d3;
+    width: 100%;
+    border-radius: 20px;
+}
+#board-edit h4.inner{
+    margin: 0 30px 0 30px;
+    padding: 20px 0;
+    font-weight: 400;
+    color: #00d283;
+}
+#board-edit .divider{
+    border-top: 1px solid #d1d2d3;
+    width: 100%;
+}
+#board-edit .form-wrap{
+    padding: 20px;
+}
+#board-edit .create-grid{
+    margin: 0;
+}
+#board-edit .poll-wrap{
+    padding: 0;
+}
+#board-edit .poll-wrap span{
+    margin: 0 0 10px;
+}
+#board-edit .poll-wrap a.add{
+    color: #404041;
+    position: relative;
+    top: 15px;
+}
+#board-edit .poll-wrap a.add:hover{
+    text-decoration: underline;
+}
+#board-edit .poll-wrap a.add .uk-icon{
+    margin: 0 10px 0 0;
+    position: relative;
+    top: -1px;
+}
+#board-edit input:not(.uk-checkbox),
+#board-edit textarea{
+    width: 100%;
+}
+#board-edit .uk-checkbox{
+    margin: 0 5px 0 0;
+    position: relative;
+    top: -2px;
+}
+#board-edit textarea{
+    margin: 0 0 20px;
+    height: 169px;
+}
+#board-edit .uk-button{
+    border-radius: 20px;
+}
+#board-edit .uk-button-primary{
+    margin: 0 10px 0 0;
+}
+#board-edit .list-wrap ul{
+    padding: 0;
+    margin: 0;
+}
+#board-edit .list-wrap ul li{
+    list-style-type: none;
+    border-bottom: 1px solid #d1d2d3;
+    padding: 20px;
+}
+#board-edit .list-wrap ul li:last-child{
+    border: none;
+}
+#board-edit .list-wrap ul li .uk-icon{
+    margin: 0 10px 0 0;
+    position: relative;
+    top: -2px;
+}
+#board-edit .list-wrap ul li a{
+    color: #58595b;
+}
+#board-edit .list-wrap ul li a:hover{
+    color: #00d283;
+    text-decoration: none;
+}

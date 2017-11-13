@@ -1,8 +1,8 @@
 var mongoose = require('mongoose');
 
 var timeSchema = new mongoose.Schema({
-  follows: [post: {type: mongoose.Schema.Types.ObjectId, refPath: 'Post'}, user: {type: mongoose.Schema.Types.ObjectId, refPath: 'User'}, createdAt: {type: Date, default: Date.now()}],
-  subscriptions: [board: {type: mongoose.Schema.Types.ObjectId, refPath: 'Board'}, user: {type: mongoose.Schema.Types.ObjectId, refPath: 'User'}, createdAt: {type: Date, default: Date.now()}],
+  follows: [{createdAt: Date, post: {type: mongoose.Schema.Types.ObjectId, refPath: 'Post'}, user: {type: mongoose.Schema.Types.ObjectId, refPath: 'User'}}],
+  subscriptions: [{createdAt: Date, board: {type: mongoose.Schema.Types.ObjectId, refPath: 'Board'}, user: {type: mongoose.Schema.Types.ObjectId, refPath: 'User'}}]
 })
 
 // Export schema =====================================================================================================================================================================

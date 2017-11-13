@@ -5,6 +5,7 @@ var Board = require('../models/board');
 var Event = require('../models/event');
 var Comment = require('../models/comment');
 var Notification = require('../models/notification')
+var moment = require('moment');
 
 router.get('/events/create', function(req, res) {
 	Board.find({}, function(err, boards) {
@@ -17,110 +18,89 @@ router.get('/events/create', function(req, res) {
 	})
 })
 
-router.post('/events/create', function(req, res) {
-  var deleteFiles = req.body.deleteFiles.split(" ");
-  deleteFiles.splice(deleteFiles.length-1, 1);
-  for(var i=0; i<deleteFiles.length; i++) {
-    for(var j=0; j<req.files.images.length; j++) {
-      if(req.files.images[j].name == deleteFiles[i]) {
-        req.files.images.splice(j,1);
-        break;
-      }
-    }
-  }
-  if(req.files.images && req.files.images != '') {
-    imgProc.convertImgs(req.files.images).then((imageStringArray)=>{
-      var newEvent = new Event({
-        postedBy: req.user._id,
-        name: req.body.name,
-        board: req.body.board,
-        startTime: req.body.startTime,
-        endTime: req.body.endTime,
-        location: req.body.location,
-        text: req.body.text,
-        date: req.body.date,
-        images: imageStringArray
-      });
-      var newNotification = new Notification({
-        recipient: req.user._id,
-        message: 'Your event has been made on Loop. Please assign it to a board.'
-      })
-      newEvent.save(function(error, newEvent) {
-        if (error)
-          throw error;
-        newNotification.save(function(error, newNotification) {
-          if (error)
-            throw error;
-          User.findById(req.user._id, function(error, user) {
-            if (error)
-              throw error;
-            user.createdEvents.push(newEvent._id)
-            user.notifications.push(newNotification._id)
-            user.save(function(error, updatedUser) {
-              if (error)
-                throw error
-              Board.findById(newEvent.board, function(error, board) {
-                if (error)
-                  throw error
-                board.events.push(newEvent._id);
-                board.save(function(error, updatedBoard) {
-                  if (error)
-                    throw error
-                  res.redirect('/boards/'+updatedBoard._id)
-                })
-              })
-            })
-          })
-        })
-      })
-    });
-  } else {
-    var newEvent = new Event({
-      postedBy: req.user._id,
-      name: req.body.name,
-      board: req.body.board,
-      startTime: req.body.startTime,
-      endTime: req.body.endTime,
-      location: req.body.location,
-      text: req.body.text,
-      date: req.body.date
-    })
-    console.log(newEvent);
-    var newNotification = new Notification({
-      recipient: req.user._id,
-      message: 'Your event has been made on Loop. Please assign it to a board.'
-    })
-    newEvent.save(function(error, newEvent) {
-      if (error)
-        throw error;
-      newNotification.save(function(error, newNotification) {
-        if (error)
-          throw error;
-        User.findById(req.user._id, function(error, user) {
-          if (error)
-            throw error;
-          user.createdEvents.push(newEvent._id)
-          user.notifications.push(newNotification._id)
-          user.save(function(error, updatedUser) {
-            if (error)
-              throw error
-            Board.findById(newEvent.board, function(error, board) {
-              if (error)
-                throw error
-              board.events.push(newEvent._id);
-              board.save(function(error, updatedBoard) {
-                if (error)
-                  throw error
-                res.redirect('/boards/'+updatedBoard._id)
-              })
-            })
-          })
-        })
-      })
-    })
-  }
+router.get('/events-invite', function(req, res) {
+	res.render("create-a-new-event-invite");
 })
 
+router.post('/events/create', function(req, res) {
+  var newEvent = new Event({
+    title: req.body.title,
+		description: req.body.description,
+    board: req.body.board,
+    startTime: req.body.startTime,
+    endTime: req.body.endTime,
+    location: req.body.location,
+    date: req.body.date,
+		contact: req.user.username
+  });
+	newEvent.attendees.push(req.user._id);
+  newEvent.save(function(error, newEvent) {
+    if (error) throw error;
+    User.findById(req.user._id, function(error, user) {
+      if (error) throw error;
+			user.attendedEvents.push(newEvent._id);
+      user.save(function(error, updatedUser) {
+        if (error) throw error;
+				Board.findById(newEvent.board, function(err, board) {
+					if (err) throw err;
+					board.contents.push({"kind": "Event", "item": newEvent._id});
+					board.save(function(err, updatedBoard) {
+						if(err) throw err;
+						res.redirect('/boards/' + updatedBoard._id);
+					})
+				})
+      })
+    })
+  })
+});
+
+router.get('/event/:id', function(req, res) {
+	Event.findById(req.params.id, function(err, event) {
+		if(err) throw err;
+		Board.findById(event.board, function(err, board) {
+			if(err) throw err;
+			User.find({"_id": event.attendees}, function(err, attendees) {
+				if(err) throw err;
+				User.findOne({"username": event.contact}, function(err, user) {
+					if(err) throw err;
+					console.log(attendees);
+				  var eventObject = {
+						"id": event._id,
+						"createdAt": moment(event.createdAt).format('MMMM D, YYYY, h:mm a'),
+						"postedBy": {
+							"id": user._id,
+							"firstName": user.firstName,
+							"lastName": user.lastName
+						},
+						"title": event.title,
+						"board": event.board,
+						"date": moment(event.date).format('MMMM D, YYYY'),
+						"startTime": moment(event.startTime, "HH:mm").format('h:mm a'),
+						"endTime": moment(event.endTime, "HH:mm").format('h:mm a'),
+						"location": event.location,
+						"description": event.description,
+						"comments": event.comments,
+						"attendees": attendees
+					}
+					res.render('event-detail', {"event": eventObject, "board": board.name});
+				})
+			})
+		})
+	})
+})
+
+router.get('/event-attendees', function(req, res) {
+	res.render('event-attendees-list')
+})
+router.get('/eventlist', function(req, res) {
+	res.render('events-list-view')
+})
+router.get('/event-calendar', function(req, res) {
+	res.render('events-calendar-view')
+})
+router.get('/edit-event', function(req, res) {
+	res.render('edit-event');
+})
 //Editing event
 router.post('/events/:id/edit', function(req, res) {
 	Event.findById(req.params.id, function(error, event) {
@@ -195,7 +175,7 @@ router.put('/events/:id', function(req, res) {
 })
 
 //Deleting event from event board
-router.delete('/events/:id', function(req, res) {
+router.post('/events/:id', function(req, res) {
 	Event.findById(req.params.id, function(err, event) {
 		if (err)  {
 			throw err;
@@ -204,32 +184,12 @@ router.delete('/events/:id', function(req, res) {
 				if (err) {
 					throw err;
 				} else {
-					res.json({success: true});
+					res.redirect('/boards/' + event.board);
 				}
 			})
 		}
 	})
 })
-/*
-router.post('/events/:id/delete-event', function(req, res) {
-	Event.findById(req.params.id, function(error, event) {
-		if (error)
-			throw error;
-		Board.findOne({name: 'Event'}, function(error, board) {
-			if (error)
-				throw error;
-			var boardEvents = board.events
-			var index = boardEvents.indexOf(event._id)
-			board.events = boardEvents.slice(0, index).concat(boardEvents.slice(index+1, boardEvents.length))
-			board.save(function(error, updatedBoard) {
-				if (error)
-					throw error;
-				res.redirect('/boards/'+updatedBoard._id)
-			})
-		})
-	})
-})
-*/
 
 //Commenting on event
 router.post('/events/:id/comment', function(req, res) {
@@ -238,54 +198,95 @@ router.post('/events/:id/comment', function(req, res) {
 		source: {"kind": 'Event', "item": req.params.id},
 		text: req.body.text
 	})
-	newComment.save(function(err, newComment) {
-		if (err) {
-			throw err;
-		}
-		Event.findOneAndUpdate({_id: req.params.id}, {$push: {comments: newComment._id}}, function(err) {
+	newComment.save(function(err, comment) {
+		Event.findOneAndUpdate({_id: req.params.id}, {$push: {comments: comment._id}}, function(err, post) {
 			if (err) {
 				throw err;
+			} else {
+				User.findOneAndUpdate({_id: req.user._id}, {$push: {comments: comment._id}}, function(err, currentUser) {
+					if (err) {
+						throw err;
+					} else if(req.user._id==post.postedBy) {
+						let notificationToFollowers = new Notification({
+							type: 'Comment on Attending Event',
+							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the event \"" + post.title + "\" that you are attending.",
+							routeID: {
+								kind: 'Event',
+								item: post._id
+							}
+						})
+						notificationToFollowers.save(function(err, notificationToFollowers) {
+							if (err) {
+								throw err;
+							} else {
+								let promises = post.attendees.map(function(followerID) {
+									return new Promise(function(resolve, reject) {
+										User.findOneAndUpdate({_id: followerID}, {$push: {notifications: notificationToFollowers._id}}, function(err) {
+											if (err) {
+												throw reject(err);
+											} else {
+												resolve();
+											}
+										})
+									});
+								});
+								Promise.all(promises).then(function() {
+									res.redirect('/boards/' + post.board);
+								}).catch(console.error);
+							}
+						})
+					}
+					else {
+						let notificationToPoster = new Notification({
+							type: 'Comment on Created Event',
+							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on your event titled \"" + post.title + "\".",
+							routeID: {
+								kind: 'Event',
+								item: post._id
+							}
+						})
+						notificationToPoster.save(function(err, notificationToPoster) {
+							User.findOneAndUpdate({_id: post.postedBy}, {$push: {notifications: notificationToPoster._id}}, function(err) {
+								if (err) {
+									throw err;
+								} else {
+									let notificationToFollowers = new Notification({
+										type: 'Comment on Attending Event',
+										message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the event \"" + post.title + "\" that you are attending.",
+										routeID: {
+											kind: 'Event',
+											item: post._id
+										}
+									})
+									notificationToFollowers.save(function(err, notificationToFollowers) {
+										if (err) {
+											throw err;
+										} else {
+											let promises = post.attendees.map(function(followerID) {
+												return new Promise(function(resolve, reject) {
+													User.findOneAndUpdate({_id: followerID}, {$push: {notifications: notificationToFollowers._id}}, function(err) {
+														if (err) {
+															throw reject(err);
+														} else {
+															resolve();
+														}
+													})
+												});
+											});
+											Promise.all(promises).then(function() {
+												res.redirect('/boards/' + post.board);
+											}).catch(console.error);
+										}
+									})
+								}
+							})
+						})
+					}
+				})
 			}
-			User.findOneAndUpdate({_id: req.user._id}, {$push: {comments: newComment._id}}, function(err) {
-				if (err) {
-					throw err;
-				}
-				res.json({success: true})
-			})
-		});
-	})
-})
-/*
-router.post('/events/:id/comment', function(req, res) {
-	var newComment = new Comment({
-		postedBy: {"name": req.user.firstName + " " + req.user.lastName, "_id": req.user._id},
-		event: req.params.id,
-		text: req.body.text
-	})
-	newComment.save(function(error, newComment) {
-		User.findById(req.user._id, function(error, user) {
-			if (error)
-				throw error;
-			user.comments.push(newComment._id)
-			user.save(function(error, updatedUser) {
-				if (error)
-					throw error;
-		    Event.findById(newComment.event, function(error, event) {
-		      if (error)
-				    throw error;
-			    event.comments.push(newComment._id)
-	        event.save(function(error, updatedEvent) {
-				    if (error)
-				      throw error;
-		       res.redirect('back')
-	        })
-	      })
-			})
 		})
 	})
 })
-*/
-
 
 //Attend event
 router.post('/events/:id/attend', function(req, res) {

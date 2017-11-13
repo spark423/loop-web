@@ -1,14 +1,14 @@
-<link rel="stylesheet" href="css/new-org-header/sxn-new-org-header.min.css" />
+<link rel="stylesheet" href="/css/new-org-header/sxn-new-org-header.min.css" />
 
 <div id="new-org-header">
-
+<form id="org-form" method="post" action="/group-invite">
     <div class="new-org-header" class="uk-child-width-1-2@m" uk-grid>
         <div>
             <h2>New Organization</h2>
         </div>
         <div>
-            <a class="uk-float-right uk-button uk-button-cancel" type="button">Back</a>
-            <a href="create-a-new-org-invite.php" class="uk-float-right uk-button uk-button-primary" type="button">Next</a>
+            <a class="uk-float-right uk-button uk-button-cancel" onclick="javascript:history.back();" type="button">Back</a>
+            <a onclick="document.getElementById('org-form').submit()" class="uk-float-right uk-button uk-button-primary" type="button">Next</a>
         </div>
     </div>
 

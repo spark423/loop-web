@@ -6,7 +6,7 @@ var Board = require('../models/board');
 var moment = require('moment')
 var Post = require('../models/post');
 var Event = require('../models/event');
-
+var Time = require('../models/time');
 /*Top 3:
 1. Total number of Posts this week
 2. The total Events this week
@@ -20,6 +20,7 @@ router.get('/home', function(req, res) {
 		var post_counter = 0;
 		var event_counter = 0;
 		var follow_counter = 0;
+		var subscription_counter = 0;
 
 		var post_percent = 0;
 		var lastWeekPosts = 0;
@@ -69,30 +70,90 @@ router.get('/home', function(req, res) {
 					}
 				}
 				post_percent = ((thisWeekPosts-lastWeekPosts)/lastWeekPosts)*100;
+				if(post_percent==Infinity) {
+					post_percent=0;
+				}
 				Event.find({}, function(err, events) {
 					for(var i=0; i<events.length; i++) {
 						if(events[i].createdAt > start) {
 							event_counter++;
 						}
-						if(posts[i].createdAt > lastWeek && posts[i].createdAt < lastWeekToday) {
+						if(events[i].createdAt > lastWeek && events[i].createdAt < lastWeekToday) {
 							lastWeekEvents++;
 						}
-						if(posts[i].createdAt > start && posts[i].createdAt < today) {
+						if(events[i].createdAt > start && events[i].createdAt < today) {
 							thisWeekEvents++;
 						}
 					}
 					event_percent = ((thisWeekEvents-lastWeekEvents)/lastWeekEvents)*100;
+					if(event_percent==Infinity) {
+						event_percent=0;
+					}
 					Group.find({}, function(err, groups) {
 						if (err) throw err;
 						var group_counter = groups.length;
+						for(var i=0; i<groups.length; i++) {
+							if(groups[i].createdAt > lastWeek && groups[i].createdAt < lastWeekToday) {
+								lastWeekGroups++;
+							}
+							if(groups[i].createdAt > start && groups[i].createdAt < today) {
+								thisWeekGroups++;
+							}
+						}
+						group_percent = ((thisWeekGroups-lastWeekGroups)/lastWeekGroups)*100;
+						if(group_percent==Infinity) {
+							group_percent = 0;
+						}
 						User.find({}, function(err, users) {
 							if (err) throw err;
 							var user_counter = users.length;
-							var subscription_counter = 0;
+							for(var i=0; i<users.length; i++) {
+								if(users[i].createdAt > lastWeek && users[i].createdAt < lastWeekToday) {
+									lastWeekUsers++;
+								}
+								if((users[i].createdAt > start) && (users[i].createdAt < today)) {
+									thisWeekUsers++;
+								}
+							}
+							user_percent = ((thisWeekUsers-lastWeekUsers)/lastWeekUsers)*100;
+							if(user_percent==Infinity) {
+								user_percent=0;
+							}
 							for(var i=0; i<users.length; i++) {
 								subscription_counter+=users[i].subscribedBoards.length;
 							}
-							res.render('home', {user: req.user, date: moment(Date.now()).format('dddd, MMMM D, YYYY'), boards: board_counter, groups: group_counter, users: user_counter, posts: post_counter, events: event_counter, follows: follow_counter, subscriptions: subscription_counter, post_percent: post_percent, event_percent: event_percent, follow_percent: follow_percent, group_percent: group_percent, user_percent: user_percent, subscriptions_percent: subscriptions_percent});
+							Time.find({}, function(err, times) {
+								for(var i=0; i<times.length; i++) {
+									for(var j=0; j<times[i].follows.length; j++) {
+										if(times[i].follows[j].createdAt > start) {
+											follow_counter++;
+										}
+										if(times[i].follows[j].createdAt > lastWeek && times[i].follows[j].createdAt < lastWeekToday) {
+											lastWeekFollows++;
+										}
+										if(times[i].follows[j].createdAt > start && times[i].follows[j].createdAt < today) {
+											thisWeekFollows++;
+										}
+									}
+									for(var j=0; j<times[i].subscriptions.length; j++) {
+										if(times[i].subscriptions[j].createdAt > lastWeek && times[i].subscriptions[j].createdAt < lastWeekToday) {
+											lastWeekSubscriptions++;
+										}
+										if(times[i].subscriptions[j].createdAt > start && times[i].subscriptions[j].createdAt < today) {
+											thisWeekSubscriptions++;
+										}
+									}
+								}
+								follow_percent = ((thisWeekFollows-lastWeekFollows)/lastWeekFollows)*100;
+								subscriptions_percent = ((thisWeekSubscriptions-lastWeekSubscriptions)/lastWeekSubscriptions)*100;
+								if(follow_percent==Infinity) {
+									follow_percent=0;
+								}
+								if(subscriptions_percent==Infinity) {
+									subscriptions_percent=0;
+								}
+								res.render('home', {user: req.user, date: moment(Date.now()).format('dddd, MMMM D, YYYY'), groups: group_counter, users: user_counter, posts: post_counter, events: event_counter, follows: follow_counter, subscriptions: subscription_counter, post_percent: post_percent, event_percent: event_percent, follow_percent: follow_percent, group_percent: group_percent, user_percent: user_percent, subscriptions_percent: subscriptions_percent});
+							})
 						})
 					})
 				})

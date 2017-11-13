@@ -5,12 +5,12 @@
 
     <h4>TODAY</h4>
     <p style="display:none" id="boardName">{{board.name}}</p>
-    {{#each contents}}
+    {{#each board.contents}}
     {{#if this.location}}
     <form id='delete-event-{{@index}}' style="display: none" method="post" action="/events/{{this.id}}"></form>
     <form id='attend-event-{{@index}}' style="display: none" method="post" action="/events/{{this.id}}/attend"></form>
     <form id='unattend-event-{{@index}}' style="display: none" method="post" action="/events/{{this.id}}/unattend"></form>
-    <div id="feed-event">
+    <div id="feed-event" id="{{this.id}}">
         <div class="feed-item">
             <div class="uk-card uk-card-default uk-card-body">
 
@@ -19,7 +19,7 @@
                         <img src="/img/avi.jpeg" alt="Alex Reekie" />
                     </div>
                     <div class="poster-info uk-float-left">
-                      <span class="name"><a href='/users/{{this.postedBy.id}}'>{{this.postedBy.firstName}} {{this.postedBy.lastName}}</a></span><br />
+                        <span class="name"><a href='/users/{{this.postedBy.id}}'>{{this.postedBy.firstName}} {{this.postedBy.lastName}}</a></span><br />
                         <span>Created a new event at {{this.createdAt}}</span>
                     </div>
                     <div class="more">
@@ -35,7 +35,7 @@
                                 <div class="img-wrap"></div>
                             </div>
                             <div class="uk-width-1-2@m">
-                              <span class="title"><a href='/event/{{this.id}}'>{{this.title}}</a></span><br />
+                                <span class="title"><a href='/event/{{this.id}}'>{{this.title}}</a></span><br />
                                 <span>{{this.date}}, {{this.startTime}} to {{this.endTime}}</span><br />
                                 <span>{{this.location}}</span><br />
                                 <br />
@@ -58,7 +58,7 @@
                         <img src="/img/gg.png" alt="Georgina Reekie" />
                     </div>
                     <div class="poster-info uk-float-left">
-                      <span class="name"><a href='/users/{{postedBy.id}}' style="color: black">{{postedBy.firstName}} {{postedBy.lastName}}</a></span>&nbsp;<span class="timestamp">{{createdAt}}</span><br />
+                        <span class="name"><a href='/users/{{postedBy.id}}' style="color: black">{{postedBy.firstName}} {{postedBy.lastName}}</a></span>&nbsp;<span class="timestamp">{{createdAt}}</span><br />
                         <span>{{text}}</span>
                     </div>
                     <div class="more">
@@ -84,7 +84,7 @@
                                 <img src="/img/gg.png" alt="Georgina Reekie" />
                             </div>
                             <div class="poster-info uk-float-left">
-                              <span class="name"><a href='/users/{{postedBy.id}}' style="color: black">{{postedBy.firstName}} {{postedBy.lastName}}</a></span>&nbsp;<span class="timestamp">{{createdAt}}</span><br />
+                                <span class="name">{{this.postedBy.firstName}} {{this.postedBy.lastName}}</span>&nbsp;<span class="timestamp">{{this.createdAt}}</span><br />
                                 <span>{{this.text}}</span>
                             </div>
                             <div class="more">
@@ -411,7 +411,7 @@
     <form id='delete-post-{{@index}}' style="display: none" method="post" action="/posts/{{this.id}}"></form>
     <form id='follow-post-{{@index}}' style="display: none" method="post" action="/posts/{{this.id}}/follow"></form>
     <form id='unfollow-post-{{@index}}' style="display: none" method="post" action="/posts/{{this.id}}/unfollow"></form>
-    <div class="feed-item">
+    <div class="feed-item" id="{{this.id}}">
         <div class="uk-card uk-card-default uk-card-body">
             <div class="main-post">
                 <div class="poster-avi uk-float-left">
@@ -419,7 +419,8 @@
                 </div>
                 <div class="poster-info uk-float-left">
                   <span class="name"><a href='/users/{{this.postedBy.id}}'>{{this.postedBy.firstName}} {{this.postedBy.lastName}}</a></span><br />
-                    <span>Posted at {{this.createdAt}} in <a href="/boards/{{this.board}}" id="board-name-{{@index}}">{{this.boardName}}</a></span>
+                    <span>Posted at {{this.createdAt}} in <a href="/boards/{{this.board}}" id="board-name-{{@index}}"></a></span>
+                    <script> document.getElementById('board-name-{{@index}}').innerHTML = document.getElementById('boardName').innerHTML</script>
                 </div>
                 <div class="more">
                     <div class="uk-inline">

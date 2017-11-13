@@ -1,0 +1,24 @@
+<div uk-drop="mode: click">
+    <div class="uk-card uk-card-body uk-card-default">
+        <ul>
+          {{#compare this.attending false operator="=="}}
+            <li>
+              <a href="#" onclick="document.getElementById('attend-event-{{@index}}').submit();">
+                Attend Event
+              </a>
+            </li>
+            {{else}}
+            <li>
+              <a href="#" onclick="document.getElementById('unattend-event-{{@index}}').submit();">
+                Unattend Event
+              </a>
+            </li>
+            {{/compare}}
+            <li>
+              <a href="#" onclick="document.getElementById('delete-event-{{@index}}').submit();">
+                Delete Event
+              </a>
+            </li>
+        </ul>
+    </div>
+</div>

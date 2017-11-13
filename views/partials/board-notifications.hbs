@@ -9,11 +9,9 @@
                 <div class="create-grid" uk-grid>
                     <div class="poll-wrap uk-width-3-5@m">
                         <div class="form-wrap">
-                            <form id="postform" method="post" enctype="multipart/form-data" action="/boards/{{boardId}}/post">
+                            <form id="postform" method="post" action="/boards/{{board.id}}/post">
                                 <input class="uk-input uk-form-large uk-form-blank uk-form-width-large" type="text" name="title" placeholder="Add a title"></input>
-                                <textarea class="uk-textarea uk-form-blank uk-form-width-large" type="text" name="text" placeholder="Add a description"></textarea>
-                                <input type="file" id="files" name="images" multiple accept="image/*" style="display: none">
-                                <input type="text" id="deleteFiles" name="deleteFiles" style="display: none">
+                                <textarea class="uk-textarea uk-form-blank uk-form-width-large" type="text" name="text" placeholder="Add a description" style="overflow: hidden; resize: vertical"></textarea>
                                 <a class="uk-button uk-button-primary" type="button" onclick="document.getElementById('postform').submit();">Create</a>
                                 <a class="uk-button uk-button-cancel" type="button">Back</a>
                             </form>

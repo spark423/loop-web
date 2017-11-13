@@ -1,5 +1,5 @@
 <div class="sidenav-wrap">
-    <div id="sidenav">
+    <div id="sidenav" style="overflow:auto; resize:none">
         <div class="img-wrap">
             <img class="uk-float-left" src="/img/loop_logo_white.png" alt="Loop" />
         </div>
@@ -55,16 +55,32 @@
             <li class="uk-parent">
                 <a href="#"><span uk-icon="icon: album"></span>Boards</a>
                 <ul class="uk-nav-sub" id="side-boards">
-                    <li><a href="board-overview.php"><span uk-icon="icon: calendar"></span>Events</a></li>
-                    <li><a href="board-overview.php"><span uk-icon="icon: album"></span>Challenges</a></li>
+                    <li><a href="board-overview.php"><span uk-icon="icon: calendar"></span>Events ✔</a></li>
                     <li><a href="board-overview.php"><span uk-icon="icon: album"></span>Campus Updates</a></li>
                     <li><a href="board-overview.php"><span uk-icon="icon: album"></span>Resources</a></li>
                     <script>
                     var side_boards = $('#side-boards');
                     $.getJSON('/boardinfo', function(data) {
-                      for(var i=0; i<data.length; i++) {
-                        var board = "<li><a href=/boards/" + data[i]._id + "><span uk-icon='icon: album'></span>" + data[i].name + "</a></li>";
-                        side_boards.append(board);
+                      for(var i=0; i<data.info.length; i++) {
+                        var added = false;
+                        if(data.info[i].unsubscribable==false) {
+                          var board = "<li><a href=/boards/" + data.info[i]._id + "><span uk-icon='icon: album'></span>" + data.info[i].name + " ✔" + "</a></li>";
+                          side_boards.append(board);
+                          added=true;
+                        }
+                        else {
+                          for(var j=0; j<data.subscribedBoards.length; j++) {
+                            if(data.info[i]._id==data.subscribedBoards[j]) {
+                              var board = "<li><a href=/boards/" + data.info[i]._id + "><span uk-icon='icon: album'></span>" + data.info[i].name + " ✔" + "</a></li>";
+                              side_boards.append(board);
+                              added=true;
+                            }
+                          }
+                        }
+                        if(added == false) {
+                          var board = "<li><a href=/boards/" + data.info[i]._id + "><span uk-icon='icon: album'></span>" + data.info[i].name + "</a></li>";
+                          side_boards.append(board);
+                        }
                       }
                     });
                     </script>
@@ -98,7 +114,17 @@
                             Event
                         </a>
                     </li>
-                </li>
+                    <li>
+                        <a href="/create-a-new-board">
+                            Board
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/create-a-new-org">
+                            Organization
+                        </a>
+                    </li>
+                </ul>
             </div>
             <a class="tog create" uk-toggle="target: .create-list, .tog; animation: uk-animation-fade"><span uk-icon="icon: plus"></span>Create New</a>
             <a class="tog create" uk-toggle="target: .create-list, .tog; animation: uk-animation-fade" hidden><span uk-icon="icon: close"></span>Cancel</a>

@@ -2,34 +2,23 @@
 
 <div id="admins">
 
-    <h2>Admin(s)</h2>
+    <h2>Admin</h2>
 
     <div class="uk-card uk-card-default uk-card-body">
 
         <div class="admins" uk-grid>
-          {{#if admin}}
+          {{#if group.admin}}
             <div class="col uk-width-1-2@m">
                 <div class="member" uk-grid>
                     <div class="uk-width-auto@m">
                         <div class="img-wrap"></div>
                     </div>
                     <div class="uk-width-expand@m">
-                        <p class="name">{{admin.name}}</p>
+                        <p class="name">{{group.admin.firstName}} {{group.admin.lastName}}</p>
                     </div>
                 </div>
             </div>
           {{/if}}
-            <div class="col right uk-width-1-2@m">
-                <div class="member" uk-grid>
-                    <div class="uk-width-auto@m">
-                        <div class="img-wrap"></div>
-                    </div>
-                    <div class="uk-width-expand@m">
-                        <p class="name">Alex Reekie</p>
-                        <a href="">Message Admin</a>
-                    </div>
-                </div>
-            </div>
         </div>
 
     </div>

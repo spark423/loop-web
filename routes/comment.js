@@ -55,7 +55,7 @@ router.post('/comments/:id/edit', function(req, res) {
 
 
 //Deleting comment
-router.delete('/comments/:id', function(req, res) {
+router.post('/comments/:id', function(req, res) {
 	Comment.findById(req.params.id, function(err, comment) {
 		if (err) {
 			throw err;
@@ -64,21 +64,21 @@ router.delete('/comments/:id', function(req, res) {
 				if (err) {
 					throw err;
 				}
-				res.json({success: true});
+				res.redirect('/boards/' + board.board);
 			})
 		} else if (comment.source.kind === 'Event') {
 			Event.findOneAndUpdate({_id: comment.source.item}, {$pull: {comments: req.params.id}}, function(err, board) {
 				if (err) {
 					throw err;
 				}
-				res.json({success: true});
+				res.redirect('/boards/' + board.board);
 			})
 		} else {
 			Comment.findOneAndUpdate({_id: comment.source.item}, {$pull: {comments: req.params.id}}, function(err, board) {
 				if (err) {
 					throw err;
 				}
-				res.json({success: true});
+				res.redirect('/boards/' + board.source.item.source.item.board);
 			})
 		}
 	})

@@ -1,61 +1,5 @@
 <link rel="stylesheet" href="/css/post-board-notifications-create/sxn-post-board-notifications-create.v3.min.css" />
-<script>
-  $("#upload_link").click(function(){
-      $("#files").click();
-  });
-</script>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-<script type="text/javascript">
-  var selDiv = "";
-  var storedFiles = [];
-  $(document).ready(function() {
-      selDiv = $("#selectedFiles");
-      $("#files").unbind();
-      $("#files").on("change", handleFileSelect);
-      $("body").on("click", ".selFile", removeFile);
-  });
 
-  function handleFileSelect(e) {
-    var files = e.target.files;
-    var filesArr = Array.prototype.slice.call(files);
-    filesArr.forEach(function(f) {
-      if(!f.type.match("image.*")) {
-        return;
-      }
-      storedFiles.push(f);
-      var reader = new FileReader();
-      reader.onload = function (e) {
-        var html = "<div><img src=\"" + e.target.result + "\" data-file='"+f.name+"' class='selFile' title='Click to remove'>" + f.name + "<br clear=\"left\"/></div>";
-        selDiv.append(html);
-      }
-      reader.readAsDataURL(f);
-    });
-    e.target.result='';
-  }
-
-  function removeFile(e) {
-    var file = $(this).data("file");
-    for(var i=0;i<storedFiles.length;i++) {
-      if(storedFiles[i].name == file) {
-        document.getElementById('deleteFiles').value = document.getElementById('deleteFiles').value + storedFiles[i].name + " ";
-        storedFiles.splice(i,1);
-        break;
-      }
-    }
-    $(this).parent().remove();
-  }
-</script>
-<style>
-#files{
-  display:none
-}
-#selectedFiles img {
-    max-width: 100px;
-    max-height: 100px;
-    float: left;
-    margin-bottom:10px;
-}
-</style>
 <div id="post-board-notifications-create">
     <div class="uk-card uk-card-default uk-card-body">
         <div class="create-wrap">
@@ -64,12 +8,9 @@
             <div class="create-grid" uk-grid>
                 <div class="poll-wrap uk-width-3-5@m">
                     <div class="form-wrap">
-                        <form id="postform" action="/events/create" method="post" enctype="multipart/form-data" onsubmit="action()">
+                        <form id="postform" action="/events/create" method="post">
                             <input class="uk-input uk-form-large uk-form-blank uk-form-width-large" type="text" name="title" placeholder="Add a title"></input>
-
-
-                            <textarea class="uk-textarea uk-form-blank uk-form-width-large" type="text" name="text" placeholder="Add a description"></textarea>
-
+                            <textarea class="uk-textarea uk-form-blank uk-form-width-large" type="text" name="description" placeholder="Add a description" style="overflow: hidden; resize: vertical"></textarea>
                         <a class="uk-button uk-button-primary" type="button" onclick="document.getElementById('postform').submit();">Create</a>
                         <a class="uk-button uk-button-cancel" type="button">Back</a>
 
@@ -78,14 +19,6 @@
                 <div class="uk-width-2-5@m">
                     <div class="list-wrap">
                         <ul>
-                            <li>
-                              <input type="file" id="files" name="images" multiple accept="image/*">
-                              <input type="text" id="deleteFiles" name="deleteFiles" style="display: none">
-                              <a id="upload_link">
-                                  <span uk-icon="icon: image"></span><span>Add image</span>
-                              </a>
-                              <div id="selectedFiles"></div>
-                            </li>
                             <li>
                                 <a>
                                     <span uk-icon="icon: calendar"></span><span>Set date </span><input type="date" name="date" style="width: 130px">
