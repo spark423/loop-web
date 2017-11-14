@@ -84,10 +84,10 @@
     background-size: cover;
 }
 #new-org-add-members .member .img-wrap.one{
-    background-image: url('/loop-img/avi.jpeg');
+    background-image: url('/loop-img/user.png');
 }
 #new-org-add-members .member .img-wrap.two{
-    background-image: url('/loop-img/gg.png');
+    background-image: url('/loop-img/user.png');
 }
 #new-org-add-members .member .name{
     font-weight: 600;

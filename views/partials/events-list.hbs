@@ -8,12 +8,14 @@
     </div>
 
     <div class="uk-clearfix"></div>
-
-    <h4 class="today">TODAY</h4>
+    <h4 class="today">HAPPENING NOW</h4>
     <div class="uk-card uk-card-default uk-card-body">
 
         <ul>
-
+          {{#each events}}
+          {{#compare date currentDate operator="=="}}
+          {{#compare currentTime startTime operator=">="}}
+          {{#compare currentTime endTime operator="<"}}
             <li>
                 <div class="challenge-submissions" uk-grid>
                     <div class="uk-width-1-2@m">
@@ -21,75 +23,105 @@
                     </div>
                     <div class="uk-width-expand@m">
 
-                        <p class="title">Event Title</p>
-                        <p class="created-by">Created by Group Name</p>
-                        <p class="timestamp">at 8:15pm in <a href="">Board Name</a></p>
+                        <p class="title">{{title}}</p>
+                        <p class="created-by">Created by <a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a></p>
+                        <p class="timestamp">at {{createdAt}} in <a href="boards/{{board.id}}">{{board.name}}</a></p>
                         <p class="description">
-                            July 7, 2017<br/>
-                            8:30pm to 10:30pm<br/>
-                            McKimmon Student Center
+                            {{date}}<br/>
+                            {{startTime}} to {{endTime}}<br/>
+                            {{location}}
                         </p>
 
                     </div>
-                    <div class="uk-width-auto@m">
-                        <div>
-                            <span class="green"><span class="uk-icon" uk-icon="icon: check"></span>Affiliated</span>
-                        </div>
-                    </div>
                 </div>
             </li>
-
-            <li>
-                <div class="challenge-submissions" uk-grid>
-                    <div class="uk-width-1-2@m">
-                        <div class="img-wrap"></div>
-                    </div>
-                    <div class="uk-width-expand@m">
-
-                        <p class="title">Event Title</p>
-                        <p class="created-by">Created by Group Name</p>
-                        <p class="timestamp">at 8:15pm in <a href="">Board Name</a></p>
-                        <p class="description">
-                            July 7, 2017<br/>
-                            8:30pm to 10:30pm<br/>
-                            McKimmon Student Center
-                        </p>
-
-                    </div>
-                    <div class="uk-width-auto@m">
-                        <div>
-                            <span>Unaffiliated</span>
-                        </div>
-                    </div>
-                </div>
-            </li>
-
-            <li>
-                <div class="challenge-submissions" uk-grid>
-                    <div class="uk-width-1-2@m">
-                        <div class="img-wrap"></div>
-                    </div>
-                    <div class="uk-width-expand@m">
-
-                        <p class="title">Event Title</p>
-                        <p class="created-by">Created by Group Name</p>
-                        <p class="timestamp">at 8:15pm in <a href="">Board Name</a></p>
-                        <p class="description">
-                            July 7, 2017<br/>
-                            8:30pm to 10:30pm<br/>
-                            McKimmon Student Center
-                        </p>
-
-                    </div>
-                    <div class="uk-width-auto@m">
-                        <div>
-                            <span class="green"><span class="uk-icon" uk-icon="icon: check"></span>Affiliated</span>
-                        </div>
-                    </div>
-                </div>
-            </li>
-
+          {{/compare}}
+          {{/compare}}
+          {{/compare}}
+          {{/each}}
         </ul>
+    </div>
+    <br>
+    <h4 class="today">UPCOMING</h4>
+    <div class="uk-card uk-card-default uk-card-body">
 
+        <ul>
+          {{#each events}}
+          {{#compare date currentDate operator="=="}}
+          {{#compare startTime currentTime operator=">"}}
+            <li>
+                <div class="challenge-submissions" uk-grid>
+                    <div class="uk-width-1-2@m">
+                        <div class="img-wrap"></div>
+                    </div>
+                    <div class="uk-width-expand@m">
+
+                        <p class="title">{{title}}</p>
+                        <p class="created-by">Created by <a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a></p>
+                        <p class="timestamp">at {{createdAt}} in <a href="boards/{{board.id}}">{{board.name}}</a></p>
+                        <p class="description">
+                            {{date}}<br/>
+                            {{startTime}} to {{endTime}}<br/>
+                            {{location}}
+                        </p>
+
+                    </div>
+                </div>
+            </li>
+          {{/compare}}
+          {{/compare}}
+          {{#compare date currentDate operator=">"}}
+            <li>
+                <div class="challenge-submissions" uk-grid>
+                    <div class="uk-width-1-2@m">
+                        <div class="img-wrap"></div>
+                    </div>
+                    <div class="uk-width-expand@m">
+
+                        <p class="title">{{title}}</p>
+                        <p class="created-by">Created by <a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a></p>
+                        <p class="timestamp">at {{createdAt}} in <a href="boards/{{board.id}}">{{board.name}}</a></p>
+                        <p class="description">
+                            {{date}}<br/>
+                            {{startTime}} to {{endTime}}<br/>
+                            {{location}}
+                        </p>
+
+                    </div>
+                </div>
+            </li>
+          {{/compare}}
+          {{/each}}
+        </ul>
+    </div>
+    <br>
+    <h4 class="today">PAST</h4>
+    <div class="uk-card uk-card-default uk-card-body">
+
+        <ul>
+          {{#each events}}
+          {{#compare date currentDate operator="<="}}
+            <li>
+                <div class="challenge-submissions" uk-grid>
+                    <div class="uk-width-1-2@m">
+                        <div class="img-wrap"></div>
+                    </div>
+                    <div class="uk-width-expand@m">
+
+                        <p class="title">{{title}}</p>
+                        <p class="created-by">Created by <a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a></p>
+                        <p class="timestamp">at {{createdAt}} in <a href="boards/{{board.id}}">{{board.name}}</a></p>
+                        <p class="description">
+                            {{date}}<br/>
+                            {{startTime}} to {{endTime}}<br/>
+                            {{location}}
+                        </p>
+
+                    </div>
+                </div>
+            </li>
+          {{/compare}}
+          {{/each}}
+        </ul>
     </div>
 </div>

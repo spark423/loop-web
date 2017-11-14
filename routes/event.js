@@ -7,6 +7,58 @@ var Comment = require('../models/comment');
 var Notification = require('../models/notification')
 var moment = require('moment');
 
+function swap(items, firstIndex, secondIndex){
+  var temp = items[firstIndex];
+  items[firstIndex] = items[secondIndex];
+  items[secondIndex] = temp;
+}
+
+function partition(items, left, right) {
+  var pivot   = items[Math.floor((right + left) / 2)],
+      i       = left,
+      j       = right;
+    while (i <= j) {
+        while ((moment(items[i].date).utc() + moment(items[i].startTime, "HH:mm")) < (moment(pivot.date).utc() + moment(pivot.startTime, "HH:mm"))) {
+            i++;
+        }
+
+        console.log('item', (moment(items[j].date).utc() + moment(items[j].startTime, "HH:mm")))
+        console.log('pivot', (moment(pivot.date).utc() + moment(pivot.startTime, "HH:mm")))
+        while ((moment(items[j].date).utc() + moment(items[j].startTime, "HH:mm")) > (moment(pivot.date).utc() + moment(pivot.startTime, "HH:mm"))) {
+            j--;
+        }
+
+        if (i <= j) {
+            swap(items, i, j);
+            i++;
+            j--;
+        }
+    }
+
+    return i;
+}
+
+function quickSort(items, left, right) {
+
+    var index;
+
+    if (items.length > 1) {
+
+        index = partition(items, left, right);
+
+        if (left < index - 1) {
+            quickSort(items, left, index - 1);
+        }
+
+        if (index < right) {
+            quickSort(items, index, right);
+        }
+
+    }
+
+    return items;
+}
+
 router.get('/events/create', function(req, res) {
 	Board.find({}, function(err, boards) {
 		if(err) throw err;
@@ -74,7 +126,7 @@ router.get('/event/:id', function(req, res) {
 						},
 						"title": event.title,
 						"board": event.board,
-						"date": moment(event.date).format('MMMM D, YYYY'),
+						"date": moment(event.date).utc().format('MMMM D, YYYY'),
 						"startTime": moment(event.startTime, "HH:mm").format('h:mm a'),
 						"endTime": moment(event.endTime, "HH:mm").format('h:mm a'),
 						"location": event.location,
@@ -92,9 +144,87 @@ router.get('/event/:id', function(req, res) {
 router.get('/event-attendees', function(req, res) {
 	res.render('event-attendees-list')
 })
-router.get('/eventlist', function(req, res) {
-	res.render('events-list-view')
-})
+router.get('/events', function(req, res) {
+	if(req.user) {
+		Event.find({}, function(err, events) {
+			if(err) throw err;
+			console.log(events[0].board);
+			let sortedEvents = quickSort(events, 0, events.length-1);
+			let eventObjects = sortedEvents.map(async function(event) {
+				let board = await Board.findById(event.board);
+				if(board) {
+					let user = await User.findOne({username: event.contact});
+					if(user) {
+						let eventObject = {
+							"id": event._id,
+							"createdAt": moment(event.createdAt).format('MMMM D, YYYY, h:mm a'),
+							"title": event.title,
+							"postedBy": {
+								"id": user._id,
+								"firstName": user.firstName,
+								"lastName": user.lastName
+							},
+							"board": {
+								"id": board._id,
+								"name": board.name
+							},
+							"description": event.description,
+							"date": moment(event.date).utc().format('MMMM D, YYYY'),
+							"startTime": moment(event.startTime, "HH:mm").format('h:mm a'),
+							"endTime": moment(event.endTime, "HH:mm").format('h:mm a'),
+							"location": event.location,
+							"currentDate": moment(Date.now()).format('MMMM D, YYYY'),
+							"currentTime": moment(Date.now()).format('h:mm a')
+						}
+						return Promise.resolve(eventObject);
+					}
+				}
+			});
+			Promise.all(eventObjects).then(function(events) {
+				console.log(events);
+				Board.find({}, function(err, boards) {
+					if(err) throw err;
+					var info = [];
+					for(var i=0; i<boards.length; i++) {
+						info.push({"name": boards[i].name, "_id": boards[i]._id});
+					}
+					res.render('events-list-view', {events: events, boards: info, helpers: {
+							compare: function(lvalue, rvalue, options) {
+								if (arguments.length < 3)
+										throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
+
+								var operator = options.hash.operator || "==";
+
+								var operators = {
+										'==':       function(l,r) { return l == r; },
+										'===':      function(l,r) { return l === r; },
+										'!=':       function(l,r) { return l != r; },
+										'<':        function(l,r) { return l < r; },
+										'>':        function(l,r) { return l > r; },
+										'<=':       function(l,r) { return l <= r; },
+										'>=':       function(l,r) { return l >= r; },
+										'typeof':   function(l,r) { return typeof l == r; }
+								}
+
+								if (!operators[operator])
+										throw new Error("Handlerbars Helper 'compare' doesn't know the operator "+operator);
+
+								var result = operators[operator](lvalue,rvalue);
+
+								if( result ) {
+										return options.fn(this);
+								} else {
+										return options.inverse(this);
+								}
+							}
+						}});
+				})
+			})
+		})
+	} else {
+		res.redirect('/');
+	}
+});
 router.get('/event-calendar', function(req, res) {
 	res.render('events-calendar-view')
 })
