@@ -1,15 +1,26 @@
 <link rel="stylesheet" href="/css/filter-content/sxn-filter-content.min.css" />
+<script>
+function showAll() {
+  $('.post').show();
+  $('.event').show();
+}
+function showPosts() {
+  $('.post').show();
+  $('.event').hide();
+}
+function showEvents() {
+  $('.post').hide();
+  $('.event').show();
+}
+</script>
 <div id="filter-content">
     <h4>Filter by Content Type</h4>
     <div class="uk-card uk-card-default uk-card-body">
 
         <ul class="uk-subnav uk-subnav-pill" uk-switcher>
-            <li><a href="#">All</a></li>
-            <li><a href="#">Posts</a></li>
-            <li><a href="#">Challenges</a></li>
-            <li><a href="#">Events</a></li>
-            <li><a href="#">Polls</a></li>
-            <li><a href="#">Sales</a></li>
+            <li><a onclick="showAll()">All</a></li>
+            <li><a onclick="showPosts()">Posts</a></li>
+            <li><a onclick="showEvents()">Events</a></li>
         </ul>
 
     </div>

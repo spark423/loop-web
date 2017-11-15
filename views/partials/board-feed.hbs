@@ -10,7 +10,7 @@
     <form id='delete-event-{{@index}}' style="display: none" method="post" action="/events/{{this.id}}"></form>
     <form id='attend-event-{{@index}}' style="display: none" method="post" action="/events/{{this.id}}/attend"></form>
     <form id='unattend-event-{{@index}}' style="display: none" method="post" action="/events/{{this.id}}/unattend"></form>
-    <div id="feed-event" id="{{this.id}}">
+    <div id="feed-event" class="event">
         <div class="feed-item">
             <div class="uk-card uk-card-default uk-card-body">
 
@@ -411,7 +411,7 @@
     <form id='delete-post-{{@index}}' style="display: none" method="post" action="/posts/{{this.id}}"></form>
     <form id='follow-post-{{@index}}' style="display: none" method="post" action="/posts/{{this.id}}/follow"></form>
     <form id='unfollow-post-{{@index}}' style="display: none" method="post" action="/posts/{{this.id}}/unfollow"></form>
-    <div class="feed-item" id="{{this.id}}">
+    <div class="feed-item post">
         <div class="uk-card uk-card-default uk-card-body">
             <div class="main-post">
                 <div class="poster-avi uk-float-left">
