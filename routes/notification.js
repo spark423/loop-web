@@ -6,6 +6,7 @@ var Board = require('../models/board');
 var Post = require('../models/post');
 var Event = require('../models/event');
 var Notification = require('../models/notification')
+var moment = require('moment')
 
 router.get('/notifications', function(req, res) {
 	User.findById(req.user._id).populate('notifications').exec(function(err, user) {
@@ -13,7 +14,7 @@ router.get('/notifications', function(req, res) {
 			throw err;
 		} else {
 			let notifications = user.notifications.map(function(notification) {
-				return {"type": notification.type, "createdAt": notification.createdAt, "message": notification.message, "routeID": notification.routeID}
+				return {"type": notification.type, "createdAt": moment(notification.createdAt).format('MMMM D, YYYY, h:mm a'), "message": notification.message, "routeID": notification.routeID}
 			})
 			res.send({length: notifications.length, notifications: notifications});
 		}
@@ -26,7 +27,7 @@ router.get('/all-notifications', function(req, res) {
 			throw err;
 		} else {
 			let notifications = user.notifications.map(function(notification) {
-				return {"type": notification.type, "createdAt": notification.createdAt, "message": notification.message, "routeID": notification.routeID}
+				return {"type": notification.type, "createdAt": moment(notification.createdAt).format('MMMM D, YYYY, h:mm a'), "message": notification.message, "routeID": notification.routeID}
 			})
 			res.render('notifications', {notifications: notifications, helpers: {
 					compare: function(lvalue, rvalue, options) {

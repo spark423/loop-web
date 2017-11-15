@@ -8,7 +8,9 @@
     </div>
 
     <div class="uk-clearfix"></div>
+    {{#if now}}
     <h4 class="today">HAPPENING NOW</h4>
+    {{/if}}
     <div class="uk-card uk-card-default uk-card-body">
 
         <ul>
@@ -95,12 +97,15 @@
         </ul>
     </div>
     <br>
+    {{#if past}}
     <h4 class="today">PAST</h4>
+    {{/if}}
     <div class="uk-card uk-card-default uk-card-body">
 
         <ul>
           {{#each events}}
           {{#compare date currentDate operator="<="}}
+          {{#compare currentTime endTime operator=">"}}
             <li>
                 <div class="challenge-submissions" uk-grid>
                     <div class="uk-width-1-2@m">
@@ -120,6 +125,7 @@
                     </div>
                 </div>
             </li>
+          {{/compare}}
           {{/compare}}
           {{/each}}
         </ul>

@@ -188,7 +188,28 @@ router.get('/events', function(req, res) {
 					for(var i=0; i<boards.length; i++) {
 						info.push({"name": boards[i].name, "_id": boards[i]._id});
 					}
-					res.render('events-list-view', {events: events, boards: info, helpers: {
+          var now = false;
+          var upcoming = false;
+          var past = false;
+          for(var i=0; i<events.length; i++) {
+            if(events[i].date==events[i].currentDate && events[i].currentTime >= events[i].startTime && events[i].currentTime < events[i].endTime) {
+              var now = true;
+              break;
+            }
+          }
+          for(var i=0; i<events.length; i++) {
+            if((events[i].date==events[i].currentDate && events[i].currentTime > events[i].startTime) || events[i].currentDate > events[i].date) {
+              var upcoming = true;
+              break;
+            }
+          }
+          for(var i=0; i<events.length; i++) {
+            if((events[i].date==events[i].currentDate && events[i].currentTime > events[i].endTime) || events[i].currentDate > events[i].date) {
+              var past = true;
+              break;
+            }
+          }
+					res.render('events-list-view', {events: events, boards: info, now: now, upcoming: upcoming, past: past, helpers: {
 							compare: function(lvalue, rvalue, options) {
 								if (arguments.length < 3)
 										throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
