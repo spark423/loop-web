@@ -38,7 +38,7 @@ router.post('/boards/:id/edit', function(req, res) {
     board.description=req.body.description;
     board.create=(req.body.create=='true');
     board.private = (req.body.private=='true');
-    board.unsubscribable = (req.body.unsubscribable=='true');
+    board.unsubscribable = (req.body.unsubscribable=='false');
     board.save(function(err, updatedBoard) {
       if(err) throw err;
       res.redirect('/boards/' + updatedBoard._id);
@@ -384,6 +384,26 @@ router.post('/boards/:id/post', function(req, res) {
   });
 })
 
+//subscribe to a board
+router.post('/boards/:id/subscribe', function(req, res) {
+  Time.findOneAndUpdate({}, {$push: {subscriptions: {createdAt: Date.now(), board: req.params.id, user:req.user._id}}}, function(err, time) {
+    if (err) {
+      throw err;
+    } else {
+      User.findById(req.user._id, function(error, user) {
+        if (error)
+          throw error;
+        user.subscribedBoards.push(req.params.id);
+        user.save(function(error, updatedUser) {
+          if (error)
+            throw error;
+          res.status(200);
+        })
+      })
+    }
+  })
+})
+
 //Unsubscribe to board
 router.post('/boards/:id/unsubscribe', function(req, res) {
   Time.findOneAndUpdate({}, {$pull: {subscriptions: {createdAt: Date.now(), board: req.params.id, user:req.user._id}}}, function(err, time) {
@@ -415,7 +435,7 @@ router.post('/boards/create', function(req, res) {
     description: req.body.description,
     create: (req.body.create=='true'),
     private: (req.body.private=='true'),
-    unsubscribable: (req.body.unsubscribable=='true')
+    unsubscribable: (req.body.unsubscribable=='false')
   });
   newBoard.save(function(err, newBoard) {
     if(err) throw err;

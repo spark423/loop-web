@@ -173,7 +173,43 @@ router.get('/groups/:id', function(req, res) {
 router.get('/groups/:id/edit', function(req, res) {
   Group.findById(req.params.id, function(err, group) {
     if(err) throw err;
-    res.render('edit-org', {id: req.params.id, name: group.name, description: group.description});
+    User.find({}, function(err, users) {
+      if(err) throw err;
+      var user_info = [];
+      for(var i=0; i<users.length; i++) {
+        user_info.push({"firstName": users[i].firstName, "lastName": users[i].lastName, "username": users[i].username});
+      }
+      res.render('edit-org', {id: req.params.id, name: group.name, description: group.description, admin: group.admin, users: user_info, helpers: {
+          compare: function(lvalue, rvalue, options) {
+            if (arguments.length < 3)
+                throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
+
+            var operator = options.hash.operator || "==";
+
+            var operators = {
+                '==':       function(l,r) { return l == r; },
+                '===':      function(l,r) { return l === r; },
+                '!=':       function(l,r) { return l != r; },
+                '<':        function(l,r) { return l < r; },
+                '>':        function(l,r) { return l > r; },
+                '<=':       function(l,r) { return l <= r; },
+                '>=':       function(l,r) { return l >= r; },
+                'typeof':   function(l,r) { return typeof l == r; }
+            }
+
+            if (!operators[operator])
+                throw new Error("Handlerbars Helper 'compare' doesn't know the operator "+operator);
+
+            var result = operators[operator](lvalue,rvalue);
+
+            if( result ) {
+                return options.fn(this);
+            } else {
+                return options.inverse(this);
+            }
+          }
+        }});
+    })
   })
 })
 //Edit group page
@@ -181,9 +217,9 @@ router.post('/groups/:id/edit', function(req, res) {
 	Group.findById(req.params.id, function(error, group) {
 		if (error)
 			throw error;
-		if (req.body.description) {
- 		   group.description = req.body.description;
-		}
+		group.description = req.body.description;
+    group.name = req.body.name;
+    group.admin = req.body.admin;
 		group.save(function(error, updatedGroup) {
 			if (error)
 				throw error;

@@ -59,21 +59,27 @@ function quickSort(items, left, right) {
     return items;
 }
 
+//Render event creation page
 router.get('/events/create', function(req, res) {
-	Board.find({}, function(err, boards) {
-		if(err) throw err;
-		var info = [];
-		for(var i=0; i<boards.length; i++) {
-			info.push({"name": boards[i].name, "_id": boards[i]._id});
-		}
-		res.render("create-a-new-event", {boards: info});
-	})
-})
+  if(req.user) {
+    Board.find({}, function(err, boards) {
+      if(err) throw err;
+      var info = [];
+      for(var i=0; i<boards.length; i++) {
+        info.push({"name": boards[i].name, "_id": boards[i]._id});
+      }
+      res.render("create-a-new-event", {boards: info});
+    })
+  } else {
+    res.redirect('/');
+  }
+});
 
 router.get('/events-invite', function(req, res) {
 	res.render("create-a-new-event-invite");
 })
 
+//Create a new event
 router.post('/events/create', function(req, res) {
   var newEvent = new Event({
     title: req.body.title,
@@ -106,44 +112,47 @@ router.post('/events/create', function(req, res) {
   })
 });
 
+//Render Event page
 router.get('/event/:id', function(req, res) {
-	Event.findById(req.params.id, function(err, event) {
-		if(err) throw err;
-		Board.findById(event.board, function(err, board) {
-			if(err) throw err;
-			User.find({"_id": event.attendees}, function(err, attendees) {
-				if(err) throw err;
-				User.findOne({"username": event.contact}, function(err, user) {
-					if(err) throw err;
-					console.log(attendees);
-				  var eventObject = {
-						"id": event._id,
-						"createdAt": moment(event.createdAt).format('MMMM D, YYYY, h:mm a'),
-						"postedBy": {
-							"id": user._id,
-							"firstName": user.firstName,
-							"lastName": user.lastName
-						},
-						"title": event.title,
-						"board": event.board,
-						"date": moment(event.date).utc().format('MMMM D, YYYY'),
-						"startTime": moment(event.startTime, "HH:mm").format('h:mm a'),
-						"endTime": moment(event.endTime, "HH:mm").format('h:mm a'),
-						"location": event.location,
-						"description": event.description,
-						"comments": event.comments,
-						"attendees": attendees
-					}
-					res.render('event-detail', {"event": eventObject, "board": board.name});
-				})
-			})
-		})
-	})
+  if(req.user) {
+    Event.findById(req.params.id, function(err, event) {
+      if(err) throw err;
+      Board.findById(event.board, function(err, board) {
+        if(err) throw err;
+        User.find({"_id": event.attendees}, function(err, attendees) {
+          if(err) throw err;
+          User.findOne({"username": event.contact}, function(err, user) {
+            if(err) throw err;
+            console.log(attendees);
+            var eventObject = {
+              "id": event._id,
+              "createdAt": moment(event.createdAt).format('MMMM D, YYYY, h:mm a'),
+              "postedBy": {
+                "id": user._id,
+                "firstName": user.firstName,
+                "lastName": user.lastName
+              },
+              "title": event.title,
+              "board": event.board,
+              "date": moment(event.date).utc().format('MMMM D, YYYY'),
+              "startTime": moment(event.startTime, "HH:mm").format('h:mm a'),
+              "endTime": moment(event.endTime, "HH:mm").format('h:mm a'),
+              "location": event.location,
+              "description": event.description,
+              "comments": event.comments,
+              "attendees": attendees
+            }
+            res.render('event-detail', {"event": eventObject, "board": board.name});
+          })
+        })
+      })
+    })
+  } else {
+    res.redirect('/');
+  }
 })
 
-router.get('/event-attendees', function(req, res) {
-	res.render('event-attendees-list')
-})
+//Render all events
 router.get('/events', function(req, res) {
 	if(req.user) {
 		Event.find({}, function(err, events) {
@@ -249,35 +258,35 @@ router.get('/events', function(req, res) {
 router.get('/event-calendar', function(req, res) {
 	res.render('events-calendar-view')
 })
-router.get('/edit-event', function(req, res) {
-	res.render('edit-event');
+
+//Render edit event page
+router.get('/event/:id/edit', function(req, res) {
+  if(req.user) {
+    Event.findById(req.params.id, function(err, event) {
+      if(err) throw err;
+      var date = moment(event.date).utc().format("YYYY-MM-DD");
+      res.render('edit-event', {event: event, date: date});
+    })
+  } else {
+    res.redirect('/');
+  }
 })
-//Editing event
-router.post('/events/:id/edit', function(req, res) {
-	Event.findById(req.params.id, function(error, event) {
-		if (error)
-			throw error;
-		if (req.body.name) {
-			event.name = req.body.name
-		}
-		if (req.body.startTime) {
-		  event.startTime = req.body.startTime
-		}
-		if (req.body.endTime) {
-		  event.endTime = req.body.endTime
-		}
-		if (req.body.location) {
-		  event.location = req.body.location
-		}
-		if (req.body.text) {
-		  event.text = req.body.text
-		}
-		event.save(function(error, updatedEvent) {
-			if (error)
-				throw error;
-			res.redirect('back')
-		})
-	})
+
+//Edit an event
+router.post('/event/:id/edit', function(req, res) {
+  Event.findById(req.params.id, function(err, event) {
+    if(err) throw err;
+    event.title = req.body.title;
+    event.description = req.body.description;
+    event.date = req.body.date;
+    event.startTime = req.body.startTime;
+    event.endTime = req.body.endTime;
+    event.location= req.body.location;
+    event.save(function(err, updatedEvent) {
+      if(err) throw err;
+      res.redirect('/event/' + updatedEvent._id)
+    })
+  })
 })
 
 //New attendee
@@ -325,7 +334,7 @@ router.put('/events/:id', function(req, res) {
 	})
 })
 
-//Deleting event from event board
+//Deleting event from board
 router.post('/events/:id', function(req, res) {
 	Event.findById(req.params.id, function(err, event) {
 		if (err)  {

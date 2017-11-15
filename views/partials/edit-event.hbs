@@ -1,0 +1,48 @@
+<link rel="stylesheet" href="/css/post-board-notifications-create/sxn-post-board-notifications-create.v3.min.css" />
+
+<div id="post-board-notifications-create">
+    <div class="uk-card uk-card-default uk-card-body">
+        <div class="create-wrap">
+            <h4 class="inner">Edit Event</h4>
+            <div class="divider"></div>
+            <div class="create-grid" uk-grid>
+                <div class="poll-wrap uk-width-3-5@m">
+                    <div class="form-wrap">
+                        <form id="eventform" action="/event/{{event.id}}/edit" method="post">
+                            <input class="uk-input uk-form-large uk-form-blank uk-form-width-large" type="text" name="title" value="{{event.title}}"></input>
+                            <textarea class="uk-textarea uk-form-blank uk-form-width-large" type="text" name="description" placeholder="Add a description" style="overflow: hidden; resize: vertical">{{event.description}}</textarea>
+                        <a class="uk-button uk-button-primary" type="button" onclick="document.getElementById('eventform').submit();">Save</a>
+                        <a class="uk-button uk-button-cancel" href="javascript:history.back()" type="button">Back</a>
+                    </div>
+                </div>
+                <div class="uk-width-2-5@m">
+                    <div class="list-wrap">
+                        <ul>
+                            <li>
+                                <a>
+                                    <span uk-icon="icon: calendar"></span><span>Set date </span><input type="date" name="date" style="width: 130px" value="{{date}}">
+                                </a>
+                            </li>
+                            <li>
+                                <a>
+                                    <span uk-icon="icon: clock"></span><span>Start time </span><input type="time" name="startTime" style="width: 100px" value="{{event.startTime}}">
+                                </a>
+                            </li>
+                            <li>
+                                <a>
+                                    <span uk-icon="icon: clock"></span><span>End time </span><input type="time" name="endTime" style="width: 100px" value="{{event.endTime}}">
+                                </a>
+                            </li>
+                            <li>
+                                <a>
+                                    <span uk-icon="icon: bell"></span><span>Set location </span><input type="text" name="location" style="width:100px" value="{{event.location}}">
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+</form>
+    </div>
+</div>

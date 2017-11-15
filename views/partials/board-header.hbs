@@ -21,7 +21,7 @@ function unsubscribe() {
             <h2>{{board.name}}<a href="/boards/{{board.id}}/edit" class="green" uk-icon="icon: pencil"></a></h2>
             <span class="text-light">{{board.description}}</span>
         </div>
-        {{#compare board.unsubscribable true operator="=="}}
+        {{#compare board.unsubscribable false operator="=="}}
         <div id="subscribe">
           {{#compare board.subscribed false operator="=="}}
             <a onclick="subscribe()" class="uk-float-right uk-link">Subscribe</a>

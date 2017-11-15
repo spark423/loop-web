@@ -56,14 +56,12 @@
                 <a href="#"><span uk-icon="icon: album"></span>Boards</a>
                 <ul class="uk-nav-sub" id="side-boards">
                     <li><a href="/events"><span uk-icon="icon: calendar"></span>Events ✔</a></li>
-                    <li><a href="board-overview.php"><span uk-icon="icon: album"></span>Campus Updates</a></li>
-                    <li><a href="board-overview.php"><span uk-icon="icon: album"></span>Resources</a></li>
                     <script>
                     var side_boards = $('#side-boards');
                     $.getJSON('/boardinfo', function(data) {
                       for(var i=0; i<data.info.length; i++) {
                         var added = false;
-                        if(data.info[i].unsubscribable==false) {
+                        if(data.info[i].unsubscribable==true) {
                           var board = "<li><a href=/boards/" + data.info[i]._id + "><span uk-icon='icon: album'></span>" + data.info[i].name + " ✔" + "</a></li>";
                           side_boards.append(board);
                           added=true;
