@@ -13,24 +13,35 @@ var fs = require('fs')
 var multer = require('multer')
 var upload = multer();
 
+//Get boards for sidenav
 router.get('/boardinfo', function(req, res) {
-  Board.find({}, function(err, boards) {
-    if(err) throw err;
-    var info = [];
-    for(var i=0; i<boards.length; i++) {
-      info.push({"name": boards[i].name, "_id": boards[i]._id, "unsubscribable": boards[i].unsubscribable});
-    }
-    res.send({"info": info, "subscribedBoards": req.user.subscribedBoards});
-  });
+  if(req.user) {
+    Board.find({}, function(err, boards) {
+      if(err) throw err;
+      var info = [];
+      for(var i=0; i<boards.length; i++) {
+        info.push({"name": boards[i].name, "_id": boards[i]._id, "unsubscribable": boards[i].unsubscribable});
+      }
+      res.send({"info": info, "subscribedBoards": req.user.subscribedBoards});
+    });
+  } else {
+    res.redirect('/');
+  }
 });
 
+//Render page for editing board
 router.get('/boards/:id/edit', function(req, res) {
-  Board.findById(req.params.id, function(err, board) {
-    if(err) throw err;
-    res.render('edit-board', {id: req.params.id, name: board.name, description: board.description});
-  })
+  if(req.user) {
+    Board.findById(req.params.id, function(err, board) {
+      if(err) throw err;
+      res.render('edit-board', {id: req.params.id, name: board.name, description: board.description});
+    })
+  } else {
+    res.redirect('/');
+  }
 })
 
+//Edit a board
 router.post('/boards/:id/edit', function(req, res) {
   Board.findById(req.params.id, function(err, board) {
     if(err) throw err;
@@ -58,6 +69,7 @@ router.get('/boards', function(req, res) {
     }
   })
 });
+
 //Retrieving a board page
 router.get('/boards/:id', function(req, res) {
   if(req.user) {
@@ -67,7 +79,6 @@ router.get('/boards/:id', function(req, res) {
       } else if (board.private) {
         let contents = board.contents.reverse().map(async function(content) {
           if (content.postedBy === req.user._id.toString()) {
-            console.log("got here1");
             let item = content.item;
             let kind = content.kind;
             let comments = [];
@@ -76,8 +87,6 @@ router.get('/boards/:id', function(req, res) {
               let commentOfComments = comment.comments.map(function(commentOfComment) {
                 return {"id": commentOfComment._id, "createdAt": commentOfComment.createdAt, "postedBy": {"id": commentOfComment.postedBy._id, "firstName": commentOfComment.postedBy.firstName, "lastName": commentOfComment.postedBy.lastName}, "text": commentOfComment.text}
               })
-              console.log("got here2");
-
               comments.push({
                 "id": comment._id,
                 "createdAt": moment(comment.createdAt).format('MMMM D, YYYY, h:mm a'),
@@ -90,8 +99,6 @@ router.get('/boards/:id', function(req, res) {
                 "comments": commentOfComments
               });
             }
-            console.log("got here3");
-
             if (kind == 'Post') {
               let postCreator = await User.findById(item.postedBy);
               let postObject = {
@@ -109,17 +116,11 @@ router.get('/boards/:id', function(req, res) {
                 "text": item.text,
                 "comments": comments
               }
-              console.log("got here4");
-
               return Promise.resolve(postObject)
             } else {
-              console.log("got here5");
-
               let attendees = item.attendees.map(function(attendee) {
                 return {"id": attendee._id, "firstName": attendee.firstName, "lastName": attendee.lastName}
               })
-              console.log("got here6");
-
               let eventCreator = await User.findOne({username: item.contact});
               if (eventCreator) {
                 let eventObject = {
@@ -141,8 +142,6 @@ router.get('/boards/:id', function(req, res) {
                   "comments": comments,
                   "attendees": attendees
                 }
-                console.log("got here7");
-
                 return Promise.resolve(eventObject);
               } else {
                 let eventObject = {
@@ -160,15 +159,12 @@ router.get('/boards/:id', function(req, res) {
                   "comments": comments,
                   "attendees": attendees
                 };
-                console.log("got here8");
-
                 return Promise.resolve(eventObject);
               }
             }
           }
         });
         Promise.all(contents).then(function(contents) {
-          console.log("here");
           res.render('board-overview', {
             board: {
               id: board._id,
@@ -210,8 +206,6 @@ router.get('/boards/:id', function(req, res) {
           })
         })
       } else {
-        console.log(board);
-        console.log(board.contents);
         let contents = board.contents.reverse().map(async function(content) {
           let item = content.item;
           let kind = content.kind;
@@ -221,7 +215,6 @@ router.get('/boards/:id', function(req, res) {
             let commentOfComments = comment.comments.map(function(commentOfComment) {
               return {"id": commentOfComment._id, "createdAt": commentOfComment.createdAt, "postedBy": {"id": commentOfComment.postedBy._id, "firstName": commentOfComment.postedBy.firstName, "lastName": commentOfComment.postedBy.lastName}, "text": commentOfComment.text}
             })
-            console.log("a1");
             comments.push({
               "id": comment._id,
               "createdAt": moment(comment.createdAt).format('MMMM D, YYYY, h:mm a'),
@@ -233,13 +226,9 @@ router.get('/boards/:id', function(req, res) {
               "text": comment.text,
               "comments": commentOfComments
             });
-            console.log("a2");
           }
           if (kind == 'Post') {
-            console.log(item);
-            console.log(item.postedBy);
             let postCreator = await User.findById(item.postedBy);
-            console.log(postCreator);
             let postObject = {
               "own": req.user._id.toString() === postCreator._id.toString(),
               "following": req.user.followingPosts.indexOf(item._id) > -1,
@@ -255,13 +244,11 @@ router.get('/boards/:id', function(req, res) {
               "text": item.text,
               "comments": comments
             }
-            console.log(postObject);
             return Promise.resolve(postObject)
           } else {
             let attendees = item.attendees.map(function(attendee) {
               return {"id": attendee._id, "firstName": attendee.firstName, "lastName": attendee.lastName}
             })
-            console.log("a4");
             let eventCreator = await User.findOne({username: item.contact});
             if (eventCreator) {
               let eventObject = {
@@ -283,8 +270,6 @@ router.get('/boards/:id', function(req, res) {
                 "comments": comments,
                 "attendees": attendees
               }
-              console.log(eventObject);
-
               return Promise.resolve(eventObject);
             } else {
               let eventObject = {
@@ -302,14 +287,11 @@ router.get('/boards/:id', function(req, res) {
                 "comments": comments,
                 "attendees": attendees
               };
-              console.log(eventObject);
               return Promise.resolve(eventObject);
             }
           }
         });
-        console.log("b1");
         Promise.all(contents).then(function(contents) {
-          console.log("here2");
           res.render('board-overview', {
             board: {
               id: board._id,
@@ -424,6 +406,7 @@ router.post('/boards/:id/unsubscribe', function(req, res) {
   })
 })
 
+//Render create a new board page
 router.get('/create-a-new-board', function(req, res) {
   res.render("create-a-new-board");
 });

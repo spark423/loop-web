@@ -7,6 +7,7 @@ var Post = require('../models/post');
 var Event = require('../models/event');
 var Notification = require('../models/notification');
 
+//Create a new group
 router.post('/groups/create', function(req, res) {
   if(req.body.admin) {
     var admin = req.body.admin;
@@ -89,6 +90,8 @@ router.get('/create-a-new-org', function(req, res) {
     res.redirect('/');
   }
 });
+
+//Send information in URL to invite page
 router.post('/group-invite', function(req, res) {
   var name = encodeURIComponent(req.body.name);
   var description = encodeURIComponent(req.body.description);
@@ -96,6 +99,7 @@ router.post('/group-invite', function(req, res) {
   res.redirect('/create-a-new-org-invite/?name=' + name + '&description=' + description + '&admin=' + admin);
 })
 
+//Render invite page
 router.get('/create-a-new-org-invite', function(req, res) {
   if(req.user) {
     User.find({}, function(err, users) {
@@ -111,6 +115,7 @@ router.get('/create-a-new-org-invite', function(req, res) {
   }
 })
 
+//Get info for sidenav
 router.get('/groupinfo', function(req, res) {
   Group.find({}, function(err, groups) {
     if(err) throw err;
@@ -170,48 +175,54 @@ router.get('/groups/:id', function(req, res) {
   }
 })
 
+//Render edit group page
 router.get('/groups/:id/edit', function(req, res) {
-  Group.findById(req.params.id, function(err, group) {
-    if(err) throw err;
-    User.find({}, function(err, users) {
+  if(req.user) {
+    Group.findById(req.params.id, function(err, group) {
       if(err) throw err;
-      var user_info = [];
-      for(var i=0; i<users.length; i++) {
-        user_info.push({"firstName": users[i].firstName, "lastName": users[i].lastName, "username": users[i].username});
-      }
-      res.render('edit-org', {id: req.params.id, name: group.name, description: group.description, admin: group.admin, users: user_info, helpers: {
-          compare: function(lvalue, rvalue, options) {
-            if (arguments.length < 3)
-                throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
+      User.find({}, function(err, users) {
+        if(err) throw err;
+        var user_info = [];
+        for(var i=0; i<users.length; i++) {
+          user_info.push({"firstName": users[i].firstName, "lastName": users[i].lastName, "username": users[i].username});
+        }
+        res.render('edit-org', {id: req.params.id, name: group.name, description: group.description, admin: group.admin, users: user_info, helpers: {
+            compare: function(lvalue, rvalue, options) {
+              if (arguments.length < 3)
+                  throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
 
-            var operator = options.hash.operator || "==";
+              var operator = options.hash.operator || "==";
 
-            var operators = {
-                '==':       function(l,r) { return l == r; },
-                '===':      function(l,r) { return l === r; },
-                '!=':       function(l,r) { return l != r; },
-                '<':        function(l,r) { return l < r; },
-                '>':        function(l,r) { return l > r; },
-                '<=':       function(l,r) { return l <= r; },
-                '>=':       function(l,r) { return l >= r; },
-                'typeof':   function(l,r) { return typeof l == r; }
+              var operators = {
+                  '==':       function(l,r) { return l == r; },
+                  '===':      function(l,r) { return l === r; },
+                  '!=':       function(l,r) { return l != r; },
+                  '<':        function(l,r) { return l < r; },
+                  '>':        function(l,r) { return l > r; },
+                  '<=':       function(l,r) { return l <= r; },
+                  '>=':       function(l,r) { return l >= r; },
+                  'typeof':   function(l,r) { return typeof l == r; }
+              }
+
+              if (!operators[operator])
+                  throw new Error("Handlerbars Helper 'compare' doesn't know the operator "+operator);
+
+              var result = operators[operator](lvalue,rvalue);
+
+              if( result ) {
+                  return options.fn(this);
+              } else {
+                  return options.inverse(this);
+              }
             }
-
-            if (!operators[operator])
-                throw new Error("Handlerbars Helper 'compare' doesn't know the operator "+operator);
-
-            var result = operators[operator](lvalue,rvalue);
-
-            if( result ) {
-                return options.fn(this);
-            } else {
-                return options.inverse(this);
-            }
-          }
-        }});
+          }});
+      })
     })
-  })
+  } else {
+    res.redirect('/');
+  }
 })
+
 //Edit group page
 router.post('/groups/:id/edit', function(req, res) {
 	Group.findById(req.params.id, function(error, group) {
@@ -244,26 +255,6 @@ router.put('/groups/:id/join', function(req, res) {
     }
   })
 })
-/*
-router.post('/groups/:id/join', function(req, res) {
-	Group.findById(req.params.id, function(error, group) {
-		if (error)
-			throw error;
-		group.members.push(req.user._id)
-		group.save(function(error, updatedGroup) {
-			if (error)
-				throw error;
-			User.findById(req.user._id, function(error, user) {
-				user.joinedGroups.push(updatedGroup._id)
-				user.save(function(error, updatedUser) {
-					if (error)
-						throw error;
-					res.redirect('/groups/'+updatedGroup._id)
-				})
-			})
-		})
-	})
-})*/
 
 //Leave group
 router.put('/groups/:id/leave', function(req, res) {
@@ -281,31 +272,5 @@ router.put('/groups/:id/leave', function(req, res) {
     }
   })
 })
-/*
-router.post('/groups/:id/leave', function(req, res) {
-	Group.findById(req.params.id, function(error, group) {
-		if (error)
-			throw error;
-		var groupMembers = group.members
-		var index = groupMembers.indexOf(req.user._id)
-		group.members = groupMembers.slice(0,index).concat(groupMembers.slice(index+1, groupMembers.length))
-		group.save(function(error, updatedGroup) {
-			if (error)
-				throw error;
-			User.findById(req.user._id, function(error, user) {
-				if (error)
-					throw error;
-				var userJoinedGroups = user.joinedGroups
-				var index =  userJoinedGroups.indexOf(updatedGroup._id)
-				user.joinedGroups = userJoinedGroups.slice(0, index).concat(userJoinedGroups.slice(index+1, userJoinedGroups.length))
-				user.save(function(error, updatedUser) {
-					if (error)
-						throw error;
-					res.redirect('/groups/'+updatedGroup._id)
-				})
-			})
-		})
-	})
-})*/
 
 module.exports = router;

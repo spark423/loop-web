@@ -23,44 +23,33 @@ function partition(items, left, right) {
         while (items[i].item.createdAt < pivot.item.createdAt) {
             i++;
         }
-
-        console.log('item', items[j].item.createdAt)
-        console.log('pivot', pivot.item.createdAt)
         while (items[j].item.createdAt > pivot.item.createdAt) {
             j--;
         }
-
         if (i <= j) {
             swap(items, i, j);
             i++;
             j--;
         }
     }
-
     return i;
 }
 
 function quickSort(items, left, right) {
-
     var index;
-
     if (items.length > 1) {
-
         index = partition(items, left, right);
-
         if (left < index - 1) {
             quickSort(items, left, index - 1);
         }
-
         if (index < right) {
             quickSort(items, index, right);
         }
-
     }
-
     return items;
 }
 
+//Render feed page
   router.get('/feed', function(req, res) {
     if(req.user) {
       User.findById(req.user._id, function(err, user) {
@@ -71,7 +60,6 @@ function quickSort(items, left, right) {
             if (err) {
               throw err;
             } else {
-              console.log("boards", boards)
               let contents = [];
               for (let i=0; i<boards.length; i++) {
                 contents = contents.concat(boards[i].contents)
@@ -165,7 +153,6 @@ function quickSort(items, left, right) {
                 }
               })
               Promise.all(feed).then(function(feed) {
-                console.log(feed);
                 res.render('feed', {contents: feed, helpers: {
                     compare: function(lvalue, rvalue, options) {
                       if (arguments.length < 3)

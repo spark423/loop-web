@@ -21,44 +21,38 @@ function partition(items, left, right) {
         while ((moment(items[i].date).utc() + moment(items[i].startTime, "HH:mm")) < (moment(pivot.date).utc() + moment(pivot.startTime, "HH:mm"))) {
             i++;
         }
-
-        console.log('item', (moment(items[j].date).utc() + moment(items[j].startTime, "HH:mm")))
-        console.log('pivot', (moment(pivot.date).utc() + moment(pivot.startTime, "HH:mm")))
         while ((moment(items[j].date).utc() + moment(items[j].startTime, "HH:mm")) > (moment(pivot.date).utc() + moment(pivot.startTime, "HH:mm"))) {
             j--;
         }
-
         if (i <= j) {
             swap(items, i, j);
             i++;
             j--;
         }
     }
-
     return i;
 }
 
 function quickSort(items, left, right) {
-
     var index;
-
     if (items.length > 1) {
-
         index = partition(items, left, right);
-
         if (left < index - 1) {
             quickSort(items, left, index - 1);
         }
-
         if (index < right) {
             quickSort(items, index, right);
         }
-
     }
-
     return items;
 }
+router.get('/events-calendar', function(req, res) {
+	res.render('events-calendar-view')
+})
 
+router.get('/events-invite', function(req, res) {
+	res.render("create-a-new-event-invite");
+})
 //Render event creation page
 router.get('/events/create', function(req, res) {
   if(req.user) {
@@ -74,10 +68,6 @@ router.get('/events/create', function(req, res) {
     res.redirect('/');
   }
 });
-
-router.get('/events-invite', function(req, res) {
-	res.render("create-a-new-event-invite");
-})
 
 //Create a new event
 router.post('/events/create', function(req, res) {
@@ -123,7 +113,6 @@ router.get('/event/:id', function(req, res) {
           if(err) throw err;
           User.findOne({"username": event.contact}, function(err, user) {
             if(err) throw err;
-            console.log(attendees);
             var eventObject = {
               "id": event._id,
               "createdAt": moment(event.createdAt).format('MMMM D, YYYY, h:mm a'),
@@ -157,7 +146,6 @@ router.get('/events', function(req, res) {
 	if(req.user) {
 		Event.find({}, function(err, events) {
 			if(err) throw err;
-			console.log(events[0].board);
 			let sortedEvents = quickSort(events, 0, events.length-1);
 			let eventObjects = sortedEvents.map(async function(event) {
 				let board = await Board.findById(event.board);
@@ -190,7 +178,6 @@ router.get('/events', function(req, res) {
 				}
 			});
 			Promise.all(eventObjects).then(function(events) {
-				console.log(events);
 				Board.find({}, function(err, boards) {
 					if(err) throw err;
 					var info = [];
@@ -255,9 +242,6 @@ router.get('/events', function(req, res) {
 		res.redirect('/');
 	}
 });
-router.get('/event-calendar', function(req, res) {
-	res.render('events-calendar-view')
-})
 
 //Render edit event page
 router.get('/event/:id/edit', function(req, res) {
