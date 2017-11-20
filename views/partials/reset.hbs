@@ -1,3 +1,14 @@
+<script>
+function reset() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/forgot", true);
+  var email = document.getElementById('email').value;
+  xhttp.setRequestHeader('Content-Type', 'application/json');
+  xhttp.send(JSON.stringify({username: email}));
+  document.getElementById('info').innerHTML = "A email has been sent to " + email + ". Click Next to finish resetting your password.";
+}
+
+</script>
 <section id="login">
     <div class="login-header">
         <img class="uk-float-left" src="img/loop_logo_white.png" alt="Loop" />
@@ -14,9 +25,9 @@
     <div class="inputs">
         <form>
             <div class="uk-margin">
-                <input class="uk-input uk-form-width-medium" type="text" placeholder="Email">
+                <input class="uk-input uk-form-width-medium" type="text" placeholder="Email" id="email">
             </div>
-            <a href="#reset" class="uk-button uk-button-default" uk-toggle>
+            <a href="#reset" onclick="reset()" class="uk-button uk-button-default" uk-toggle>
                 Send Email
             </a>
             <a href="/" class="uk-button uk-button-secondary">

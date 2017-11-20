@@ -34,7 +34,7 @@
                                 </li>
                                 <li>
                                     <a href="/user/edit">
-                                        <span uk-icon="icon: settings"></span>Edit Profile
+                                        <span uk-icon="icon: file-edit"></span>Edit Profile
                                     </a>
                                 </li>
                                 <li>
@@ -66,7 +66,12 @@
                     $.getJSON('/boardinfo', function(data) {
                       for(var i=0; i<data.info.length; i++) {
                         var added = false;
-                        if(data.info[i].unsubscribable==true) {
+                        if(data.info[i].archived==true) {
+                          var board = "<li><a href=/boards/" + data.info[i]._id + "><span uk-icon='icon: album'></span>" + data.info[i].name + " (Deleted)" + "</a></li>";
+                          side_boards.append(board);
+                          added=true;
+                        }
+                        else if(data.info[i].unsubscribable==true) {
                           var board = "<li><a href=/boards/" + data.info[i]._id + "><span uk-icon='icon: album'></span>" + data.info[i].name + " ✔" + "</a></li>";
                           side_boards.append(board);
                           added=true;
@@ -96,8 +101,14 @@
                     var side_groups = $('#side-groups');
                     $.getJSON('/groupinfo', function(data) {
                       for(var i=0; i<data.length; i++) {
-                        var group = "<li><a href=/groups/" + data[i]._id + "><span uk-icon='icon: users'></span>" + data[i].name + "</a></li>";
-                        side_groups.append(group);
+                        if(data[i].archived==true) {
+                          var group = "<li><a href=/groups/" + data[i]._id + "><span uk-icon='icon: users'></span>" + data[i].name + " (Deleted)</a></li>";
+                          side_groups.append(group);
+                        }
+                        else {
+                          var group = "<li><a href=/groups/" + data[i]._id + "><span uk-icon='icon: users'></span>" + data[i].name + "</a></li>";
+                          side_groups.append(group);
+                        }
                       }
                     });
                     </script>

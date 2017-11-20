@@ -7,26 +7,21 @@
     <div class="uk-card uk-card-default uk-card-body">
 
         <div uk-grid>
-          {{#each groups}}
-            <div class="uk-width-1-3@m">
+          {{#each user.joinedGroups}}
+            <div class="uk-width-1-3@m" style="margin-top:0px">
                 <p>
-                    <b>Member</b><br/>
-                    <span>{{group.name}}</span>
+                    <b>
+                    {{#each ../user.adminGroups}}
+                    {{#compare ../name name operator="=="}}
+                    Admin
+                    {{/compare}}
+                    {{/each}}
+                    Member
+                    </b><br/>
+                    <span>{{name}}</span>
                 </p>
             </div>
             {{/each}}
-            <div class="uk-width-1-3@m">
-                <p>
-                    <b>Title Header</b><br/>
-                    <span>Title Desciption</span>
-                </p>
-            </div>
-            <div class="uk-width-1-3@m">
-                <p>
-                    <b>Title Header</b><br/>
-                    <span>Title Desciption</span>
-                </p>
-            </div>
 
         </div>
 

@@ -1,7 +1,14 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../models/user');
-
+var jwt = require('jsonwebtoken');
+var crypto = require('crypto');
+var async = require('async');
+var nodemailer = require('nodemailer');
+var sgTransport = require('nodemailer-sendgrid-transport');
+var secret = process.env.secret;
+var username = process.env.api_user;
+var password = process.env.api_key;
 module.exports = function(passport) {
 
   // Retrieve registration page
@@ -19,9 +26,9 @@ module.exports = function(passport) {
       } else if(req.body.adminID != 100) {
         var message = encodeURIComponent('You must enter a valid Administrator ID.');
         res.redirect('/signup/?message=' + message)
-      } else if(!req.body.username.includes("@haverford.edu")) {
+      /*} else if(!req.body.username.includes("@haverford.edu")) {
         var message = encodeURIComponent('Your username must be a valid Haverford email address.');
-        res.redirect('/signup/?message=' + message)
+        res.redirect('/signup/?message=' + message)*/
       } else {
         res.redirect('/signup-password/?username=' + req.body.username + '&firstName=' + req.body.firstName + '&lastName=' + req.body.lastName);
       }
@@ -65,21 +72,28 @@ module.exports = function(passport) {
 
   // Retrieve settings page
   router.get('/settings', function(req, res) {
-    res.render('settings', {email: req.user.email, message: req.flash('settingsMessage')})
+    if(req.user) {
+      res.render('settings', {message: req.flash('settingsMessage')})
+    }
+    else {
+      res.redirect('/');
+    }
   });
 
   // Process settings page
   router.post('/settings', passport.authenticate('local-settings', {
     successRedirect : '/', // redirect to the login page
     failureRedirect : '/settings', // redirect back to the login page if there is an error
-    failureFlash : true // allow flash messages
   }));
 
   router.get('/reset', function(req, res) {
     res.render('reset');
   })
 
-/*
+  router.get('/forgot-password', function(req, res) {
+    res.render('forgot-password');
+  })
+
   router.post('/forgot', function(req, res) {
     async.waterfall([
       function(done) {
@@ -89,9 +103,12 @@ module.exports = function(passport) {
         });
       },
       function(token, done) {
+        console.log(req.body);
+        console.log(req.body.username);
         User.findOne({ username: req.body.username }, function(err, user) {
           if (!user) {
-            res.send(401, {success: false, message: 'No account with that email address exists.'});
+            console.log("no account");
+            //res.send(401, {success: false, message: 'No account with that email address exists.'});
            return;
           }
 
@@ -127,20 +144,22 @@ module.exports = function(passport) {
       }
     ], function(err) {
       if (err) throw err;
+      console.log("success");
       res.send({success: true})
     });
   })
 
-  router.put('/reset', function(req, res) {
+  router.post('/reset', function(req, res) {
     async.waterfall([
       function(done) {
+        console.log(req.body);
         User.findOne({ resetPasswordToken: req.body.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
           if (!user) {
             res.json(401, {success: false, message: 'Password reset token is invalid or has expired.'});
           } else if (req.body.newPassword !== req.body.confirmNewPassword) {
           	res.json(401, {success: false, message: "Passwords don't match."})
           } else {
-            user.password = req.body.newPassword;
+            user.password = user.hashPassword(req.body.newPassword);
             user.resetPasswordToken = undefined;
             user.resetPasswordExpires = undefined;
             user.save(function(err) {
@@ -172,9 +191,10 @@ module.exports = function(passport) {
       }
     ], function(err) {
       if (err) throw err;
+      console.log("success");
       res.send({success: true});
     });
-  });*/
+  });
 
   return router;
 };

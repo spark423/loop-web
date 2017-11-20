@@ -69,6 +69,34 @@ router.get('/events/create', function(req, res) {
   }
 });
 
+router.post('/event-invite', function(req, res) {
+  var title = encodeURIComponent(req.body.title);
+  var description = encodeURIComponent(req.body.description);
+  var board = encodeURIComponent(req.body.board);
+  var startTime = encodeURIComponent(req.body.startTime);
+  var endTime = encodeURIComponent(req.body.endTime);
+  var location = encodeURIComponent(req.body.location);
+  var date = encodeURIComponent(req.body.date);
+  var contact = encodeURIComponent(req.user.username);
+  res.redirect('/create-a-new-event-invite/?title=' + title + '&description=' + description + '&board=' + board + '&startTime=' + startTime + '&endTime=' + endTime + '&location=' + location + '&date=' + date + '&contact=' + contact);
+})
+
+router.get('/create-a-new-event-invite', function(req, res) {
+  if(req.user) {
+    User.find({}, function(err, users) {
+      if(err) throw err;
+      var user_info = [];
+      for(var i=0; i<users.length; i++) {
+        if(req.user.username!=users[i].username) {
+          user_info.push({"firstName": users[i].firstName, "lastName": users[i].lastName, "username": users[i].username, "major": users[i].major, "classYear": users[i].classYear});
+        }
+      }
+      res.render('create-a-new-event-invite', {title: req.query.title, description: req.query.description, board: req.query.board, date: req.query.date, startTime: req.query.startTime, endTime: req.query.endTime, location: req.query.location, contact: req.query.contact, users: user_info});
+    })
+  } else {
+    res.redirect('/');
+  }
+})
 //Create a new event
 router.post('/events/create', function(req, res) {
   var newEvent = new Event({
@@ -81,6 +109,16 @@ router.post('/events/create', function(req, res) {
     date: req.body.date,
 		contact: req.user.username
   });
+  var addMembers = req.body.addMembers.split(',');
+  var removeMembers = req.body.removeMembers.split(',');
+  for(var i=0; i<removeMembers.length; i++) {
+    for(var j=0; j<addMembers.length; j++) {
+      if(removeMembers[i]==addMembers[j]) {
+        addMembers.splice(j, 1);
+      }
+    }
+  }
+  console.log(addMembers);
 	newEvent.attendees.push(req.user._id);
   newEvent.save(function(error, newEvent) {
     if (error) throw error;
@@ -94,7 +132,27 @@ router.post('/events/create', function(req, res) {
 					board.contents.push({"kind": "Event", "item": newEvent._id});
 					board.save(function(err, updatedBoard) {
 						if(err) throw err;
-						res.redirect('/boards/' + updatedBoard._id);
+            User.find({'username': addMembers}, function(err, members) {
+              if(err) throw err;
+              var newNotification = new Notification({
+                type: 'Invited to Event',
+                message: "You have been invited to a new Event, " + newEvent.title + ".",
+                routeID: {
+                  kind: 'Event',
+                  item: newEvent._id
+                }
+              });
+              newNotification.save(function(err, notification) {
+                if(err) throw err;
+                for(var i=0; i<members.length; i++) {
+                  members[i].notifications.push(notification._id);
+                  members[i].save(function(err, completeUser) {
+                    if(err) throw err;
+                  })
+                }
+                res.redirect('/boards/' + updatedBoard._id);
+              });
+            })
 					})
 				})
       })
@@ -105,12 +163,22 @@ router.post('/events/create', function(req, res) {
 //Render Event page
 router.get('/event/:id', function(req, res) {
   if(req.user) {
-    Event.findById(req.params.id, function(err, event) {
+    Event.findById(req.params.id).populate([{path: 'comments', populate: [{path: 'postedBy'}]}]).exec(function(err, event) {
       if(err) throw err;
       Board.findById(event.board, function(err, board) {
         if(err) throw err;
         User.find({"_id": event.attendees}, function(err, attendees) {
           if(err) throw err;
+          if(event.attendees.indexOf(req.user._id)!=-1) {
+            var attending = true;
+          }
+          else {
+            var attending = false;
+          }
+          let comments = event.comments.map(function(comment) {
+            return {"id": comment._id, "createdAt": moment(comment.createdAt).format('MMMM D, YYYY, h:mm a'), "postedBy": {"id": comment.postedBy._id, "firstName": comment.postedBy.firstName, "lastName": comment.postedBy.lastName}, "text": comment.text}
+          })
+          console.log(comments);
           User.findOne({"username": event.contact}, function(err, user) {
             if(err) throw err;
             var eventObject = {
@@ -123,15 +191,46 @@ router.get('/event/:id', function(req, res) {
               },
               "title": event.title,
               "board": event.board,
+              "archived": event.archived,
               "date": moment(event.date).utc().format('MMMM D, YYYY'),
               "startTime": moment(event.startTime, "HH:mm").format('h:mm a'),
               "endTime": moment(event.endTime, "HH:mm").format('h:mm a'),
               "location": event.location,
               "description": event.description,
-              "comments": event.comments,
-              "attendees": attendees
+              "comments": comments,
+              "attendees": attendees,
+              "attending": attending
             }
-            res.render('event-detail', {"event": eventObject, "board": board.name});
+            res.render('event-detail', {"event": eventObject, "board": board.name, helpers: {
+  							compare: function(lvalue, rvalue, options) {
+  								if (arguments.length < 3)
+  										throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
+
+  								var operator = options.hash.operator || "==";
+
+  								var operators = {
+  										'==':       function(l,r) { return l == r; },
+  										'===':      function(l,r) { return l === r; },
+  										'!=':       function(l,r) { return l != r; },
+  										'<':        function(l,r) { return l < r; },
+  										'>':        function(l,r) { return l > r; },
+  										'<=':       function(l,r) { return l <= r; },
+  										'>=':       function(l,r) { return l >= r; },
+  										'typeof':   function(l,r) { return typeof l == r; }
+  								}
+
+  								if (!operators[operator])
+  										throw new Error("Handlerbars Helper 'compare' doesn't know the operator "+operator);
+
+  								var result = operators[operator](lvalue,rvalue);
+
+  								if( result ) {
+  										return options.fn(this);
+  								} else {
+  										return options.inverse(this);
+  								}
+  							}
+  						}});
           })
         })
       })
@@ -165,6 +264,7 @@ router.get('/events', function(req, res) {
 								"id": board._id,
 								"name": board.name
 							},
+              "archived": event.archived,
 							"description": event.description,
 							"date": moment(event.date).utc().format('MMMM D, YYYY'),
 							"startTime": moment(event.startTime, "HH:mm").format('h:mm a'),
@@ -324,13 +424,16 @@ router.post('/events/:id', function(req, res) {
 		if (err)  {
 			throw err;
 		} else {
-			Board.findOneAndUpdate({_id: event.board}, {$pull: {contents: {item: req.params.id}}}, function(err) {
-				if (err) {
-					throw err;
-				} else {
-					res.redirect('/boards/' + event.board);
-				}
-			})
+      event.archived = true;
+      event.save(function(err, unpdatedEvent) {
+        Board.findOneAndUpdate({_id: event.board}, {$pull: {contents: {item: req.params.id}}}, function(err) {
+          if (err) {
+            throw err;
+          } else {
+            res.redirect('/boards/' + event.board);
+          }
+        })
+      })
 		}
 	})
 })
@@ -448,7 +551,7 @@ router.post('/events/:id/attend', function(req, res) {
 				event.save(function(error, updatedEvent) {
 					if (error)
 						throw error;
-					res.redirect('back')
+					res.status(200);
 				})
 			})
 		})
@@ -475,7 +578,7 @@ router.post('/events/:id/unattend', function(req, res) {
 				event.save(function(error, updatedEvent) {
 					if (error)
 						throw error;
-					res.redirect('back')
+					res.status(200);
 				})
 			})
 		})

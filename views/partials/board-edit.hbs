@@ -3,7 +3,7 @@
 <div id="board-edit">
 
     <div class="uk-card uk-card-default uk-card-body">
-
+<form action="/boards/{{id}}/delete" method="post" id="delete"></form>
         <div class="create-wrap">
             <h4 class="inner">Edit Board</h4>
             <div class="divider"></div>
@@ -15,7 +15,7 @@
 
                             <textarea class="uk-textarea uk-form-blank uk-form-width-large" type="text" name="description" style="overflow: hidden; resize: vertical">{{description}}</textarea>
                         <a class="uk-button uk-button-primary" type="button" onclick="document.getElementById('editform').submit()">Save</a>
-                        <a class="uk-button uk-button-cancel" type="button">Back</a>
+                        <a href="javascript:history.back()" class="uk-button uk-button-cancel" type="button">Back</a>
                     </div>
                 </div>
                 <div class="uk-width-2-5@m">
@@ -47,6 +47,10 @@
                                   <option value="true">Yes</option>
                                   <option value="false">No</option>
                                 </select>
+                            </li>
+                            <li>
+                              <a class="uk-button uk-button-primary uk-float-left" style="color: white; background-color:red; border-color: red" type="button" onclick="document.getElementById('delete').submit()">Deactivate</a>
+
                             </li>
                         </ul>
                     </div>

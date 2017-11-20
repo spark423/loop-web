@@ -122,8 +122,8 @@ passport.use('local-login', new LocalStrategy({
 
 //Settings =========================================================================================================================================================================
 passport.use('local-settings', new LocalStrategy({
-    // usernameField : 'username',
-    // passwordField : 'password',
+    usernameField : 'newPassword',
+    passwordField : 'password',
     passReqToCallback : true // allows us to pass back the entire request to the callback
   },
   function(req, username, password, done) {
@@ -132,10 +132,13 @@ passport.use('local-settings', new LocalStrategy({
     process.nextTick(function() {
       // Find a user whose email is the same as the forms email and check to see if the user trying to sign up already exists
       if (!req.user.validatePassword(password)) {
+        console.log("wrong current password");
         return done(null, false, req.flash('settingsMessage', 'Current password is incorrect.'));
       } else if (req.body.newPassword !== req.body.confirmPassword) {
-        return done(null, false, req.flash('settingsMessage', 'Passwords don\'t match.'));
+        console.log("passwords dont match");
+        return done(null, false, req.flash('settingsMessage', 'Passwords do not match.'));
       } else {
+        console.log("success");
         //Find the user and update the password
         User.findById(req.user._id, function (err, user) {
           if (err)

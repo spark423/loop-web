@@ -13,33 +13,10 @@ router.get('/userinfo', function(req, res) {
 	res.send(info);
 })
 
-//View Own user page
-router.get('/user', function(err, user) {
-	if(req.user) {
-		User.findById(req.user._id, function(err, user) {
-			if (err)  {
-				throw err;
-			} else {
-				res.render('profile-user', {
-					"user": {
-						username: user.username,
-						firstName: user.firstName,
-						lastName: user.lastName,
-						major: user.major,
-						classYear: user.classYear
-					}
-				})
-			}
-		})
-	} else {
-		res.redirect('/');
-	}
-})
-
 //View someone else's page
 router.get('/users/:id', function(req, res) {
 	if(req.user) {
-		User.findById(req.params.id, function(err, user) {
+		User.findById(req.params.id).populate([{path: 'adminGroups'}, {path: 'joinedGroups'}, {path: 'subscribedBoards'}]).exec(function(err, user) {
 			if (err) throw err;
 			res.render('profile-user',{
 				"user": {
@@ -47,8 +24,41 @@ router.get('/users/:id', function(req, res) {
 					firstName: user.firstName,
 					lastName: user.lastName,
 					major: user.major,
-					classYear: user.classYear
-				}
+					classYear: user.classYear,
+					description: user.description,
+					adminGroups: user.adminGroups,
+					joinedGroups: user.joinedGroups,
+					subscribedBoards: user.subscribedBoards
+				}, helpers: {
+						compare: function(lvalue, rvalue, options) {
+							if (arguments.length < 3)
+									throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
+
+							var operator = options.hash.operator || "==";
+
+							var operators = {
+									'==':       function(l,r) { return l == r; },
+									'===':      function(l,r) { return l === r; },
+									'!=':       function(l,r) { return l != r; },
+									'<':        function(l,r) { return l < r; },
+									'>':        function(l,r) { return l > r; },
+									'<=':       function(l,r) { return l <= r; },
+									'>=':       function(l,r) { return l >= r; },
+									'typeof':   function(l,r) { return typeof l == r; }
+							}
+
+							if (!operators[operator])
+									throw new Error("Handlerbars Helper 'compare' doesn't know the operator "+operator);
+
+							var result = operators[operator](lvalue,rvalue);
+
+							if( result ) {
+									return options.fn(this);
+							} else {
+									return options.inverse(this);
+							}
+						}
+					}
 			})
 		})
 	} else {
@@ -59,7 +69,7 @@ router.get('/users/:id', function(req, res) {
 //Render edit profile page
 router.get('/user/edit', function(req, res) {
 	if(req.user) {
-		res.render('edit-profile');
+		res.render('edit-profile', {id: req.user._id, description: req.user.description});
 	} else {
 		res.redirect('/');
 	}

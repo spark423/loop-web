@@ -8,6 +8,7 @@ var commentSchema = new mongoose.Schema({
     item: { type: mongoose.Schema.Types.ObjectId, refPath: 'source.kind' }
   },
   text: {type: String},
+  archived: {type: Boolean, default: false},
   comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Comment'}]
 });
 

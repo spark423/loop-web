@@ -1,0 +1,25 @@
+<link rel="stylesheet" href="/css/post-board-notifications-create/sxn-post-board-notifications-create.v3.min.css" />
+<div id="post-board-notifications-create">
+    <div class="uk-card uk-card-default uk-card-body">
+        <div class="create-wrap">
+            <h4 class="inner">New Post</h4>
+            <div class="divider"></div>
+            <div class="create-grid" uk-grid>
+                <div class="poll-wrap uk-width-3-5@m">
+                    <div class="form-wrap">
+                        <form id="postform" action="/posts/{{id}}/edit" method="post">
+                            <input class="uk-input uk-form-large uk-form-blank uk-form-width-large" type="text" name="title" value="{{title}}"></input>
+
+
+                            <textarea class="uk-textarea uk-form-blank uk-form-width-large" type="text" name="text" style="overflow: hidden; resize: vertical">{{text}}</textarea>
+
+                        <a class="uk-button uk-button-primary" type="button" onclick="document.getElementById('postform').submit();">Save</a>
+                        <a href="javascript:history.back()" class="uk-button uk-button-cancel" type="button">Back</a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+</form>
+    </div>
+</div>

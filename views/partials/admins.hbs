@@ -1,5 +1,5 @@
 <link rel="stylesheet" href="/css/admins/sxn-admins.min.css" />
-
+{{#if group.admin}}
 <div id="admins">
 
     <h2>Admin</h2>
@@ -7,7 +7,6 @@
     <div class="uk-card uk-card-default uk-card-body">
 
         <div class="admins" uk-grid>
-          {{#if group.admin}}
             <div class="col uk-width-1-2@m">
                 <div class="member" uk-grid>
                     <div class="uk-width-auto@m">
@@ -15,12 +14,40 @@
                     </div>
                     <div class="uk-width-expand@m">
                         <p class="name"><a href="/users/{{group.admin.id}}">{{group.admin.firstName}} {{group.admin.lastName}}</a></p>
+                        <p style="margin-top: 0px; font-size: 14px">{{group.admin.username}}</p>
                     </div>
                 </div>
             </div>
-          {{/if}}
         </div>
 
     </div>
 
 </div>
+{{/if}}
+{{#if group.members}}
+<div id="admins">
+
+    <h2>Members</h2>
+
+    <div class="uk-card uk-card-default uk-card-body">
+
+        <div class="admins" uk-grid>
+            <div class="col uk-width-1-2@m">
+              {{#each group.members}}
+                <div class="member" uk-grid>
+                    <div class="uk-width-auto@m">
+                        <div class="img-wrap"></div>
+                    </div>
+                    <div class="uk-width-expand@m">
+                        <p class="name"><a href="/users/{{id}}">{{firstName}} {{lastName}}</a></p>
+                        <p style="margin-top: 0px; font-size: 14px">{{username}}</p>
+                    </div>
+                </div>
+              {{/each}}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{{/if}}

@@ -18,6 +18,9 @@
                       {{#compare this.routeID.kind 'Post' operator="=="}}
                       href="/post/{{this.routeID.item}}"
                       {{/compare}}
+                      {{#compare this.routeID.kind 'Event' operator="=="}}
+                      href="/event/{{this.routeID.item}}"
+                      {{/compare}}
                       >{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br />
                     <span>{{this.message}}</span>
                 </div>

@@ -54,6 +54,16 @@ router.get('/post/:id', function(req, res) {
 	})
 })
 
+router.get('/posts/:id/edit', function(req, res) {
+	if(req.user) {
+		Post.findById(req.params.id, function(err, post) {
+			if(err) throw err;
+			res.render('edit-post', {title: post.title, text: post.text, id: post._id});
+		})
+	} else {
+		res.redirect('/');
+	}
+})
 //Editing post
 router.post('/posts/:id/edit', function(req, res) {
 	Post.findById(req.params.id, function(error, post) {
@@ -79,12 +89,15 @@ router.post('/posts/:id', function(req, res) {
 		if (err) {
 			throw err;
 		} else {
-			Board.findOneAndUpdate({_id: post.board}, {$pull: {contents: {item: req.params.id}}}, function(err, board) {
-				if (err) {
-					throw err;
-				} else {
-					res.redirect('/boards/' + board._id);
-				}
+			post.archived=true;
+			post.save(function(err, updatedPost) {
+				Board.findOneAndUpdate({_id: updatedPost.board}, {$pull: {contents: {item: req.params.id}}}, function(err, board) {
+					if (err) {
+						throw err;
+					} else {
+						res.redirect('/boards/' + board._id);
+					}
+				})
 			})
 		}
 	})

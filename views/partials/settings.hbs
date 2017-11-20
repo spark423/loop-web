@@ -1,15 +1,18 @@
 <link rel="stylesheet" href="css/settings/sxn-settings.min.css" />
 
+{{#if message}}
+<script> alert("{{message}}"); </script>
+{{/if}}
 <div id="settings">
 
-    <h3>General</h3>
+    <h3>Change Password</h3>
     <div class="divider"></div>
-    <h3>Notifications</h3>
-    <div class="divider"></div>
-    <h3>Iterface</h3>
-    <div class="divider"></div>
-    <h3>Automation</h3>
-    <div class="divider"></div>
-    <h3>Permissions</h3>
-
+    <form id="settingsform" method="post" action="/settings">
+    <input class="uk-input" type="password" name="password" placeholder="Current Password" style="width:200px; margin-bottom: 5px"><br>
+    <input class="uk-input" type="password" name="newPassword" placeholder="New Password" style="width:200px; margin-bottom: 5px"><br>
+    <input class="uk-input" type="password" name="confirmPassword" placeholder="Confirm Password" style="width:200px; margin-bottom: 5px"><br>
+    <a class="uk-button uk-button-default new-margin" style="background-color: #00d283; color: #fff"onclick="document.getElementById('settingsform').submit();">
+        Save
+    </a>
+  </form>
 </div>

@@ -1,27 +1,31 @@
 <script>
 var notifications = $('#notifications')
 $.getJSON('/notifications', function(data) {
-  document.getElementById('notifications-number').innerHTML = data.length;
   var createdPostCount=0;
   var followingPostCount=0;
   var createdEventCount=0;
   var attendingEventCount=0;
   var addedOrganizationCount=0;
+  var inviteEventCount=0;
   for(var i=0; i<data.length; i++) {
-    if(data.notifications[i].type=="Comment on Created Post") {
+    console.log(data.notifications[i].createdAt);
+    if(data.notifications[i].type=="Comment on Created Post" && data.notifications[i].createdAt > localStorage.past) {
       createdPostCount++;
     }
-    else if(data.notifications[i].type=="Comment on Following Post") {
+    else if(data.notifications[i].type=="Comment on Following Post" && data.notifications[i].createdAt > localStorage.past) {
       followingPostCount++;
     }
-    else if(data.notifications[i].type=="Comment on Created Event") {
+    else if(data.notifications[i].type=="Comment on Created Event" && data.notifications[i].createdAt > localStorage.past) {
       createdEventCount++;
     }
-    else if(data.notifications[i].type=="Comment on Attending Event") {
+    else if(data.notifications[i].type=="Comment on Attending Event" && data.notifications[i].createdAt > localStorage.past) {
       attendingEventCount++;
     }
-    else if(data.notifications[i].type=="Added to Organization") {
+    else if(data.notifications[i].type=="Added to Organization" && data.notifications[i].createdAt > localStorage.past) {
       addedOrganizationCount++;
+    }
+    else if(data.notifications[i].type=="Invited to Event" && data.notifications[i].createdAt > localStorage.past) {
+      inviteEventCount++;
     }
   }
   if(createdPostCount!=0) {
@@ -41,7 +45,11 @@ $.getJSON('/notifications', function(data) {
     notifications.append(notification);
   }
   if(addedOrganizationCount!=0) {
-    var notification="<li><a href='/all-notifications'><span uk-icon='icon: comment'></span>You have been added to " + "<b>" + addedOrganizationCount + "</b> organization(s)</a></li>";
+    var notification="<li><a href='/all-notifications'><span uk-icon='icon: users'></span>You have been added to " + "<b>" + addedOrganizationCount + "</b> organization(s)</a></li>";
+    notifications.append(notification);
+  }
+  if(inviteEventCount!=0) {
+    var notification="<li><a href='/all-notifications'><span uk-icon='icon: calendar'></span>You have been invited to " + "<b>" + inviteEventCount + "</b> event(s)</a></li>";
     notifications.append(notification);
   }
   notifications.append("<li><a class='green' href='/all-notifications'>See all notifications</a></li>");

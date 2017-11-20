@@ -8,6 +8,17 @@ var Comment = require('../models/comment')
 
 //Editing comment
 router.post('/comments/:id/edit', function(req, res) {
+	Comment.findById(req.params.id, function(err, comment) {
+		if(err) throw err;
+		comment.text=req.body.text;
+		comment.save(function(err, updatedComment) {
+			console.log(updatedComment);
+			if(err) throw err;
+			res.status(200);
+		})
+	})
+});
+/*router.post('/comments/:id/edit', function(req, res) {
 	Comment.findById(req.params.id, function(error, comment) {
 		if (error)
 			throw error
@@ -50,7 +61,7 @@ router.post('/comments/:id/edit', function(req, res) {
 			}
 		})
 	})
-})
+})*/
 
 
 //Deleting comment
@@ -80,6 +91,10 @@ router.post('/comments/:id', function(req, res) {
 				res.redirect('/boards/' + board.source.item.source.item.board);
 			})
 		}
+		comment.archived=true;
+		comment.save(function(err, updatedComment) {
+			if(err) throw err;
+		})
 	})
 })
 

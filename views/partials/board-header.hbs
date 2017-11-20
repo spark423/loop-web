@@ -11,7 +11,6 @@ function unsubscribe() {
   xhttp.open("POST", "/boards/{{board.id}}/unsubscribe", true);
   xhttp.send();
   document.getElementById("subscribe").innerHTML = "<a onclick='subscribe()' class='uk-float-right uk-link'>Subscribe</a>";
-
 }
 </script>
 <div id="board-header">

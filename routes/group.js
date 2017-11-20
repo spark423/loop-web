@@ -10,16 +10,20 @@ var Notification = require('../models/notification');
 //Create a new group
 router.post('/groups/create', function(req, res) {
   if(req.body.admin) {
-    var admin = req.body.admin;
+    admin=req.body.admin;
+    var newGroup = new Group({
+      name: req.body.name,
+      description: req.body.description,
+      admin: admin
+    });
   }
   else {
-    var admin = req.user.username;
+    admin='';
+    var newGroup = new Group({
+      name: req.body.name,
+      description: req.body.description
+    });
   }
-  var newGroup = new Group({
-    name: req.body.name,
-    description: req.body.description,
-    admin: admin
-  });
   var containsAdmin = false;
   var addMembers = req.body.addMembers.split(',');
   var removeMembers = req.body.removeMembers.split(',');
@@ -106,7 +110,9 @@ router.get('/create-a-new-org-invite', function(req, res) {
       if(err) throw err;
       var user_info = [];
       for(var i=0; i<users.length; i++) {
-        user_info.push({"firstName": users[i].firstName, "lastName": users[i].lastName, "username": users[i].username, "major": users[i].major, "classYear": users[i].classYear});
+        if(req.user.username!=users[i].username) {
+          user_info.push({"firstName": users[i].firstName, "lastName": users[i].lastName, "username": users[i].username, "major": users[i].major, "classYear": users[i].classYear});
+        }
       }
       res.render('create-a-new-org-invite', {name: req.query.name, description: req.query.description, admin: req.query.admin, users: user_info});
     })
@@ -115,13 +121,24 @@ router.get('/create-a-new-org-invite', function(req, res) {
   }
 })
 
+router.post('/groups/:id/delete', function(req, res) {
+  Group.findById(req.params.id, function(err, group) {
+    if(err) throw err;
+    group.archived = true;
+    group.save(function(err, updatedGroup) {
+      if(err) throw err;
+      res.redirect('/');
+    })
+  })
+})
+
 //Get info for sidenav
 router.get('/groupinfo', function(req, res) {
   Group.find({}, function(err, groups) {
     if(err) throw err;
     var info = [];
     for(var i=0; i<groups.length; i++) {
-      info.push({"name": groups[i].name, "_id": groups[i]._id});
+      info.push({"name": groups[i].name, "_id": groups[i]._id, "archived": groups[i].archived});
     }
     res.send(info);
   });

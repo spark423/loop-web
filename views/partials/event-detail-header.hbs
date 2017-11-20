@@ -1,9 +1,38 @@
 <link rel="stylesheet" href="/css/event-detail-header/sxn-event-detail-header.min.css" />
-
+<script>
+function attend() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/events/{{event.id}}/attend", true);
+  xhttp.send();
+  document.getElementById("attend").innerHTML = "<a onclick='unattend1()' class='uk-float-right uk-link'>✔ Attending</a>";
+  document.getElementById("number_attendees").innerHTML = {{event.attendees.length}} + 1;
+}
+function unattend1() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/events/{{event.id}}/unattend", true);
+  xhttp.send();
+  document.getElementById("attend").innerHTML = "<a onclick='attend()' class='uk-float-right uk-link'>Attend</a>";
+  document.getElementById("number_attendees").innerHTML = {{event.attendees.length}};
+}
+function attend1() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/events/{{event.id}}/attend", true);
+  xhttp.send();
+  document.getElementById("attend").innerHTML = "<a onclick='unattend()' class='uk-float-right uk-link'>✔ Attending</a>";
+  document.getElementById("number_attendees").innerHTML = {{event.attendees.length}};
+}
+function unattend() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/events/{{event.id}}/unattend", true);
+  xhttp.send();
+  document.getElementById("attend").innerHTML = "<a onclick='attend1()' class='uk-float-right uk-link'>Attend</a>";
+  document.getElementById("number_attendees").innerHTML = {{event.attendees.length}} - 1;
+}
+</script>
 <div id="event-detail-header">
 
     <div class="event-detail-header top">
-        <h2><a href="javascript:history.back()"><span uk-icon="icon: chevron-left"></span></a>{{event.title}}</h2>
+        <h2><a href="javascript:history.back()"><span uk-icon="icon: chevron-left"></span></a>{{event.title}} {{#compare event.archived true opeartor="=="}}<b style="color: red">(DELETED)</b>{{/compare}}</h2>
         <a href="/event/{{event.id}}/edit" class="uk-float-right green"><span class="uk-icon" uk-icon="icon: pencil"></span>Edit event</a>
         <div class="img-wrap"></div>
     </div>
@@ -14,12 +43,16 @@
             <span>{{event.date}}, {{event.startTime}} to {{event.endTime}}</span>
         </div>
         <div>
-          <div class="uk-float-right">
-              <span class="green uk-icon" uk-icon="icon: check"></span><span class="green">Attending</span>
+          <div id="attend">
+          {{#compare event.attending false operator="=="}}
+            <a onclick="attend()" class="uk-float-right uk-link">Attend</a>
+            {{else}}
+            <a onclick="unattend()" class="uk-float-right uk-link">✔ Attending</a>
+            {{/compare}}
           </div>
             <div class="uk-clearfix"></div>
             <div class="attending uk-float-right">
-                <span uk-icon="icon: users"></span><span>{{event.attendees.length}} attending</span>
+                <span uk-icon="icon: users"></span><span><span id="number_attendees">{{event.attendees.length}}</span> attending</span>
             </div>
             <div class="uk-clearfix"></div>
         </div>

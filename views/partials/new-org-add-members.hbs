@@ -7,7 +7,7 @@ function search() {
   table = document.getElementById("users");
   tr = table.getElementsByTagName("li");
   for (i = 0; i < tr.length; i++) {
-    p = tr[i].getElementsByTagName("p")[0];
+    p = tr[i].getElementsByTagName("p")[1];
     if (p.innerHTML.toUpperCase().indexOf(filter) > -1) {
       tr[i].style.display = "";
     } else {
@@ -61,7 +61,7 @@ function addMember(index) {
                                     </div>
                                     <div class="uk-width-auto@m" id="icons">
                                         <div class="invite-icon">
-                                            <span onclick="addMember({{@index}})" id="icon1-{{@index}}" class="uk-icon" uk-icon="icon: mail" style="display:"></span>
+                                            <span onclick="addMember({{@index}})" id="icon1-{{@index}}" class="uk-icon" uk-icon="icon: plus" style="display:"></span>
                                         </div>
                                         <div class="invite-icon green">
                                             <span onclick="addMember({{@index}})" id="icon2-{{@index}}" class="uk-icon" uk-icon="icon: check" style="display:none"></span>

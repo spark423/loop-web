@@ -1,0 +1,29 @@
+{{>sidenav}}
+<div class="col-tog single-col">
+
+    <div class="app">
+        {{>topbar}}
+        <br><br>
+        {{>edit-post}}
+    </div>
+
+</div>
+
+<div class="col-tog double-col" hidden>
+
+  <div class="side-col">
+      <div class="side-col-scroll">
+      {{>scroll-title-home}}
+      </div>
+  </div>
+
+    <div class="app double">
+        {{>topbar-hidden}}
+        <br><br>
+        {{>edit-post}}
+    </div>
+    </div>
+
+</div>
+
+<?php include 'sxn/ftr/sxn-ftr.php'; ?>

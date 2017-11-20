@@ -1,14 +1,30 @@
 <script>
 var notifications = $('#notifications')
 $.getJSON('/notifications', function(data) {
-  document.getElementById('notifications-number').innerHTML = data.length;
+    document.getElementById('notifications-number').innerHTML = data.length - localStorage.notifications;
+    if(data.length > localStorage.notifications) {
+      localStorage.seen = 'false';
+      localStorage.past = localStorage.time;
+    }
+    console.log(localStorage.past);
+    console.log(localStorage.time);
 });
 function clearNotifications() {
   document.getElementById('notifications-number').innerHTML = 0;
+  if(localStorage.seen=='false') {
+    localStorage.time = new Date().toISOString();
+    localStorage.seen = true;
+  }
+  $.getJSON('/notifications', function(data) {
+    localStorage.notifications = data.length;
+  })
 }
 </script>
 <div id="topbar">
     <div class="uk-float-right">
+        <span class="text-light uk-margin-small-right" style="visibility:hidden"></span>
+        <a href="#" class="uk-icon-link app-link" uk-icon="icon: more-vertical" uk-toggle="target: .col-tog, .app-link" style="visibility:hidden"></a>
+        <a href="#" class="uk-icon-link app-link green" uk-icon="icon: more-vertical" uk-toggle="target: .col-tog, .app-link" style="visibility:hidden" hidden></a>
         <div class="uk-inline">
             <a href="#" onclick="clearNotifications()">
                 <span class="uk-badge" type="button" id="notifications-number">0</span>
@@ -21,9 +37,6 @@ function clearNotifications() {
                 </div>
             </div>
         </div>
-        <span class="text-light uk-margin-small-right">|</span>
-        <a href="#" class="uk-icon-link app-link" uk-icon="icon: more-vertical" uk-toggle="target: .col-tog, .app-link"></a>
-        <a href="#" class="uk-icon-link app-link green" uk-icon="icon: more-vertical" uk-toggle="target: .col-tog, .app-link" hidden></a>
     </div>
 </div>
 <div class="topbar-nudge"></div>

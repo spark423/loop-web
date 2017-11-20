@@ -5,6 +5,7 @@ var Group = require('../models/group')
 var Board = require('../models/board');
 var Post = require('../models/post');
 var Event = require('../models/event');
+var Comment = require('../models/comment');
 var Notification = require('../models/notification')
 var Time = require('../models/time')
 var moment = require('moment')
@@ -20,7 +21,7 @@ router.get('/boardinfo', function(req, res) {
       if(err) throw err;
       var info = [];
       for(var i=0; i<boards.length; i++) {
-        info.push({"name": boards[i].name, "_id": boards[i]._id, "unsubscribable": boards[i].unsubscribable});
+        info.push({"name": boards[i].name, "_id": boards[i]._id, "unsubscribable": boards[i].unsubscribable, "archived": boards[i].archived});
       }
       res.send({"info": info, "subscribedBoards": req.user.subscribedBoards});
     });
@@ -57,18 +58,50 @@ router.post('/boards/:id/edit', function(req, res) {
   })
 })
 
-router.get('/boards', function(req, res) {
-  Board.find({}, function(err, boards) {
-    if (err) {
-      throw err;
-    } else {
-      let boardsArr = boards.map(function(board) {
-        return {"id": board._id, "name": board.name, "unsubscribable": board.unsubscribable, "subscribed": req.user.subscribedBoards(board._id) > -1};
-      })
-      res.json({"boards": boardsArr});
-    }
+router.post('/boards/:id/delete', function(req, res) {
+  Board.findById(req.params.id, function(err, board) {
+    if(err) throw err;
+    board.archived = true;
+    board.save(function(err, updatedBoard) {
+      if(err) throw err;
+      for(var i=0; i<updatedBoard.contents.length; i++) {
+        if(updatedBoard.contents[i].kind=="Post") {
+          Post.findById(board.contents[i].item, function(err, posts) {
+            posts.archived=true;
+            posts.save(function(err, updatedPost) {
+              if(err) throw err;
+              Comment.find({'_id': updatedPost.comments}, function(err, comments) {
+                for(var j=0; j<comments.length; j++) {
+                  comments[j].archived=true;
+                  comments[j].save(function(err, updatedComment) {
+                    if(err) throw err;
+                  })
+                }
+              })
+            })
+          })
+        }
+        else {
+          Event.findById(board.contents[i].item, function(err, events) {
+            events.archived=true;
+            events.save(function(err, updatedEvent) {
+              if(err) throw err;
+              Comment.find({'_id': events.comments}, function(err, comments) {
+                for(var j=0; j<comments.length; j++) {
+                  comments[j].archived=true;
+                  comments[j].save(function(err, updatedComment) {
+                    if(err) throw err;
+                  })
+                }
+              })
+            })
+          })
+        }
+      }
+      res.redirect('/');
+    })
   })
-});
+})
 
 //Retrieving a board page
 router.get('/boards/:id', function(req, res) {
@@ -292,6 +325,7 @@ router.get('/boards/:id', function(req, res) {
           }
         });
         Promise.all(contents).then(function(contents) {
+          console.log(contents);
           res.render('board-overview', {
             board: {
               id: board._id,

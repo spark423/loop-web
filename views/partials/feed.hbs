@@ -1,12 +1,31 @@
 <link rel="stylesheet" href="/css/feed/sxn-feed.v5.min.css" />
 <link rel="stylesheet" href="/css/feed-event/sxn-feed-event.min.css" />
-
+<script>
+function edit(index, index2) {
+  document.getElementById('comment-' + index + "-" + index2).style.display = "none";
+  document.getElementById('edit-comment-' + index + "-" + index2).style.display = "";
+}
+function saveComment(index, index2, id) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/comments/" + id + "/edit", true);
+  xhttp.setRequestHeader("Content-Type", "application/json");
+  var text = document.getElementById("editedComment-" + index + "-"+ index2).value;
+  xhttp.send(JSON.stringify({text: text}));
+  document.getElementById('comment-' + index + "-" + index2).style.display = "";
+  document.getElementById('comment-' + index + "-" + index2).innerHTML = text;
+  document.getElementById('edit-comment-' + index + "-" + index2).style.display = "none";
+}
+function cancel(index, index2) {
+  document.getElementById('edit-comment-' + index + "-" + index2).style.display = "none";
+  document.getElementById('comment-' + index + "-" + index2).style.display = "";
+}
+</script>
 <div id="feed">
 
     <h4>TODAY</h4>
     <p style="display:none" id="boardName">{{board.name}}</p>
     {{#each contents}}
-    {{#if this.location}}
+    {{#if this.contact}}
     <form id='delete-event-{{@index}}' style="display: none" method="post" action="/events/{{this.id}}"></form>
     <form id='attend-event-{{@index}}' style="display: none" method="post" action="/events/{{this.id}}/attend"></form>
     <form id='unattend-event-{{@index}}' style="display: none" method="post" action="/events/{{this.id}}/unattend"></form>
@@ -59,7 +78,13 @@
                     </div>
                     <div class="poster-info uk-float-left">
                       <span class="name"><a href='/users/{{postedBy.id}}' style="color: black">{{postedBy.firstName}} {{postedBy.lastName}}</a></span>&nbsp;<span class="timestamp">{{createdAt}}</span><br />
-                        <span>{{text}}</span>
+                      <span id="comment-{{@../index}}-{{@index}}">{{text}}</span>
+                      <div class="add-comment" uk-grid id="edit-comment-{{@../index}}-{{@index}}" style="display: none">
+                        <div class="uk-width-expand@m">
+                          <input class="uk-input" type="text" name="text" id="editedComment-{{@../index}}-{{@index}}"value="{{text}}" onkeydown = "if(event.keyCode==13)saveComment({{@../index}}, {{@index}}, '{{id}}');else if(event.keyCode==27)cancel({{@../index}}, {{@index}})" autofocus>
+                          <p>Press Enter to save, Press ESC to cancel</p>
+                        </div>
+                      </div>
                     </div>
                     <div class="more">
                         <div class="uk-inline">
@@ -136,7 +161,13 @@
                     </div>
                     <div class="poster-info uk-float-left">
                       <span class="name"><a href='/users/{{postedBy.id}}' style="color: black">{{postedBy.firstName}} {{postedBy.lastName}}</a></span>&nbsp;<span class="timestamp">{{createdAt}}</span><br />
-                        <span>{{this.text}}</span>
+                      <span id="comment-{{@../index}}-{{@index}}">{{text}}</span>
+                      <div class="add-comment" uk-grid id="edit-comment-{{@../index}}-{{@index}}" style="display: none">
+                        <div class="uk-width-expand@m">
+                          <input class="uk-input" type="text" name="text" id="editedComment-{{@../index}}-{{@index}}"value="{{text}}" onkeydown = "if(event.keyCode==13)saveComment({{@../index}}, {{@index}}, '{{id}}');else if(event.keyCode==27)cancel({{@../index}}, {{@index}})" autofocus>
+                          <p>Press Enter to save, Press ESC to cancel</p>
+                        </div>
+                      </div>
                     </div>
                     <div class="more">
                       <div class="uk-inline">
@@ -203,6 +234,9 @@
                       </form>
                     </div>
                 </div>
+                {{#compare ../this.comments.length 2 operator="<="}}
+                <div class="divider"></div>
+                {{/compare}}
                 {{/compare}}
 
                 {{#compare @index 2 operator=">="}}
@@ -224,7 +258,13 @@
                         </div>
                         <div class="poster-info uk-float-left">
                           <span class="name"><a href='/users/{{postedBy.id}}' style="color: black">{{postedBy.firstName}} {{postedBy.lastName}}</a></span>&nbsp;<span class="timestamp">{{createdAt}}</span><br />
-                            <span>{{this.text}}</span>
+                          <span id="comment-{{@../index}}-{{@index}}">{{text}}</span>
+                          <div class="add-comment" uk-grid id="edit-comment-{{@../index}}-{{@index}}" style="display: none">
+                            <div class="uk-width-expand@m">
+                              <input class="uk-input" type="text" name="text" id="editedComment-{{@../index}}-{{@index}}"value="{{text}}" onkeydown = "if(event.keyCode==13)saveComment({{@../index}}, {{@index}}, '{{id}}');else if(event.keyCode==27)cancel({{@../index}}, {{@index}})" autofocus>
+                              <p>Press Enter to save, Press ESC to cancel</p>
+                            </div>
+                          </div>
                         </div>
                         <div class="more">
                           <div class="uk-inline">
@@ -302,7 +342,13 @@
                         </div>
                         <div class="poster-info uk-float-left">
                           <span class="name"><a href='/users/{{postedBy.id}}' style="color: black">{{postedBy.firstName}} {{postedBy.lastName}}</a></span>&nbsp;<span class="timestamp">{{createdAt}}</span><br />
-                            <span>{{this.text}}</span>
+                          <span id="comment-{{@../index}}-{{@index}}">{{text}}</span>
+                          <div class="add-comment" uk-grid id="edit-comment-{{@../index}}-{{@index}}" style="display: none">
+                            <div class="uk-width-expand@m">
+                              <input class="uk-input" type="text" name="text" id="editedComment-{{@../index}}-{{@index}}"value="{{text}}" onkeydown = "if(event.keyCode==13)saveComment({{@../index}}, {{@index}}, '{{id}}');else if(event.keyCode==27)cancel({{@../index}}, {{@index}})" autofocus>
+                              <p>Press Enter to save, Press ESC to cancel</p>
+                            </div>
+                          </div>
                         </div>
                         <div class="more">
                           <div class="uk-inline">
@@ -446,7 +492,13 @@
                 </div>
                 <div class="poster-info uk-float-left">
                   <span class="name"><a href='/users/{{postedBy.id}}' style="color: black">{{postedBy.firstName}} {{postedBy.lastName}}</a></span>&nbsp;<span class="timestamp">{{createdAt}}</span><br />
-                    <span>{{text}}</span>
+                  <span id="comment-{{@../index}}-{{@index}}">{{text}}</span>
+                  <div class="add-comment" uk-grid id="edit-comment-{{@../index}}-{{@index}}" style="display: none">
+                    <div class="uk-width-expand@m">
+                      <input class="uk-input" type="text" name="text" id="editedComment-{{@../index}}-{{@index}}"value="{{text}}" onkeydown = "if(event.keyCode==13)saveComment({{@../index}}, {{@index}}, '{{id}}');else if(event.keyCode==27)cancel({{@../index}}, {{@index}})" autofocus>
+                      <p>Press Enter to save, Press ESC to cancel</p>
+                    </div>
+                  </div>
                 </div>
                 <div class="more">
                     <div class="uk-inline">
@@ -523,7 +575,13 @@
                 </div>
                 <div class="poster-info uk-float-left">
                   <span class="name"><a href='/users/{{postedBy.id}}' style="color: black">{{postedBy.firstName}} {{postedBy.lastName}}</a></span>&nbsp;<span class="timestamp">{{createdAt}}</span><br />
-                    <span>{{this.text}}</span>
+                  <span id="comment-{{@../index}}-{{@index}}">{{text}}</span>
+                  <div class="add-comment" uk-grid id="edit-comment-{{@../index}}-{{@index}}" style="display: none">
+                    <div class="uk-width-expand@m">
+                      <input class="uk-input" type="text" name="text" id="editedComment-{{@../index}}-{{@index}}"value="{{text}}" onkeydown = "if(event.keyCode==13)saveComment({{@../index}}, {{@index}}, '{{id}}');else if(event.keyCode==27)cancel({{@../index}}, {{@index}})" autofocus>
+                      <p>Press Enter to save, Press ESC to cancel</p>
+                    </div>
+                  </div>
                 </div>
                 <div class="more">
                   <div class="uk-inline">
@@ -590,6 +648,9 @@
                   </form>
                 </div>
             </div>
+            {{#compare ../this.comments.length 2 operator="<="}}
+            <div class="divider"></div>
+            {{/compare}}
             {{/compare}}
 
             {{#compare @index 2 operator=">="}}
@@ -611,7 +672,13 @@
                     </div>
                     <div class="poster-info uk-float-left">
                       <span class="name"><a href='/users/{{postedBy.id}}' style="color: black">{{postedBy.firstName}} {{postedBy.lastName}}</a></span>&nbsp;<span class="timestamp">{{createdAt}}</span><br />
-                        <span>{{this.text}}</span>
+                      <span id="comment-{{@../index}}-{{@index}}">{{text}}</span>
+                      <div class="add-comment" uk-grid id="edit-comment-{{@../index}}-{{@index}}" style="display: none">
+                        <div class="uk-width-expand@m">
+                          <input class="uk-input" type="text" name="text" id="editedComment-{{@../index}}-{{@index}}"value="{{text}}" onkeydown = "if(event.keyCode==13)saveComment({{@../index}}, {{@index}}, '{{id}}');else if(event.keyCode==27)cancel({{@../index}}, {{@index}})" autofocus>
+                          <p>Press Enter to save, Press ESC to cancel</p>
+                        </div>
+                      </div>
                     </div>
                     <div class="more">
                       <div class="uk-inline">
@@ -689,7 +756,13 @@
                     </div>
                     <div class="poster-info uk-float-left">
                       <span class="name"><a href='/users/{{postedBy.id}}' style="color: black">{{postedBy.firstName}} {{postedBy.lastName}}</a></span>&nbsp;<span class="timestamp">{{createdAt}}</span><br />
-                        <span>{{this.text}}</span>
+                      <span id="comment-{{@../index}}-{{@index}}">{{text}}</span>
+                      <div class="add-comment" uk-grid id="edit-comment-{{@../index}}-{{@index}}" style="display: none">
+                        <div class="uk-width-expand@m">
+                          <input class="uk-input" type="text" name="text" id="editedComment-{{@../index}}-{{@index}}"value="{{text}}" onkeydown = "if(event.keyCode==13)saveComment({{@../index}}, {{@index}}, '{{id}}');else if(event.keyCode==27)cancel({{@../index}}, {{@index}})" autofocus>
+                          <p>Press Enter to save, Press ESC to cancel</p>
+                        </div>
+                      </div>
                     </div>
                     <div class="more">
                       <div class="uk-inline">

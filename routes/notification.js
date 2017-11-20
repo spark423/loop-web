@@ -8,6 +8,46 @@ var Event = require('../models/event');
 var Notification = require('../models/notification')
 var moment = require('moment')
 
+function swap(items, firstIndex, secondIndex){
+  var temp = items[firstIndex];
+  items[firstIndex] = items[secondIndex];
+  items[secondIndex] = temp;
+}
+
+function partition(items, left, right) {
+  var pivot   = items[Math.floor((right + left) / 2)],
+      i       = left,
+      j       = right;
+    while (i <= j) {
+        while (items[i].createdAt < pivot.createdAt) {
+            i++;
+        }
+        while (items[j].createdAt > pivot.createdAt) {
+            j--;
+        }
+        if (i <= j) {
+            swap(items, i, j);
+            i++;
+            j--;
+        }
+    }
+    return i;
+}
+
+function quickSort(items, left, right) {
+    var index;
+    if (items.length > 1) {
+        index = partition(items, left, right);
+        if (left < index - 1) {
+            quickSort(items, left, index - 1);
+        }
+        if (index < right) {
+            quickSort(items, index, right);
+        }
+    }
+    return items;
+}
+
 //Load notifications on topbar
 router.get('/notifications', function(req, res) {
 	if(req.user) {
@@ -16,7 +56,7 @@ router.get('/notifications', function(req, res) {
 				throw err;
 			} else {
 				let notifications = user.notifications.map(function(notification) {
-					return {"type": notification.type, "createdAt": moment(notification.createdAt).format('MMMM D, YYYY, h:mm a'), "message": notification.message, "routeID": notification.routeID}
+					return {"type": notification.type, "createdAt": moment(notification.createdAt), "message": notification.message, "routeID": notification.routeID}
 				})
 				res.send({length: notifications.length, notifications: notifications});
 			}
@@ -36,7 +76,8 @@ router.get('/all-notifications', function(req, res) {
 				let notifications = user.notifications.map(function(notification) {
 					return {"type": notification.type, "createdAt": moment(notification.createdAt).format('MMMM D, YYYY, h:mm a'), "message": notification.message, "routeID": notification.routeID}
 				})
-				res.render('notifications', {notifications: notifications, helpers: {
+				let sortedNotifications = quickSort(notifications, 0, notifications.length - 1).reverse();
+				res.render('notifications', {notifications: sortedNotifications, helpers: {
 						compare: function(lvalue, rvalue, options) {
 							if (arguments.length < 3)
 									throw new Error("Handlerbars Helper 'compare' needs 2 parameters");

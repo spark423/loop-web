@@ -17,7 +17,9 @@ var userSchema = new mongoose.Schema({
   subscribedBoards: [{type: mongoose.Schema.Types.ObjectId, ref: 'Board'}],
   attendedEvents: [{type: mongoose.Schema.Types.ObjectId, ref: 'Event'}],
   comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Comment'}],
-  notifications: [{type: mongoose.Schema.Types.ObjectId, ref: 'Notification'}]
+  notifications: [{type: mongoose.Schema.Types.ObjectId, ref: 'Notification'}],
+  resetPasswordToken: {type: String},
+  resetPasswordExpires: {type: Date}  
 });
 
 // Define methods ====================================================================================================================================================================
