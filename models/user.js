@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var bcrypt   = require('bcrypt-nodejs');
 
 var userSchema = new mongoose.Schema({
-  createdAt: {type: Date, default: Date.now()},
+  createdAt: {type: Date, default: Date.now},
   username: {type: String, lowercase: true, unique: true, required: true},
   password: {type: String, required: true},
   firstName: {type: String},
@@ -19,7 +19,7 @@ var userSchema = new mongoose.Schema({
   comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Comment'}],
   notifications: [{type: mongoose.Schema.Types.ObjectId, ref: 'Notification'}],
   resetPasswordToken: {type: String},
-  resetPasswordExpires: {type: Date}  
+  resetPasswordExpires: {type: Date}
 });
 
 // Define methods ====================================================================================================================================================================

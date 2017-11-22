@@ -1,5 +1,10 @@
+<style>
+#sidenav::-webkit-scrollbar { 
+    display: none;
+}
+</style>
 <div class="sidenav-wrap">
-    <div id="sidenav" style="overflow:auto; resize:none">
+    <div id="sidenav" style="overflow:scroll; resize:none">
         <div class="img-wrap">
             <img class="uk-float-left" src="/img/loop_logo_white.png" alt="Loop" />
         </div>
@@ -66,7 +71,7 @@
                     $.getJSON('/boardinfo', function(data) {
                       for(var i=0; i<data.info.length; i++) {
                         var added = false;
-                        if(data.info[i].archived==true) {
+                        if(data.info[i].archive==true) {
                           var board = "<li><a href=/boards/" + data.info[i]._id + "><span uk-icon='icon: album'></span>" + data.info[i].name + " (Deleted)" + "</a></li>";
                           side_boards.append(board);
                           added=true;
@@ -101,7 +106,7 @@
                     var side_groups = $('#side-groups');
                     $.getJSON('/groupinfo', function(data) {
                       for(var i=0; i<data.length; i++) {
-                        if(data[i].archived==true) {
+                        if(data[i].archive==true) {
                           var group = "<li><a href=/groups/" + data[i]._id + "><span uk-icon='icon: users'></span>" + data[i].name + " (Deleted)</a></li>";
                           side_groups.append(group);
                         }

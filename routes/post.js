@@ -89,7 +89,7 @@ router.post('/posts/:id', function(req, res) {
 		if (err) {
 			throw err;
 		} else {
-			post.archived=true;
+			post.archive=true;
 			post.save(function(err, updatedPost) {
 				Board.findOneAndUpdate({_id: updatedPost.board}, {$pull: {contents: {item: req.params.id}}}, function(err, board) {
 					if (err) {
@@ -105,7 +105,7 @@ router.post('/posts/:id', function(req, res) {
 
 //Follow a post
 router.post('/posts/:id/follow', function(req, res) {
-	Time.findOneAndUpdate({}, {$push: {follows: {createdAt: Date.now(), post: req.params.id, user:req.user._id}}}, function(err, time) {
+	Time.findOneAndUpdate({}, {$push: {follows: {createdAt: Date.now, post: req.params.id, user:req.user._id}}}, function(err, time) {
 		if (err) {
 			throw err;
 		} else {

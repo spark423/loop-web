@@ -25,12 +25,12 @@
                     </div>
                     <div class="uk-width-expand@m">
 
-                        <p class="title"><a href="/event/{{id}}">{{title}} {{#compare archived true operator="=="}}<b style="color: red">(DELETED)</b>{{/compare}}</a></p>
-                        <p class="created-by">Created by <a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a></p>
+                        <p class="title"><a href="/event/{{id}}">{{title}} {{#compare archive true operator="=="}}<b style="color: red">(DELETED)</b>{{/compare}}</a></p>
+                        <p class="created-by">Created by {{#if postedBy.isLoopUser}}<a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a>{{else}}{{postedBy.username}}{{/if}}</p>
                         <p class="timestamp">at {{createdAt}} in <a href="boards/{{board.id}}">{{board.name}}</a></p>
                         <p class="description">
                             {{date}}<br/>
-                            {{startTime}} to {{endTime}}<br/>
+                            {{startTime}} {{#compare endTime "" operator="!="}}to {{endTime}}{{/compare}}<br/>
                             {{location}}
                         </p>
 
@@ -58,12 +58,12 @@
                     </div>
                     <div class="uk-width-expand@m">
 
-                      <p class="title"><a href="/event/{{id}}">{{title}} {{#compare archived true operator="=="}}<b style="color: red">(DELETED)</b>{{/compare}}</a></p>
-                        <p class="created-by">Created by <a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a></p>
+                      <p class="title"><a href="/event/{{id}}">{{title}} {{#compare archive true operator="=="}}<b style="color: red">(DELETED)</b>{{/compare}}</a></p>
+                        <p class="created-by">Created by {{#if postedBy.isLoopUser}}<a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a>{{else}}{{postedBy.username}}{{/if}}</p>
                         <p class="timestamp">at {{createdAt}} in <a href="boards/{{board.id}}">{{board.name}}</a></p>
                         <p class="description">
                             {{date}}<br/>
-                            {{startTime}} to {{endTime}}<br/>
+                            {{startTime}} {{#compare endTime "" operator="!="}}to {{endTime}}{{/compare}}<br/>
                             {{location}}
                         </p>
 
@@ -80,12 +80,12 @@
                     </div>
                     <div class="uk-width-expand@m">
 
-                      <p class="title"><a href="/event/{{id}}">{{title}} {{#compare archived true operator="=="}}<b style="color: red">(DELETED)</b>{{/compare}}</a></p>
-                        <p class="created-by">Created by <a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a></p>
+                      <p class="title"><a href="/event/{{id}}">{{title}} {{#compare archive true operator="=="}}<b style="color: red">(DELETED)</b>{{/compare}}</a></p>
+                      <p class="created-by">Created by {{#if postedBy.isLoopUser}}<a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a>{{else}}{{postedBy.username}}{{/if}}</p>
                         <p class="timestamp">at {{createdAt}} in <a href="boards/{{board.id}}">{{board.name}}</a></p>
                         <p class="description">
                             {{date}}<br/>
-                            {{startTime}} to {{endTime}}<br/>
+                            {{startTime}} {{#compare endTime "" operator="!="}}to {{endTime}}{{/compare}}<br/>
                             {{location}}
                         </p>
 
@@ -113,12 +113,12 @@
                     </div>
                     <div class="uk-width-expand@m">
 
-                      <p class="title"><a href="/event/{{id}}">{{title}} {{#compare archived true operator="=="}}<b style="color: red">(DELETED)</b>{{/compare}}</a></p>
-                        <p class="created-by">Created by <a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a></p>
+                      <p class="title"><a href="/event/{{id}}">{{title}} {{#compare archive true operator="=="}}<b style="color: red">(DELETED)</b>{{/compare}}</a></p>
+                      <p class="created-by">Created by {{#if postedBy.isLoopUser}}<a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a>{{else}}{{postedBy.username}}{{/if}}</p>
                         <p class="timestamp">at {{createdAt}} in <a href="boards/{{board.id}}">{{board.name}}</a></p>
                         <p class="description">
                             {{date}}<br/>
-                            {{startTime}} to {{endTime}}<br/>
+                            {{startTime}} {{#compare endTime "" operator="!="}}to {{endTime}}{{/compare}}<br/>
                             {{location}}
                         </p>
 

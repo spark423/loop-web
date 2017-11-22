@@ -21,7 +21,7 @@ router.get('/boardinfo', function(req, res) {
       if(err) throw err;
       var info = [];
       for(var i=0; i<boards.length; i++) {
-        info.push({"name": boards[i].name, "_id": boards[i]._id, "unsubscribable": boards[i].unsubscribable, "archived": boards[i].archived});
+        info.push({"name": boards[i].name, "_id": boards[i]._id, "unsubscribable": boards[i].unsubscribable, "archive": boards[i].archive});
       }
       res.send({"info": info, "subscribedBoards": req.user.subscribedBoards});
     });
@@ -61,18 +61,18 @@ router.post('/boards/:id/edit', function(req, res) {
 router.post('/boards/:id/delete', function(req, res) {
   Board.findById(req.params.id, function(err, board) {
     if(err) throw err;
-    board.archived = true;
+    board.archive = true;
     board.save(function(err, updatedBoard) {
       if(err) throw err;
       for(var i=0; i<updatedBoard.contents.length; i++) {
         if(updatedBoard.contents[i].kind=="Post") {
           Post.findById(board.contents[i].item, function(err, posts) {
-            posts.archived=true;
+            posts.archive=true;
             posts.save(function(err, updatedPost) {
               if(err) throw err;
               Comment.find({'_id': updatedPost.comments}, function(err, comments) {
                 for(var j=0; j<comments.length; j++) {
-                  comments[j].archived=true;
+                  comments[j].archive=true;
                   comments[j].save(function(err, updatedComment) {
                     if(err) throw err;
                   })
@@ -83,12 +83,12 @@ router.post('/boards/:id/delete', function(req, res) {
         }
         else {
           Event.findById(board.contents[i].item, function(err, events) {
-            events.archived=true;
+            events.archive=true;
             events.save(function(err, updatedEvent) {
               if(err) throw err;
               Comment.find({'_id': events.comments}, function(err, comments) {
                 for(var j=0; j<comments.length; j++) {
-                  comments[j].archived=true;
+                  comments[j].archive=true;
                   comments[j].save(function(err, updatedComment) {
                     if(err) throw err;
                   })
@@ -122,7 +122,7 @@ router.get('/boards/:id', function(req, res) {
               })
               comments.push({
                 "id": comment._id,
-                "createdAt": moment(comment.createdAt).format('MMMM D, YYYY, h:mm a'),
+                "createdAt": moment(comment.createdAt).local().format('MMMM D, YYYY, h:mm a'),
                 "postedBy": {
                   "id": comment.postedBy._id,
                   "firstName": comment.postedBy.firstName,
@@ -139,7 +139,7 @@ router.get('/boards/:id', function(req, res) {
                 "following": req.user.followingPosts.indexOf(item._id) > -1,
                 "id": item._id,
                 "board": item.board,
-                "createdAt": moment(item.createdAt).format('MMMM D, YYYY, h:mm a'),
+                "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
                 "postedBy": {
                   "id": postCreator._id,
                   "firstName": postCreator.firstName,
@@ -160,16 +160,16 @@ router.get('/boards/:id', function(req, res) {
                   "own": req.user.username === item.postedBy,
                   "attending": req.user.attendedEvents.indexOf(item._id) > -1,
                   "id": item._id,
-                  "createdAt": moment(item.createdAt).format('MMMM D, YYYY, h:mm a'),
+                  "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
                   "postedBy": {
                     "id": eventCreator._id,
                     "firstName": eventCreator.firstName,
                     "lastName": eventCreator.lastName
                   },
                   "title": item.title,
-                  "date": moment(item.date).utc().format('MMMM D, YYYY'),
-                  "startTime": moment(item.startTime, "HH:mm").format('h:mm a'),
-                  "endTime": moment(item.endTime, "HH:mm").format('h:mm a'),
+                  "date": moment(item.date).utc().local().format('MMMM D, YYYY'),
+                  "startTime": moment(item.startTime, "HH:mm").local().format('h:mm a'),
+                  "endTime": moment(item.endTime, "HH:mm").local().format('h:mm a'),
                   "location": item.location,
                   "description": item.description,
                   "comments": comments,
@@ -181,12 +181,12 @@ router.get('/boards/:id', function(req, res) {
                   "own": req.user.username === item.postedBy,
                   "attending": req.user.attendedEvents.indexOf(item._id) > -1,
                   "id": item._id,
-                  "createdAt": moment(item.createdAt).format('MMMM D, YYYY, h:mm a'),
+                  "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
                   "postedBy": item.contact,
                   "title": item.title,
-                  "date": moment(item.date).utc().format('MMMM D, YYYY'),
-                  "startTime": moment(item.startTime, "HH:mm").format('h:mm a'),
-                  "endTime": moment(item.endTime, "HH:mm").format('h:mm a'),
+                  "date": moment(item.date).utc().local().format('MMMM D, YYYY'),
+                  "startTime": moment(item.startTime, "HH:mm").local().format('h:mm a'),
+                  "endTime": moment(item.endTime, "HH:mm").local().format('h:mm a'),
                   "location": item.location,
                   "description": item.description,
                   "comments": comments,
@@ -250,7 +250,7 @@ router.get('/boards/:id', function(req, res) {
             })
             comments.push({
               "id": comment._id,
-              "createdAt": moment(comment.createdAt).format('MMMM D, YYYY, h:mm a'),
+              "createdAt": moment(comment.createdAt).local().format('MMMM D, YYYY, h:mm a'),
               "postedBy": {
                 "id": comment.postedBy._id,
                 "firstName": comment.postedBy.firstName,
@@ -267,7 +267,7 @@ router.get('/boards/:id', function(req, res) {
               "following": req.user.followingPosts.indexOf(item._id) > -1,
               "id": item._id,
               "board": item.board,
-              "createdAt": moment(item.createdAt).format('MMMM D, YYYY, h:mm a'),
+              "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
               "postedBy": {
                 "id": postCreator._id,
                 "firstName": postCreator.firstName,
@@ -288,16 +288,16 @@ router.get('/boards/:id', function(req, res) {
                 "own": req.user.username === item.contact,
                 "attending": req.user.attendedEvents.indexOf(item._id) > -1,
                 "id": item._id,
-                "createdAt": moment(item.createdAt).format('MMMM D, YYYY, h:mm a'),
+                "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
                 "postedBy": {
                   "id": eventCreator._id,
                   "firstName": eventCreator.firstName,
                   "lastName": eventCreator.lastName
                 },
                 "title": item.title,
-                "date": moment(item.date).utc().format('MMMM D, YYYY'),
-                "startTime": moment(item.startTime, "HH:mm").format('h:mm a'),
-                "endTime": moment(item.endTime, "HH:mm").format('h:mm a'),
+                "date": moment(item.date).utc().local().format('MMMM D, YYYY'),
+                "startTime": moment(item.startTime, "HH:mm").local().format('h:mm a'),
+                "endTime": moment(item.endTime, "HH:mm").local().format('h:mm a'),
                 "location": item.location,
                 "description": item.description,
                 "comments": comments,
@@ -309,12 +309,12 @@ router.get('/boards/:id', function(req, res) {
                 "own": req.user.username === item.contact,
                 "attending": req.user.attendedEvents.indexOf(item._id) > -1,
                 "id": item._id,
-                "createdAt": moment(item.createdAt).format('MMMM D, YYYY, h:mm a'),
+                "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
                 "postedBy": item.contact,
                 "title": item.title,
-                "date": moment(item.date).utc().format('MMMM D, YYYY'),
-                "startTime": moment(item.startTime, "HH:mm").format('h:mm a'),
-                "endTime": moment(item.endTime, "HH:mm").format('h:mm a'),
+                "date": moment(item.date).utc().local().format('MMMM D, YYYY'),
+                "startTime": moment(item.startTime, "HH:mm").local().format('h:mm a'),
+                "endTime": moment(item.endTime, "HH:mm").local().format('h:mm a'),
                 "location": item.location,
                 "description": item.description,
                 "comments": comments,
@@ -402,7 +402,7 @@ router.post('/boards/:id/post', function(req, res) {
 
 //subscribe to a board
 router.post('/boards/:id/subscribe', function(req, res) {
-  Time.findOneAndUpdate({}, {$push: {subscriptions: {createdAt: Date.now(), board: req.params.id, user:req.user._id}}}, function(err, time) {
+  Time.findOneAndUpdate({}, {$push: {subscriptions: {createdAt: Date.now, board: req.params.id, user:req.user._id}}}, function(err, time) {
     if (err) {
       throw err;
     } else {
@@ -422,7 +422,7 @@ router.post('/boards/:id/subscribe', function(req, res) {
 
 //Unsubscribe to board
 router.post('/boards/:id/unsubscribe', function(req, res) {
-  Time.findOneAndUpdate({}, {$pull: {subscriptions: {createdAt: Date.now(), board: req.params.id, user:req.user._id}}}, function(err, time) {
+  Time.findOneAndUpdate({}, {$pull: {subscriptions: {createdAt: Date.now, board: req.params.id, user:req.user._id}}}, function(err, time) {
     if (err) {
       throw err;
     } else {
@@ -460,7 +460,7 @@ router.post('/boards/create', function(req, res) {
       if (err) throw err;
       user.subscribedBoards.push(newBoard._id);
       user.save(function(err, updatedUser) {
-        Time.findOneAndUpdate({}, {$push: {subscriptions: {createdAt: Date.now(), board: newBoard._id, user: req.user._id}}}, function(err, time) {
+        Time.findOneAndUpdate({}, {$push: {subscriptions: {createdAt: Date.now, board: newBoard._id, user: req.user._id}}}, function(err, time) {
           if(err) throw err;
           res.redirect('/boards/' + newBoard._id);
         })

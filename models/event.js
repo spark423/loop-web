@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 
 var eventSchema = new mongoose.Schema({
-  createdAt: {type: Date, default: Date.now()},
+  createdAt: {type: Date, default: Date.now},
   contact: {type: String},
   board: {type: mongoose.Schema.Types.ObjectId, ref: 'Board'},
   title: {type: String},
@@ -10,7 +10,7 @@ var eventSchema = new mongoose.Schema({
   endTime: {type: String},
   location: {type: String},
   description: {type: String},
-  archived: {type: Boolean, default: false},
+  archive: {type: Boolean, default: false},
   attendees: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
   comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Comment'}]
 });

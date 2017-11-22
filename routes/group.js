@@ -124,7 +124,7 @@ router.get('/create-a-new-org-invite', function(req, res) {
 router.post('/groups/:id/delete', function(req, res) {
   Group.findById(req.params.id, function(err, group) {
     if(err) throw err;
-    group.archived = true;
+    group.archive = true;
     group.save(function(err, updatedGroup) {
       if(err) throw err;
       res.redirect('/');
@@ -138,7 +138,7 @@ router.get('/groupinfo', function(req, res) {
     if(err) throw err;
     var info = [];
     for(var i=0; i<groups.length; i++) {
-      info.push({"name": groups[i].name, "_id": groups[i]._id, "archived": groups[i].archived});
+      info.push({"name": groups[i].name, "_id": groups[i]._id, "archive": groups[i].archive});
     }
     res.send(info);
   });

@@ -76,7 +76,7 @@ function quickSort(items, left, right) {
                         })
                     comments.push({
                       "id": comment._id,
-                      "createdAt": moment(comment.createdAt).format('MMMM D, YYYY, h:mm a'),
+                      "createdAt": moment(comment.createdAt).local().format('MMMM D, YYYY, h:mm a'),
                       "postedBy": {
                         "id": comment.postedBy._id,
                         "firstName": comment.postedBy.firstName,
@@ -95,7 +95,7 @@ function quickSort(items, left, right) {
                     "id": item._id,
                     "board": item.board,
                     "boardName": boardName.name,
-                    "createdAt": moment(item.createdAt).format('MMMM D, YYYY, h:mm a'),
+                    "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
                     "postedBy": {
                       "id": postCreator._id,
                       "firstName": postCreator.firstName,
@@ -116,16 +116,16 @@ function quickSort(items, left, right) {
                       "own": req.user.username === item.postedBy,
                       "attending": req.user.attendedEvents.indexOf(item._id) > -1,
                       "id": item._id,
-                      "createdAt": moment(item.createdAt).format('MMMM D, YYYY, h:mm a'),
+                      "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
                       "postedBy": {
                         "id": eventCreator._id,
                         "firstName": eventCreator.firstName,
                         "lastName": eventCreator.lastName
                       },
                       "title": item.title,
-                      "date": moment(item.date).format('MMMM D, YYYY'),
-                      "startTime": moment(item.startTime, "HH:mm").format('h:mm a'),
-                      "endTime": moment(item.endTime, "HH:mm").format('h:mm a'),
+                      "date": moment(item.date).local().format('MMMM D, YYYY'),
+                      "startTime": moment(item.startTime, "HH:mm").local().format('h:mm a'),
+                      "endTime": moment(item.endTime, "HH:mm").local().format('h:mm a'),
                       "location": item.location,
                       "description": item.description,
                       "comments": comments,
@@ -137,11 +137,11 @@ function quickSort(items, left, right) {
                       "own": req.user.username === item.postedBy,
                       "attending": req.user.attendedEvents.indexOf(item._id) > -1,
                       "id": item._id,
-                      "createdAt": moment(item.createdAt).format('MMMM D, YYYY, h:mm a'),
+                      "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
                       "postedBy": item.contact,
                       "title": item.title,
-                      "date": moment(item.date).format('MMMM D, YYYY'),
-                      "startTime": moment(item.startTime, "HH:mm").format('h:mm a'),
+                      "date": moment(item.date).local().format('MMMM D, YYYY'),
+                      "startTime": moment(item.startTime, "HH:mm").local().format('h:mm a'),
                       "endTime": moment(item.endTime, "HH:mm").format('h:mm a'),
                       "location": item.location,
                       "description": item.description,

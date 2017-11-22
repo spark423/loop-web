@@ -16,7 +16,7 @@
                         <p class="count">{{posts}}</p>
                         <p>Total number of posts this week</p>
                         {{#if post_percent}}
-                        <b>{{post_percent}}% from last week</b>
+                        <b>{{#compare post_percent 0 operator=">"}}+{{/compare}}{{post_percent}}% from last week</b>
                         {{/if}}
                     </div>
                 </div>
@@ -30,7 +30,7 @@
                         <p class="count">{{events}}</p>
                         <p>Total number of events this week.</p>
                         {{#if event_percent}}
-                        <b>{{event_percent}}% from last week</b>
+                        <b>{{#compare event_percent 0 operator=">"}}+{{/compare}}{{event_percent}}% from last week</b>
                         {{/if}}
                     </div>
                 </div>
@@ -44,7 +44,7 @@
                         <p class="count">{{follows}}</p>
                         <p>Total number of follows this week.</p>
                         {{#if follow_percent}}
-                        <b>{{follow_percent}}% from last week</b>
+                        <b>{{#compare follow_percent 0 operator=">"}}+{{/compare}}{{follow_percent}}% from last week</b>
                         {{/if}}
                     </div>
                 </div>
@@ -58,7 +58,7 @@
                         <p class="count">{{groups}}</p>
                         <p>Total number of groups.</p>
                         {{#if group_percent}}
-                        <b>{{group_percent}}% from last week</b>
+                        <b>{{#compare group_percent 0 operator=">"}}+{{/compare}}{{group_percent}}% from last week</b>
                         {{/if}}
                     </div>
                 </div>
@@ -72,7 +72,7 @@
                         <p class="count">{{users}}</p>
                         <p>Total number of users.</p>
                         {{#if user_percent}}
-                        <b>{{user_percent}}% from last week</b>
+                        <b>{{#compare user_percent 0 operator=">"}}+{{/compare}}{{user_percent}}% from last week</b>
                         {{/if}}
                     </div>
                 </div>

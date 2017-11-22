@@ -91,7 +91,7 @@ router.post('/comments/:id', function(req, res) {
 				res.redirect('/boards/' + board.source.item.source.item.board);
 			})
 		}
-		comment.archived=true;
+		comment.archive=true;
 		comment.save(function(err, updatedComment) {
 			if(err) throw err;
 		})

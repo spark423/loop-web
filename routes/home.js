@@ -69,7 +69,7 @@ router.get('/home', function(req, res) {
 						thisWeekPosts++;
 					}
 				}
-				post_percent = ((thisWeekPosts-lastWeekPosts)/lastWeekPosts)*100;
+				post_percent = Math.round(Number(((thisWeekPosts-lastWeekPosts)/lastWeekPosts)*100));
 				if(post_percent==Infinity) {
 					post_percent=0;
 				}
@@ -85,7 +85,7 @@ router.get('/home', function(req, res) {
 							thisWeekEvents++;
 						}
 					}
-					event_percent = ((thisWeekEvents-lastWeekEvents)/lastWeekEvents)*100;
+					event_percent = Math.round(Number(((thisWeekEvents-lastWeekEvents)/lastWeekEvents)*100));
 					if(event_percent==Infinity) {
 						event_percent=0;
 					}
@@ -100,7 +100,7 @@ router.get('/home', function(req, res) {
 								thisWeekGroups++;
 							}
 						}
-						group_percent = ((thisWeekGroups-lastWeekGroups)/lastWeekGroups)*100;
+						group_percent = Math.round(Number(((thisWeekGroups-lastWeekGroups)/lastWeekGroups)*100));
 						if(group_percent==Infinity) {
 							group_percent = 0;
 						}
@@ -115,7 +115,7 @@ router.get('/home', function(req, res) {
 									thisWeekUsers++;
 								}
 							}
-							user_percent = ((thisWeekUsers-lastWeekUsers)/lastWeekUsers)*100;
+							user_percent = Math.round(Number(((thisWeekUsers-lastWeekUsers)/lastWeekUsers)*100));
 							if(user_percent==Infinity) {
 								user_percent=0;
 							}
@@ -144,15 +144,44 @@ router.get('/home', function(req, res) {
 										}
 									}
 								}
-								follow_percent = ((thisWeekFollows-lastWeekFollows)/lastWeekFollows)*100;
-								subscriptions_percent = ((thisWeekSubscriptions-lastWeekSubscriptions)/lastWeekSubscriptions)*100;
+								follow_percent = Math.round(Number(((thisWeekFollows-lastWeekFollows)/lastWeekFollows)*100));
+								subscriptions_percent = Math.round(Number(((thisWeekSubscriptions-lastWeekSubscriptions)/lastWeekSubscriptions)*100));
 								if(follow_percent==Infinity) {
 									follow_percent=0;
 								}
 								if(subscriptions_percent==Infinity) {
 									subscriptions_percent=0;
 								}
-								res.render('home', {user: req.user, date: moment(Date.now()).format('dddd, MMMM D, YYYY'), groups: group_counter, users: user_counter, posts: post_counter, events: event_counter, follows: follow_counter, subscriptions: subscription_counter, post_percent: post_percent, event_percent: event_percent, follow_percent: follow_percent, group_percent: group_percent, user_percent: user_percent, subscriptions_percent: subscriptions_percent});
+								res.render('home', {user: req.user, date: moment(Date.now()).local().format('dddd, MMMM D, YYYY'), groups: group_counter, users: user_counter, posts: post_counter, events: event_counter, follows: follow_counter, subscriptions: subscription_counter, post_percent: post_percent, event_percent: event_percent, follow_percent: follow_percent, group_percent: group_percent, user_percent: user_percent, subscriptions_percent: subscriptions_percent, helpers: {
+	              		compare: function(lvalue, rvalue, options) {
+	              			if (arguments.length < 3)
+	              					throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
+
+	              			var operator = options.hash.operator || "==";
+
+	              			var operators = {
+	              					'==':       function(l,r) { return l == r; },
+	              					'===':      function(l,r) { return l === r; },
+	              					'!=':       function(l,r) { return l != r; },
+	              					'<':        function(l,r) { return l < r; },
+	              					'>':        function(l,r) { return l > r; },
+	              					'<=':       function(l,r) { return l <= r; },
+	              					'>=':       function(l,r) { return l >= r; },
+	              					'typeof':   function(l,r) { return typeof l == r; }
+	              			}
+
+	              			if (!operators[operator])
+	              					throw new Error("Handlerbars Helper 'compare' doesn't know the operator "+operator);
+
+	              			var result = operators[operator](lvalue,rvalue);
+
+	              			if( result ) {
+	              					return options.fn(this);
+	              			} else {
+	              					return options.inverse(this);
+	              			}
+	              		}
+	                }});
 							})
 						})
 					})
