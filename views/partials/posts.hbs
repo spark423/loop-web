@@ -111,10 +111,9 @@ function cancel(index) {
               </div>
           </div>
 
-          <div class="divider"></div>
           {{/compare}}
           {{#compare @index 1 operator="=="}}
-
+          <div class="divider"></div>
           <div class="reply">
               <div class="poster-avi uk-float-left">
                   <img src="/img/user.png" alt="Alex Reekie" />
@@ -383,10 +382,9 @@ function cancel(index) {
           {{#compare this.comments.length 2 operator=">"}}
         </div>
         {{/compare}}
+        {{#compare event.comments.length 2 operator=">"}}
+      </div>
 
-        {{/if}}
-
-        </div>
         <div class="add-comment" uk-grid>
           <div class="uk-width-expand@m">
               <form id="comment-{{@index}}" method="post" action="/events/{{event.id}}/comment">
@@ -400,6 +398,39 @@ function cancel(index) {
           </div>
       </div>
     </div>
+    {{else}}
+    <div class="divider"></div>
+    <div class="add-comment" uk-grid>
+      <div class="uk-width-expand@m">
+          <form id="comment-{{@index}}" method="post" action="/events/{{event.id}}/comment">
+              <div>
+                  <input class="uk-input" type="text" name="text" placeholder="Add comment...">
+                  <a class="uk-button uk-button-default" onclick="document.getElementById('comment-{{@index}}').submit();">
+                      Comment
+                  </a>
+              </div>
+          </form>
+      </div>
+    </div>
+    </div>
+  </div>
+    {{/compare}}
+        {{else}}
+
+        <div class="add-comment" uk-grid>
+          <div class="uk-width-expand@m">
+              <form id="comment-{{@index}}" method="post" action="/events/{{event.id}}/comment">
+                  <div>
+                      <input class="uk-input" type="text" name="text" placeholder="Add comment...">
+                      <a class="uk-button uk-button-default" onclick="document.getElementById('comment-{{@index}}').submit();">
+                          Comment
+                      </a>
+                  </div>
+              </form>
+          </div>
+      </div>
+    </div>
+        {{/if}}
 
 </div>
 {{>image-upload-modal}}

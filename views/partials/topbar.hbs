@@ -6,8 +6,6 @@ $.getJSON('/notifications', function(data) {
       localStorage.seen = 'false';
       localStorage.past = localStorage.time;
     }
-    console.log(localStorage.past);
-    console.log(localStorage.time);
 });
 function clearNotifications() {
   document.getElementById('notifications-number').innerHTML = 0;

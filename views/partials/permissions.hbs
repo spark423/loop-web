@@ -1,0 +1,34 @@
+<link rel="stylesheet" href="/css/board-permissions/sxn-board-permissions.min.css" />
+<script>
+function block(id) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/user/" + id + "/block", true);
+  xhttp.send();
+}
+function unblock(id) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/user/" + id + "/unblock", true);
+  xhttp.send();
+}
+</script>
+<div id="board-permissions">
+
+    <h4>Permissions</h4>
+
+    <div class="uk-card uk-card-default uk-card-body">
+
+        <div uk-grid>
+
+            <div class="uk-width-1-2@m">
+              {{#if user.blocked}}
+              <label id="checked"><input onclick="unblock('{{user.id}}')" class="uk-checkbox" type="checkbox" checked> Blocked from Posting</label>
+              {{else}}
+              <label id="unchecked"><input onclick="block('{{user.id}}')" class="uk-checkbox" type="checkbox"> Blocked from Posting</label>
+              {{/if}}
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

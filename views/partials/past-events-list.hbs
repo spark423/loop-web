@@ -4,11 +4,11 @@ $( document ).ready(function() {
   var today = $('#today');
   var week = $('#week');
   var month = $('#month');
-  var future = $('#future');
+  var past = $('#past');
   var header = "";
   var events = "";
   var current = new Date();
-  var endofWeek = current.getDate() - current.getDay() + 6;
+  var begofWeek = current.getDate() - current.getDay();
   var currentDay = current.getDate();
   var currentMonth = current.getMonth();
   var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -25,8 +25,8 @@ $( document ).ready(function() {
     header = '<h4 class="today">TODAY</h4><div class="uk-card uk-card-default uk-card-body">';
     events += header;
     addedHeader = true;
-  } else if(dateArray[0] == currentMonth && dateArray[1]==currentDay+1 && addedHeader==false) {
-    header = '<h4 class="today">TOMORROW</h4><div class="uk-card uk-card-default uk-card-body">';
+  } else if(dateArray[0] == currentMonth && dateArray[1]==currentDay-1 && addedHeader==false) {
+    header = '<h4 class="today">YESTERDAY</h4><div class="uk-card uk-card-default uk-card-body">';
     events += header;
     addedHeader = true;
   } else if(addedHeader==false){
@@ -40,23 +40,25 @@ $( document ).ready(function() {
       events+= '</div><br>';
       if('{{date}}' == '{{currentDate}}') {
         today.append(events);
-      } else if(dateArray[0] == currentMonth && dateArray[1] > currentDay && dateArray[1] < endofWeek) {
+        console.log("hello");
+      } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] > begofWeek) {
         week.append(events);
       } else if(dateArray[0] == currentMonth) {
         month.append(events);
       } else {
-        future.append(events);
+        past.append(events);
       }
     }
   } else {
     if('{{date}}' == '{{currentDate}}') {
       events += '</div><br>'
       today.append(events);
+      console.log("hello2");
       events = "";
       previousDate = '{{date}}';
       addedHeader=false;
-      if(dateArray[0] == currentMonth && dateArray[1]==currentDay+1 && addedHeader==false) {
-        header = '<h4 class="today">TOMORROW</h4><div class="uk-card uk-card-default uk-card-body">';
+      if(dateArray[0] == currentMonth && dateArray[1]==currentDay-1 && addedHeader==false) {
+        header = '<h4 class="today">YESTERDAY</h4><div class="uk-card uk-card-default uk-card-body">';
         events += header;
         addedHeader = true;
       } else if(addedHeader==false){
@@ -69,22 +71,23 @@ $( document ).ready(function() {
         events+= '</div><br>';
         if('{{date}}' == '{{currentDate}}') {
           today.append(events);
-        } else if(dateArray[0] == currentMonth && dateArray[1] > currentDay && dateArray[1] <= endofWeek) {
+          console.log("hello3");
+        } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] >= begofWeek) {
           week.append(events);
         } else if(dateArray[0] == currentMonth) {
           month.append(events);
         } else {
-          future.append(events);
+          past.append(events);
         }
       }
-    } else if (dateArray[0] == currentMonth && dateArray[1] > currentDay && dateArray[1] <= endofWeek) {
+    } else if (dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] >= begofWeek) {
       events += '</div><br>'
       week.append(events);
       events = "";
       previousDate = '{{date}}';
       addedHeader=false;
-      if(dateArray[0] == currentMonth && dateArray[1]==currentDay+1 && addedHeader==false) {
-        header = '<h4 class="today">TOMORROW</h4><div class="uk-card uk-card-default uk-card-body">';
+      if(dateArray[0] == currentMonth && dateArray[1]==currentDay-1 && addedHeader==false) {
+        header = '<h4 class="today">YESTERDAY</h4><div class="uk-card uk-card-default uk-card-body">';
         events += header;
         addedHeader = true;
       }
@@ -98,12 +101,13 @@ $( document ).ready(function() {
         events+= '</div><br>';
         if('{{date}}' == '{{currentDate}}') {
           today.append(events);
-        } else if(dateArray[0] == currentMonth && dateArray[1] > currentDay && dateArray[1] <= endofWeek) {
+          console.log("hello4");
+        } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] >= begofWeek) {
           week.append(events);
         } else if(dateArray[0] == currentMonth) {
           month.append(events);
         } else {
-          future.append(events);
+          past.append(events);
         }
       }
     } else if (dateArray[0] == currentMonth) {
@@ -122,17 +126,18 @@ $( document ).ready(function() {
         events+= '</div><br>';
         if('{{date}}' == '{{currentDate}}') {
           today.append(events);
-        } else if(dateArray[0] == currentMonth && dateArray[1] > currentDay && dateArray[1] <= endofWeek) {
+          console.log("hello5");
+        } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] >= begofWeek) {
           week.append(events);
         } else if(dateArray[0] == currentMonth) {
           month.append(events);
         } else {
-          future.append(events);
+          past.append(events);
         }
       }
     } else {
       events += '</div><br>'
-      future.append(events);
+      past.append(events);
       events = "";
       previousDate = '{{date}}';
       addedHeader=false;
@@ -146,12 +151,13 @@ $( document ).ready(function() {
         events+= '</div><br>';
         if('{{date}}' == '{{currentDate}}') {
           today.append(events);
-        } else if(dateArray[0] == currentMonth && dateArray[1] > currentDay && dateArray[1] <= endofWeek) {
+          console.log("hello6");
+        } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] >= begofWeek) {
           week.append(events);
         } else if(dateArray[0] == currentMonth) {
           month.append(events);
         } else {
-          future.append(events);
+          past.append(events);
         }
       }
     }
@@ -168,6 +174,6 @@ $( document ).ready(function() {
   </div>
   <div class="month" id="month">
   </div>
-  <div class="future" id="future">
+  <div class="past" id="past">
   </div>
 </div>

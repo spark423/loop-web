@@ -11,3 +11,19 @@
     border-top: 1px solid #d1d2d3;
     margin: 0 0 30px;
 }
+#settings .uk-card-body{
+    padding: 0;
+    margin: 0 0 30px;
+}
+#settings .uk-card-body div.uk-grid{
+    width: 100%;
+    margin: 0;
+}
+#settings .uk-card-body div div{
+    padding: 20px;
+    border-right: 1px solid #d1d2d3;
+    border-bottom: 1px solid #d1d2d3;
+}
+#settings .uk-card-body div div.uk-first-column{
+    border-left: none;
+}

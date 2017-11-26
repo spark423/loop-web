@@ -6,6 +6,7 @@ var groupSchema = new mongoose.Schema({
   description: {type: String},
   admin: {type: String},
   archive: {type: Boolean, default: false},
+  active: {type: Boolean, default: true},
   members: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}]
 });
 

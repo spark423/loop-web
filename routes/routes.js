@@ -9,6 +9,12 @@ var sgTransport = require('nodemailer-sendgrid-transport');
 var secret = process.env.secret;
 var username = process.env.api_user;
 var password = process.env.api_key;
+var User = require('../models/user');
+var Group = require('../models/group');
+var Board = require('../models/board');
+var Post = require('../models/post');
+var Event = require('../models/event');
+
 module.exports = function(passport) {
 
   // Retrieve registration page
@@ -73,7 +79,13 @@ module.exports = function(passport) {
   // Retrieve settings page
   router.get('/settings', function(req, res) {
     if(req.user) {
-      res.render('settings', {message: req.flash('settingsMessage')})
+      Board.find({}, function(err, boards){
+        if(err) throw err;
+        Group.find({}, function(err, groups) {
+          if(err) throw err;
+          res.render('settings', {message: req.flash('settingsMessage'), boards: boards, groups: groups})
+        })
+      })
     }
     else {
       res.redirect('/');

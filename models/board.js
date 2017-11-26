@@ -7,6 +7,7 @@ var boardSchema = new mongoose.Schema({
   unsubscribable: {type: Boolean},
   private: {type: Boolean},
   archive: {type: Boolean, default: false},
+  active: {type: Boolean, default: true},
   contents: [{
     kind: String,
     item: { type: mongoose.Schema.Types.ObjectId, refPath: 'contents.kind' }

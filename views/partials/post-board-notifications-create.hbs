@@ -22,12 +22,12 @@
                     <div class="list-wrap">
                         <ul>
                             <li>
-                                <a href="">
+                                <a>
                                     <span uk-icon="icon: commenting"></span><span>Select Board</span>
                                 </a>
                                 <select name="board">
                                   {{#each boards}}
-                                    <option value="{{_id}}">{{name}}</option>
+                                    <option value="{{_id}}">{{name}}{{#if active}}{{else}} (Deactivated){{/if}}</option>
                                   {{/each}}
                                 </select>
                             </li>

@@ -84,7 +84,8 @@ passport.use('local-signup', new LocalStrategy({
             newUser.username = req.body.username,
             newUser.password = newUser.hashPassword(req.body.password),
             newUser.firstName = req.body.firstName,
-            newUser.lastName = req.body.lastName
+            newUser.lastName = req.body.lastName,
+            newUser.admin = true
             newUser.save(function(err) {
               if (err)
                 throw err;
@@ -113,7 +114,6 @@ passport.use('local-login', new LocalStrategy({
           return done(null, false, req.flash('loginMessage', 'Password is incorrect.'));
         } else {
           //Found the user and logs the user in
-          console.log("GOT HERE")
           return done(null, user);
         }
       });

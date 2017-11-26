@@ -21,7 +21,9 @@ router.get('/boardinfo', function(req, res) {
       if(err) throw err;
       var info = [];
       for(var i=0; i<boards.length; i++) {
-        info.push({"name": boards[i].name, "_id": boards[i]._id, "unsubscribable": boards[i].unsubscribable, "archive": boards[i].archive});
+        if(boards[i].archive==false) {
+          info.push({"name": boards[i].name, "_id": boards[i]._id, "unsubscribable": boards[i].unsubscribable, "active": boards[i].active});
+        }
       }
       res.send({"info": info, "subscribedBoards": req.user.subscribedBoards});
     });
@@ -35,7 +37,7 @@ router.get('/boards/:id/edit', function(req, res) {
   if(req.user) {
     Board.findById(req.params.id, function(err, board) {
       if(err) throw err;
-      res.render('edit-board', {id: req.params.id, name: board.name, description: board.description});
+      res.render('edit-board', {id: req.params.id, name: board.name, description: board.description, active: board.active});
     })
   } else {
     res.redirect('/');
@@ -54,6 +56,56 @@ router.post('/boards/:id/edit', function(req, res) {
     board.save(function(err, updatedBoard) {
       if(err) throw err;
       res.redirect('/boards/' + updatedBoard._id);
+    })
+  })
+})
+
+router.post('/boards/:id/deactivate', function(req, res) {
+  Board.findById(req.params.id, function(err, board) {
+    if(err) throw err;
+    board.active=false;
+    board.save(function(err, updatedBoard) {
+      if(err) throw err;
+      let notificationToSubscribers = new Notification({
+        type: 'Deactivated Board',
+        message: "The Board, " + updatedBoard.name + ", that you are subscribed to has been deactivated.",
+        routeID: {
+          kind: 'Board',
+          item: updatedBoard._id
+        }
+      })
+      notificationToSubscribers.save(function(err, notificationToSubscribers) {
+        if(err) throw err;
+        User.findOneAndUpdate({$and: [{subscribedBoards: updatedBoard._id}, {_id: {$ne: req.user._id}}]}, {$push: {notifications: notificationToSubscribers._id}}, function(err) {
+          if (err) throw (err);
+        })
+        res.redirect('/boards/' + updatedBoard._id);
+      })
+    })
+  })
+})
+
+router.post('/boards/:id/reactivate', function(req, res) {
+  Board.findById(req.params.id, function(err, board) {
+    if(err) throw err;
+    board.active=true;
+    board.save(function(err, updatedBoard) {
+      if(err) throw err;
+      let notificationToSubscribers = new Notification({
+        type: 'Reactivated Board',
+        message: "The Board, " + updatedBoard.name + ", that you are subscribed to has been reactivated.",
+        routeID: {
+          kind: 'Board',
+          item: updatedBoard._id
+        }
+      })
+      notificationToSubscribers.save(function(err, notificationToSubscribers) {
+        if(err) throw err;
+        User.findOneAndUpdate({$and: [{subscribedBoards: updatedBoard._id}, {_id: {$ne: req.user._id}}]}, {$push: {notifications: notificationToSubscribers._id}}, function(err) {
+          if (err) throw (err);
+        })
+        res.redirect('/boards/' + updatedBoard._id);
+      })
     })
   })
 })
@@ -98,7 +150,21 @@ router.post('/boards/:id/delete', function(req, res) {
           })
         }
       }
-      res.redirect('/');
+      let notificationToSubscribers = new Notification({
+        type: 'Deleted Board',
+        message: "The Board, " + updatedBoard.name + ", that you are subscribed to has been deleted.",
+        routeID: {
+          kind: 'Board',
+          item: updatedBoard._id
+        }
+      })
+      notificationToSubscribers.save(function(err, notificationToSubscribers) {
+        if(err) throw err;
+        User.findOneAndUpdate({$and: [{subscribedBoards: updatedBoard._id}, {_id: {$ne: req.user._id}}]}, {$push: {notifications: notificationToSubscribers._id}}, function(err) {
+          if (err) throw (err);
+        })
+        res.redirect('/');
+      })
     })
   })
 })
@@ -147,6 +213,7 @@ router.get('/boards/:id', function(req, res) {
                 },
                 "title": item.title,
                 "text": item.text,
+                "flagged": item.flagged,
                 "comments": comments
               }
               return Promise.resolve(postObject)
@@ -154,6 +221,11 @@ router.get('/boards/:id', function(req, res) {
               let attendees = item.attendees.map(function(attendee) {
                 return {"id": attendee._id, "firstName": attendee.firstName, "lastName": attendee.lastName}
               })
+              if(item.endTime) {
+                var endTime = moment(item.endTime, "HH:mm").local().format('h:mm a');
+              } else {
+                var endTime = "";
+              }
               let eventCreator = await User.findOne({username: item.contact});
               if (eventCreator) {
                 let eventObject = {
@@ -164,12 +236,13 @@ router.get('/boards/:id', function(req, res) {
                   "postedBy": {
                     "id": eventCreator._id,
                     "firstName": eventCreator.firstName,
-                    "lastName": eventCreator.lastName
+                    "lastName": eventCreator.lastName,
+                    "isLoopUser": true
                   },
                   "title": item.title,
-                  "date": moment(item.date).utc().local().format('MMMM D, YYYY'),
+                  "date": moment(item.date).utc().format('MMMM D, YYYY'),
                   "startTime": moment(item.startTime, "HH:mm").local().format('h:mm a'),
-                  "endTime": moment(item.endTime, "HH:mm").local().format('h:mm a'),
+                  "endTime": endTime,
                   "location": item.location,
                   "description": item.description,
                   "comments": comments,
@@ -182,11 +255,14 @@ router.get('/boards/:id', function(req, res) {
                   "attending": req.user.attendedEvents.indexOf(item._id) > -1,
                   "id": item._id,
                   "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
-                  "postedBy": item.contact,
+                  "postedBy": {
+                    "username": event.contact,
+                    "isLoopUser": false
+                  },
                   "title": item.title,
-                  "date": moment(item.date).utc().local().format('MMMM D, YYYY'),
+                  "date": moment(item.date).utc().format('MMMM D, YYYY'),
                   "startTime": moment(item.startTime, "HH:mm").local().format('h:mm a'),
-                  "endTime": moment(item.endTime, "HH:mm").local().format('h:mm a'),
+                  "endTime": endTime,
                   "location": item.location,
                   "description": item.description,
                   "comments": comments,
@@ -275,6 +351,7 @@ router.get('/boards/:id', function(req, res) {
               },
               "title": item.title,
               "text": item.text,
+              "flagged": item.flagged,
               "comments": comments
             }
             return Promise.resolve(postObject)
@@ -282,6 +359,11 @@ router.get('/boards/:id', function(req, res) {
             let attendees = item.attendees.map(function(attendee) {
               return {"id": attendee._id, "firstName": attendee.firstName, "lastName": attendee.lastName}
             })
+            if(item.endTime) {
+              var endTime = moment(item.endTime, "HH:mm").local().format('h:mm a');
+            } else {
+              var endTime = "";
+            }
             let eventCreator = await User.findOne({username: item.contact});
             if (eventCreator) {
               let eventObject = {
@@ -292,12 +374,13 @@ router.get('/boards/:id', function(req, res) {
                 "postedBy": {
                   "id": eventCreator._id,
                   "firstName": eventCreator.firstName,
-                  "lastName": eventCreator.lastName
+                  "lastName": eventCreator.lastName,
+                  "isLoopUser": true
                 },
                 "title": item.title,
-                "date": moment(item.date).utc().local().format('MMMM D, YYYY'),
+                "date": moment(item.date).utc().format('MMMM D, YYYY'),
                 "startTime": moment(item.startTime, "HH:mm").local().format('h:mm a'),
-                "endTime": moment(item.endTime, "HH:mm").local().format('h:mm a'),
+                "endTime": endTime,
                 "location": item.location,
                 "description": item.description,
                 "comments": comments,
@@ -310,11 +393,14 @@ router.get('/boards/:id', function(req, res) {
                 "attending": req.user.attendedEvents.indexOf(item._id) > -1,
                 "id": item._id,
                 "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
-                "postedBy": item.contact,
+                "postedBy": {
+                  "username": item.contact,
+                  "isLoopUser": false
+                },
                 "title": item.title,
-                "date": moment(item.date).utc().local().format('MMMM D, YYYY'),
+                "date": moment(item.date).utc().format('MMMM D, YYYY'),
                 "startTime": moment(item.startTime, "HH:mm").local().format('h:mm a'),
-                "endTime": moment(item.endTime, "HH:mm").local().format('h:mm a'),
+                "endTime": endTime,
                 "location": item.location,
                 "description": item.description,
                 "comments": comments,
@@ -325,7 +411,6 @@ router.get('/boards/:id', function(req, res) {
           }
         });
         Promise.all(contents).then(function(contents) {
-          console.log(contents);
           res.render('board-overview', {
             board: {
               id: board._id,
@@ -333,6 +418,7 @@ router.get('/boards/:id', function(req, res) {
               unsubscribable: board.unsubscribable,
               subscribed: req.user.subscribedBoards.indexOf(board._id) > -1,
               name: board.name,
+              active: board.active,
               description: board.description,
               contents: contents}, helpers: {
               		compare: function(lvalue, rvalue, options) {
@@ -402,7 +488,7 @@ router.post('/boards/:id/post', function(req, res) {
 
 //subscribe to a board
 router.post('/boards/:id/subscribe', function(req, res) {
-  Time.findOneAndUpdate({}, {$push: {subscriptions: {createdAt: Date.now, board: req.params.id, user:req.user._id}}}, function(err, time) {
+  Time.findOneAndUpdate({}, {$push: {subscriptions: {createdAt: Date.now(), board: req.params.id, user:req.user._id}}}, function(err, time) {
     if (err) {
       throw err;
     } else {
@@ -422,7 +508,7 @@ router.post('/boards/:id/subscribe', function(req, res) {
 
 //Unsubscribe to board
 router.post('/boards/:id/unsubscribe', function(req, res) {
-  Time.findOneAndUpdate({}, {$pull: {subscriptions: {createdAt: Date.now, board: req.params.id, user:req.user._id}}}, function(err, time) {
+  Time.findOneAndUpdate({}, {$pull: {subscriptions: {board: req.params.id, user:req.user._id}}}, function(err, time) {
     if (err) {
       throw err;
     } else {
@@ -460,7 +546,7 @@ router.post('/boards/create', function(req, res) {
       if (err) throw err;
       user.subscribedBoards.push(newBoard._id);
       user.save(function(err, updatedUser) {
-        Time.findOneAndUpdate({}, {$push: {subscriptions: {createdAt: Date.now, board: newBoard._id, user: req.user._id}}}, function(err, time) {
+        Time.findOneAndUpdate({}, {$push: {subscriptions: {createdAt: Date.now(), board: newBoard._id, user: req.user._id}}}, function(err, time) {
           if(err) throw err;
           res.redirect('/boards/' + newBoard._id);
         })

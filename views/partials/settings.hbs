@@ -3,6 +3,74 @@
 {{#if message}}
 <script> alert("{{message}}"); </script>
 {{/if}}
+<style>
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    color: white;
+    text-decoration: underline;
+}
+</style>
+<script>
+function deactivate_check_board(name, id) {
+  document.getElementById('deactivate-info').innerHTML = "Are you sure you want to deactivate the Board, " + name + "?";
+  document.getElementById("deactivate-button").setAttribute("onclick", "javascript: deactivate_board('"+ id +"')");
+}
+function deactivate_check_group(name, id) {
+  document.getElementById('deactivate-info').innerHTML = "Are you sure you want to deactivate the Organization, " + name + "?";
+  document.getElementById("deactivate-button").setAttribute("onclick", "javascript: deactivate_group('"+ id +"')");
+}
+function delete_check_board(name, id) {
+  document.getElementById('delete-info').innerHTML = "Are you sure you want to delete the Board, " + name + "?";
+  document.getElementById("delete-button").setAttribute("onclick", "javascript: delete_board('"+ id +"')");
+}
+function delete_check_group(name, id) {
+  document.getElementById('delete-info').innerHTML = "Are you sure you want to delete the Organization, " + name + "?";
+  document.getElementById("delete-button").setAttribute("onclick", "javascript: delete_group('"+ id +"')");
+}
+function deactivate_board(id) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/boards/" + id + "/deactivate", true);
+  xhttp.send();
+  xhttp.onreadystatechange = function() {
+    if(this.status==200) {
+      location.reload();
+    }
+  }
+}
+function deactivate_group(id) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/groups/" + id + "/deactivate", true);
+  xhttp.send();
+  xhttp.onreadystatechange = function() {
+    if(this.status==200) {
+      location.reload();
+    }
+  }
+}
+function delete_board(id) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/boards/" + id + "/delete", true);
+  xhttp.send();
+  xhttp.onreadystatechange = function() {
+    if(this.status==200) {
+      location.reload();
+    }
+  }
+}
+function delete_group(id) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/groups/" + id + "/delete", true);
+  xhttp.send();
+  xhttp.onreadystatechange = function() {
+    if(this.status==200) {
+      location.reload();
+    }
+  }
+}
+</script>
 <div id="settings">
 
     <h3>Change Password</h3>
@@ -15,4 +83,89 @@
         Save
     </a>
   </form>
+  <br>
+  <h3>Boards</h3>
+  <div class="divider"></div>
+  <div class="uk-card uk-card-default uk-card-body">
+
+      <div uk-grid>
+        {{#each boards}}
+        {{#if archive}}
+        {{else}}
+        {{#if active}}
+          <div class="uk-width-1-4@m" style="margin-top:0px;background-color: #00d283">
+              <p style="display: inline">
+                  <a href="/boards/{{id}}"><b style="color: white;">
+                    {{name}}
+                  </b></a><a href="#deactivate" onclick="deactivate_check_board('{{name}}', '{{_id}}')" class="uk-icon" uk-icon="icon: close" style="display: inline; color:white; float: right" uk-toggle></a>
+                  <br/>
+                  <span style="color: white">(Active)</span>
+              </p>
+          </div>
+          {{/if}}
+          {{/if}}
+          {{/each}}
+        {{#each boards}}
+        {{#if archive}}
+        {{else}}
+        {{#if active}}
+        {{else}}
+          <div class="uk-width-1-4@m" style="margin-top:0px;background-color: #FF6666">
+              <p style="display: inline">
+                  <a href="/boards/{{id}}"><b style="color: white;">
+                    {{name}}
+                  </b><a href="#delete" onclick="delete_check_board('{{name}}', '{{_id}}')" class="uk-icon" uk-icon="icon: close" style="display: inline; color:white; float: right" uk-toggle></a>
+                  <br/>
+                  <span style="color: white">(Deactivated)</span>
+              </p>
+          </div>
+          {{/if}}
+          {{/if}}
+          {{/each}}
+      </div>
+
+  </div>
+  <h3>Organizations</h3>
+  <div class="divider"></div>
+  <div class="uk-card uk-card-default uk-card-body">
+
+      <div uk-grid>
+        {{#each groups}}
+        {{#if archive}}
+        {{else}}
+        {{#if active}}
+          <div class="uk-width-1-4@m" style="margin-top:0px;background-color: #00d283">
+              <p style="display: inline">
+                  <a href="/groups/{{id}}"><b style="color: white;">
+                    {{name}}
+                  </b><a href="#deactivate" onclick="deactivate_check_group('{{name}}', '{{_id}}')" class="uk-icon" uk-icon="icon: close" style="display: inline; color:white; float: right" uk-toggle></a>
+                  <br/>
+                  <span style="color: white">(Active)</span>
+              </p>
+          </div>
+          {{/if}}
+          {{/if}}
+          {{/each}}
+          {{#each groups}}
+          {{#if archive}}
+          {{else}}
+          {{#if active}}
+          {{else}}
+            <div class="uk-width-1-4@m" style="margin-top:0px;background-color: #FF6666">
+                <p style="display: inline">
+                    <a href="/groups/{{id}}"><b style="color: white;">
+                      {{name}}
+                    </b><a href="#delete" onclick="delete_check_group('{{name}}', '{{_id}}')" class="uk-icon" uk-icon="icon: close" style="display: inline; color:white; float: right" uk-toggle></a>
+                    <br/>
+                    <span style="color: white">(Deactivated)</span>
+                </p>
+            </div>
+            {{/if}}
+            {{/if}}
+            {{/each}}
+      </div>
+
+  </div>
 </div>
+{{>deactivate-modal}}
+{{>delete-modal}}

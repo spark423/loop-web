@@ -22,10 +22,9 @@ function cancel(index, index2) {
 </script>
 <div id="feed">
 
-    <h4>TODAY</h4>
     <p style="display:none" id="boardName">{{board.name}}</p>
     {{#each contents}}
-    {{#if this.contact}}
+    {{#if this.date}}
     <form id='delete-event-{{@index}}' style="display: none" method="post" action="/events/{{this.id}}"></form>
     <form id='attend-event-{{@index}}' style="display: none" method="post" action="/events/{{this.id}}/attend"></form>
     <form id='unattend-event-{{@index}}' style="display: none" method="post" action="/events/{{this.id}}/unattend"></form>
@@ -38,7 +37,7 @@ function cancel(index, index2) {
                         <img src="/img/user.png" alt="Alex Reekie" />
                     </div>
                     <div class="poster-info uk-float-left">
-                      <span class="name"><a href='/users/{{this.postedBy.id}}'>{{this.postedBy.firstName}} {{this.postedBy.lastName}}</a></span><br />
+                      <span class="name">{{#if this.postedBy.isLoopUser}}<a href='/users/{{this.postedBy.id}}'>{{this.postedBy.firstName}} {{this.postedBy.lastName}}</a>{{else}}{{this.postedBy.username}}{{/if}}</span><br />
                         <span>Created a new event at {{this.createdAt}}</span>
                     </div>
                     <div class="more">
@@ -55,7 +54,7 @@ function cancel(index, index2) {
                             </div>
                             <div class="uk-width-1-2@m">
                               <span class="title"><a href='/event/{{this.id}}'>{{this.title}}</a></span><br />
-                                <span>{{this.date}}, {{this.startTime}} to {{this.endTime}}</span><br />
+                              <span>{{this.date}}, {{this.startTime}} {{#compare this.endTime "" operator="!="}}to {{this.endTime}}{{/compare}}</span><br />
                                 <span>{{this.location}}</span><br />
                                 <br />
                                 <span class="description">

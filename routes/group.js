@@ -121,13 +121,77 @@ router.get('/create-a-new-org-invite', function(req, res) {
   }
 })
 
+router.post('/groups/:id/deactivate', function(req, res) {
+  Group.findById(req.params.id, function(err, group) {
+    if(err) throw err;
+    group.active = false;
+    group.save(function(err, updatedGroup) {
+      if(err) throw err;
+      let notificationToMembers = new Notification({
+        type: 'Deactivated Organization',
+        message: "The Organization, " + updatedGroup.name + ", that you are a part of has been deactivated.",
+        routeID: {
+          kind: 'Group',
+          item: updatedGroup._id
+        }
+      })
+      notificationToMembers.save(function(err, notificationToMembers) {
+        if(err) throw err;
+        User.findOneAndUpdate({_id: updatedGroup.members}, {$push: {notifications: notificationToMembers._id}}, function(err) {
+          if (err) throw (err);
+        })
+        res.redirect('/groups/' + updatedGroup._id);
+      })
+    })
+  })
+})
+
+router.post('/groups/:id/reactivate', function(req, res) {
+  Group.findById(req.params.id, function(err, group) {
+    if(err) throw err;
+    group.active = true;
+    group.save(function(err, updatedGroup) {
+      if(err) throw err;
+      let notificationToMembers = new Notification({
+        type: 'Reactivated Organization',
+        message: "The Organization, " + updatedGroup.name + ", that you are a part of has been reactivated.",
+        routeID: {
+          kind: 'Group',
+          item: updatedGroup._id
+        }
+      })
+      notificationToMembers.save(function(err, notificationToMembers) {
+        if(err) throw err;
+        User.findOneAndUpdate({_id: updatedGroup.members}, {$push: {notifications: notificationToMembers._id}}, function(err) {
+          if (err) throw (err);
+        })
+        res.redirect('/groups/' + updatedGroup._id);
+      })
+    })
+  })
+})
+
 router.post('/groups/:id/delete', function(req, res) {
   Group.findById(req.params.id, function(err, group) {
     if(err) throw err;
     group.archive = true;
     group.save(function(err, updatedGroup) {
       if(err) throw err;
-      res.redirect('/');
+      let notificationToMembers = new Notification({
+        type: 'Deleted Organization',
+        message: "The Organization, " + updatedGroup.name + ", that you are a part of has been deleted.",
+        routeID: {
+          kind: 'Group',
+          item: updatedGroup._id
+        }
+      })
+      notificationToMembers.save(function(err, notificationToMembers) {
+        if(err) throw err;
+        User.findOneAndUpdate({_id: updatedGroup.members}, {$push: {notifications: notificationToMembers._id}}, function(err) {
+          if (err) throw (err);
+        })
+        res.redirect('/');
+      })
     })
   })
 })
@@ -138,7 +202,9 @@ router.get('/groupinfo', function(req, res) {
     if(err) throw err;
     var info = [];
     for(var i=0; i<groups.length; i++) {
-      info.push({"name": groups[i].name, "_id": groups[i]._id, "archive": groups[i].archive});
+      if(groups[i].archive==false) {
+        info.push({"name": groups[i].name, "_id": groups[i]._id, "active": groups[i].active});
+      }
     }
     res.send(info);
   });
@@ -167,6 +233,7 @@ router.get('/groups/:id', function(req, res) {
                 "id": group._id,
                 "name": group.name,
                 "description": group.description,
+                "active": group.active,
                 "admin": user[0],
                 "members": members
               }
@@ -179,6 +246,7 @@ router.get('/groups/:id', function(req, res) {
                 "id": group._id,
                 "name": group.name,
                 "description": group.description,
+                "active": group.active,
                 "admin": adminUsername,
                 "members": members
               }
@@ -203,7 +271,7 @@ router.get('/groups/:id/edit', function(req, res) {
         for(var i=0; i<users.length; i++) {
           user_info.push({"firstName": users[i].firstName, "lastName": users[i].lastName, "username": users[i].username});
         }
-        res.render('edit-org', {id: req.params.id, name: group.name, description: group.description, admin: group.admin, users: user_info, helpers: {
+        res.render('edit-org', {id: req.params.id, name: group.name, description: group.description, admin: group.admin, active: group.active, users: user_info, helpers: {
             compare: function(lvalue, rvalue, options) {
               if (arguments.length < 3)
                   throw new Error("Handlerbars Helper 'compare' needs 2 parameters");

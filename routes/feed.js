@@ -56,7 +56,7 @@ function quickSort(items, left, right) {
         if (err) {
           throw err;
         } else {
-          Board.find({$or: [{unsubscribable: true},{_id: {$in: user.subscribedBoards}}]}).populate([{path: 'contents.item', populate: [{path: 'attendees'}, {path: 'comments', populate: [{path: 'postedBy'},{path: 'comments', populate: [{path: 'postedBy'}]}]}]}]).exec(function(err, boards) {
+          Board.find({$and: [{$or: [{unsubscribable: true},{_id: {$in: user.subscribedBoards}}]}, {archive: false}, {active: true}]}).populate([{path: 'contents.item', populate: [{path: 'attendees'}, {path: 'comments', populate: [{path: 'postedBy'},{path: 'comments', populate: [{path: 'postedBy'}]}]}]}]).exec(function(err, boards) {
             if (err) {
               throw err;
             } else {
@@ -110,6 +110,11 @@ function quickSort(items, left, right) {
                   let attendees = item.attendees.map(function(attendee) {
                     return {"id": attendee._id, "firstName": attendee.firstName, "lastName": attendee.lastName}
                   })
+                  if(item.endTime) {
+                    var endTime = moment(item.endTime, "HH:mm").local().format('h:mm a');
+                  } else {
+                    var endTime = "";
+                  }
                   let eventCreator = await User.findOne({username: item.contact});
                   if (eventCreator) {
                     let eventObject = {
@@ -120,12 +125,13 @@ function quickSort(items, left, right) {
                       "postedBy": {
                         "id": eventCreator._id,
                         "firstName": eventCreator.firstName,
-                        "lastName": eventCreator.lastName
+                        "lastName": eventCreator.lastName,
+                        "isLoopUser": true
                       },
                       "title": item.title,
-                      "date": moment(item.date).local().format('MMMM D, YYYY'),
+                      "date": moment(item.date).utc().format('MMMM D, YYYY'),
                       "startTime": moment(item.startTime, "HH:mm").local().format('h:mm a'),
-                      "endTime": moment(item.endTime, "HH:mm").local().format('h:mm a'),
+                      "endTime": endTime,
                       "location": item.location,
                       "description": item.description,
                       "comments": comments,
@@ -138,11 +144,14 @@ function quickSort(items, left, right) {
                       "attending": req.user.attendedEvents.indexOf(item._id) > -1,
                       "id": item._id,
                       "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
-                      "postedBy": item.contact,
+                      "postedBy": {
+                        "username": event.contact,
+                        "isLoopUser": false
+                      },
                       "title": item.title,
-                      "date": moment(item.date).local().format('MMMM D, YYYY'),
+                      "date": moment(item.date).utc().format('MMMM D, YYYY'),
                       "startTime": moment(item.startTime, "HH:mm").local().format('h:mm a'),
-                      "endTime": moment(item.endTime, "HH:mm").format('h:mm a'),
+                      "endTime": endTime,
                       "location": item.location,
                       "description": item.description,
                       "comments": comments,

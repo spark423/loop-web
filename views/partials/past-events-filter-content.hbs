@@ -1,0 +1,40 @@
+<link rel="stylesheet" href="/css/filter-content/sxn-filter-content.min.css" />
+<script>
+function showAll() {
+  $('.today').show();
+  $('.week').show();
+  $('.month').show();
+  $('.past').show();
+}
+function showToday() {
+  $('.today').show();
+  $('.week').hide();
+  $('.month').hide();
+  $('.past').hide();
+}
+function showWeek() {
+  $('.today').show();
+  $('.week').show();
+  $('.month').hide();
+  $('.past').hide();
+}
+function showMonth() {
+  $('.today').show();
+  $('.week').show();
+  $('.month').show();
+  $('.past').hide();
+}
+</script>
+<div id="filter-content">
+    <h4>Filter by Content Type</h4>
+    <div class="uk-card uk-card-default uk-card-body">
+
+        <ul class="uk-subnav uk-subnav-pill" uk-switcher>
+            <li><a onclick="showAll()">All</a></li>
+            <li><a onclick="showToday()">Today</a></li>
+            <li><a onclick="showWeek()">This Week</a></li>
+            <li><a onclick="showMonth()">This Month</a></li>
+        </ul>
+
+    </div>
+</div>

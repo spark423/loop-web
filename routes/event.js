@@ -50,8 +50,116 @@ router.get('/events-calendar', function(req, res) {
 	res.render('events-calendar-view')
 })
 
-router.get('/events-invite', function(req, res) {
-	res.render("create-a-new-event-invite");
+router.get('/events/past', function(req, res) {
+  if(req.user) {
+    Event.find({$and: [{date: {$lte: moment(Date.now()).local().startOf('day').format().slice(0,-6) + '.000Z'}, archive: false}]}).populate('board').exec(function(err, events) {
+      let sortedEvents = quickSort(events, 0, events.length-1).reverse();
+      let eventObjects = sortedEvents.filter(function(event) {
+        if(event.endTime) {
+          var endTime = moment(event.endTime, "HH:mm").local().format('h:mm a');
+        } else {
+          var endTime = "";
+        }
+        if(moment(Date.now()).local().format('MMMM D, YYYY')==moment(event.date).utc().format('MMMM D, YYYY') && (endTime > moment(Date.now()).local().format('h:mm a') || startTime > moment(Date.now()).local().format('h:mm a'))) {
+          return false;
+        }
+        return true;
+      }).map(async function(event) {
+        var user = await User.findOne({username: event.contact});
+        if(event.endTime) {
+          var endTime = moment(event.endTime, "HH:mm").local().format('h:mm a');
+        } else {
+          var endTime = "";
+        }
+        if(user) {
+            let eventObject= {
+                "id": event._id,
+                "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                "title": event.title,
+                "postedBy": {
+                  "id": user._id,
+                  "firstName": user.firstName,
+                  "lastName": user.lastName,
+                  "isLoopUser": true
+                },
+                "board": {
+                  "id": event.board._id,
+                  "name": event.board.name
+                },
+                "archive": event.archive,
+                "description": event.description,
+                "date": moment(event.date).utc().format('MMMM D, YYYY'),
+                "startTime": moment(event.startTime, "HH:mm").local().format('h:mm a'),
+                "endTime": endTime,
+                "location": event.location,
+                "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
+                "currentTime": moment(Date.now()).local().format('h:mm a')
+              }
+              return Promise.resolve(eventObject);
+        } else {
+          let eventObject= {
+            "id": event._id,
+            "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+            "title": event.title,
+            "postedBy": {
+              "id": "",
+              "firstName": "",
+              "lastName": "",
+              "username": event.contact,
+              "isLoopUser": false
+            },
+            "board": {
+              "id": event.board._id,
+              "name": event.board.name
+            },
+            "archive": event.archive,
+            "description": event.description,
+            "date": moment(event.date).utc().format('MMMM D, YYYY'),
+            "startTime": moment(event.startTime, "HH:mm").local().format('h:mm a'),
+            "endTime": endTime,
+            "location": event.location,
+            "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
+            "currentTime": moment(Date.now()).local().format('h:mm a')
+          }
+          return Promise.resolve(eventObject);
+        }
+      })
+      Promise.all(eventObjects).then(function(events) {
+        res.render("past-events", {events: events, helpers: {
+            compare: function(lvalue, rvalue, options) {
+              if (arguments.length < 3)
+                  throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
+
+              var operator = options.hash.operator || "==";
+
+              var operators = {
+                  '==':       function(l,r) { return l == r; },
+                  '===':      function(l,r) { return l === r; },
+                  '!=':       function(l,r) { return l != r; },
+                  '<':        function(l,r) { return l < r; },
+                  '>':        function(l,r) { return l > r; },
+                  '<=':       function(l,r) { return l <= r; },
+                  '>=':       function(l,r) { return l >= r; },
+                  'typeof':   function(l,r) { return typeof l == r; }
+              }
+
+              if (!operators[operator])
+                  throw new Error("Handlerbars Helper 'compare' doesn't know the operator "+operator);
+
+              var result = operators[operator](lvalue,rvalue);
+
+              if( result ) {
+                  return options.fn(this);
+              } else {
+                  return options.inverse(this);
+              }
+            }
+          }});
+        })
+    })
+  } else {
+    res.redirect('/');
+  }
 })
 //Render event creation page
 router.get('/events/create', function(req, res) {
@@ -60,7 +168,9 @@ router.get('/events/create', function(req, res) {
       if(err) throw err;
       var info = [];
       for(var i=0; i<boards.length; i++) {
-        info.push({"name": boards[i].name, "_id": boards[i]._id});
+        if(boards[i].archive==false) {
+          info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
+        }
       }
       res.render("create-a-new-event", {boards: info});
     })
@@ -118,7 +228,6 @@ router.post('/events/create', function(req, res) {
       }
     }
   }
-  console.log(addMembers);
 	newEvent.attendees.push(req.user._id);
   newEvent.save(function(error, newEvent) {
     if (error) throw error;
@@ -178,28 +287,55 @@ router.get('/event/:id', function(req, res) {
           let comments = event.comments.map(function(comment) {
             return {"id": comment._id, "createdAt": moment(comment.createdAt).local().format('MMMM D, YYYY, h:mm a'), "postedBy": {"id": comment.postedBy._id, "firstName": comment.postedBy.firstName, "lastName": comment.postedBy.lastName}, "text": comment.text}
           })
-          console.log(comments);
+          if(event.endTime) {
+            var endTime = moment(event.endTime, "HH:mm").local().format('h:mm a');
+          } else {
+            var endTime = "";
+          }
           User.findOne({"username": event.contact}, function(err, user) {
             if(err) throw err;
-            var eventObject = {
-              "id": event._id,
-              "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
-              "postedBy": {
-                "id": user._id,
-                "firstName": user.firstName,
-                "lastName": user.lastName
-              },
-              "title": event.title,
-              "board": event.board,
-              "archive": event.archive,
-              "date": moment(event.date).utc().local().format('MMMM D, YYYY'),
-              "startTime": moment(event.startTime, "HH:mm").local().format('h:mm a'),
-              "endTime": moment(event.endTime, "HH:mm").local().format('h:mm a'),
-              "location": event.location,
-              "description": event.description,
-              "comments": comments,
-              "attendees": attendees,
-              "attending": attending
+            if(user) {
+              var eventObject = {
+                "id": event._id,
+                "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                "postedBy": {
+                  "id": user._id,
+                  "firstName": user.firstName,
+                  "lastName": user.lastName,
+                  "isLoopUser": true
+                },
+                "title": event.title,
+                "board": event.board,
+                "archive": event.archive,
+                "date": moment(event.date).utc().format('MMMM D, YYYY'),
+                "startTime": moment(event.startTime, "HH:mm").local().format('h:mm a'),
+                "endTime": endTime,
+                "location": event.location,
+                "description": event.description,
+                "comments": comments,
+                "attendees": attendees,
+                "attending": attending
+              }
+            } else {
+              var eventObject = {
+                "id": event._id,
+                "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                "postedBy": {
+                  "username": event.contact,
+                  "isLoopUser": false
+                },
+                "title": event.title,
+                "board": event.board,
+                "archive": event.archive,
+                "date": moment(event.date).utc().format('MMMM D, YYYY'),
+                "startTime": moment(event.startTime, "HH:mm").local().format('h:mm a'),
+                "endTime": endTime,
+                "location": event.location,
+                "description": event.description,
+                "comments": comments,
+                "attendees": attendees,
+                "attending": attending
+              }
             }
             res.render('event-detail', {"event": eventObject, "board": board.name, helpers: {
   							compare: function(lvalue, rvalue, options) {
@@ -243,126 +379,111 @@ router.get('/event/:id', function(req, res) {
 //Render all events
 router.get('/events', function(req, res) {
 	if(req.user) {
-		Event.find({}).populate('board').exec(function(err, events) {
-			if(err) throw err;
-			let sortedEvents = quickSort(events, 0, events.length-1);
-			let eventObjects = sortedEvents.map(async function(event) {
-        var user = await User.findOne({username: event.contact});
-        if(event.endTime) {
-          var endTime = moment(event.endTime, "HH:mm").local().format('h:mm a');
-        } else {
-          var endTime = "";
-        }
-        if(user) {
+    Event.find({$and: [{date: {$gte: moment(Date.now()).local().startOf('day').format().slice(0,-6) + '.000Z'}, archive: false}]}).populate('board').exec(function(err, events) {
+      if(err) throw err;
+  			let sortedEvents = quickSort(events, 0, events.length-1);
+  			let eventObjects = sortedEvents.map(async function(event) {
+          var user = await User.findOne({username: event.contact});
+          if(event.endTime) {
+            var endTime = moment(event.endTime, "HH:mm").local().format('h:mm a');
+          } else {
+            var endTime = "";
+          }
+          if(user) {
+              let eventObject= {
+                  "id": event._id,
+                  "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                  "title": event.title,
+                  "postedBy": {
+                    "id": user._id,
+                    "firstName": user.firstName,
+                    "lastName": user.lastName,
+                    "isLoopUser": true
+                  },
+                  "board": {
+                    "id": event.board._id,
+                    "name": event.board.name
+                  },
+                  "archive": event.archive,
+                  "description": event.description,
+                  "date": moment(event.date).utc().format('MMMM D, YYYY'),
+                  "startTime": moment(event.startTime, "HH:mm").local().format('h:mm a'),
+                  "endTime": endTime,
+                  "location": event.location,
+                  "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
+                  "currentTime": moment(Date.now()).local().format('h:mm a')
+                }
+                return Promise.resolve(eventObject);
+          } else {
             let eventObject= {
-                "id": event._id,
-                "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
-                "title": event.title,
-                "postedBy": {
-                  "id": user._id,
-                  "firstName": user.firstName,
-                  "lastName": user.lastName,
-                  "isLoopUser": true
-                },
-                "board": {
-                  "id": event.board._id,
-                  "name": event.board.name
-                },
-                "archive": event.archive,
-                "description": event.description,
-                "date": moment(event.date).utc().local().format('MMMM D, YYYY'),
-                "startTime": moment(event.startTime, "HH:mm").local().format('h:mm a'),
-                "endTime": endTime,
-                "location": event.location,
-                "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
-                "currentTime": moment(Date.now()).local().format('h:mm a')
+              "id": event._id,
+              "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+              "title": event.title,
+              "postedBy": {
+                "id": "",
+                "firstName": "",
+                "lastName": "",
+                "username": event.contact,
+                "isLoopUser": false
+              },
+              "board": {
+                "id": event.board._id,
+                "name": event.board.name
+              },
+              "archive": event.archive,
+              "description": event.description,
+              "date": moment(event.date).utc().format('MMMM D, YYYY'),
+              "startTime": moment(event.startTime, "HH:mm").local().format('h:mm a'),
+              "endTime": endTime,
+              "location": event.location,
+              "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
+              "currentTime": moment(Date.now()).local().format('h:mm a')
+            }
+            return Promise.resolve(eventObject);
+          }
+        })
+        Promise.all(eventObjects).then(function(events) {
+            Board.find({}, function(err, boards) {
+              if(err) throw err;
+              var info = [];
+              for(var i=0; i<boards.length; i++) {
+                if(boards[i].archive==false) {
+                  info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
+                }
               }
-              console.log(eventObject);
-              return Promise.resolve(eventObject);
-        } else {
-          let eventObject= {
-            "id": event._id,
-            "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
-            "title": event.title,
-            "postedBy": {
-              "id": "",
-              "firstName": "",
-              "lastName": "",
-              "username": event.contact,
-              "isLoopUser": false
-            },
-            "board": {
-              "id": event.board._id,
-              "name": event.board.name
-            },
-            "archive": event.archive,
-            "description": event.description,
-            "date": moment(event.date).utc().local().format('MMMM D, YYYY'),
-            "startTime": moment(event.startTime, "HH:mm").local().format('h:mm a'),
-            "endTime": endTime,
-            "location": event.location,
-            "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
-            "currentTime": moment(Date.now()).local().format('h:mm a')
-          }
-          return Promise.resolve(eventObject);
-        }
+              res.render('events-list-view', {events: events, boards: info, helpers: {
+    							compare: function(lvalue, rvalue, options) {
+    								if (arguments.length < 3)
+    										throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
+
+    								var operator = options.hash.operator || "==";
+
+    								var operators = {
+    										'==':       function(l,r) { return l == r; },
+    										'===':      function(l,r) { return l === r; },
+    										'!=':       function(l,r) { return l != r; },
+    										'<':        function(l,r) { return l < r; },
+    										'>':        function(l,r) { return l > r; },
+    										'<=':       function(l,r) { return l <= r; },
+    										'>=':       function(l,r) { return l >= r; },
+    										'typeof':   function(l,r) { return typeof l == r; }
+    								}
+
+    								if (!operators[operator])
+    										throw new Error("Handlerbars Helper 'compare' doesn't know the operator "+operator);
+
+    								var result = operators[operator](lvalue,rvalue);
+
+    								if( result ) {
+    										return options.fn(this);
+    								} else {
+    										return options.inverse(this);
+    								}
+    							}
+    						}});
+            })
+
       })
-      Promise.all(eventObjects).then(function(events) {
-
-
-      console.log("events is", events);
-          var now = false;
-          var upcoming = false;
-          var past = false;
-          for(var i=0; i<events.length; i++) {
-            if(events[i].date==events[i].currentDate && events[i].currentTime >= events[i].startTime && events[i].currentTime < events[i].endTime) {
-              var now = true;
-              break;
-            }
-          }
-          for(var i=0; i<events.length; i++) {
-            if((events[i].date==events[i].currentDate && events[i].currentTime > events[i].startTime) || events[i].currentDate > events[i].date) {
-              var upcoming = true;
-              break;
-            }
-          }
-          for(var i=0; i<events.length; i++) {
-            if((events[i].date==events[i].currentDate && events[i].currentTime > events[i].endTime) || events[i].currentDate > events[i].date) {
-              var past = true;
-              break;
-            }
-          }
-					res.render('events-list-view', {events: events, now: now, upcoming: upcoming, past: past, helpers: {
-							compare: function(lvalue, rvalue, options) {
-								if (arguments.length < 3)
-										throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
-
-								var operator = options.hash.operator || "==";
-
-								var operators = {
-										'==':       function(l,r) { return l == r; },
-										'===':      function(l,r) { return l === r; },
-										'!=':       function(l,r) { return l != r; },
-										'<':        function(l,r) { return l < r; },
-										'>':        function(l,r) { return l > r; },
-										'<=':       function(l,r) { return l <= r; },
-										'>=':       function(l,r) { return l >= r; },
-										'typeof':   function(l,r) { return typeof l == r; }
-								}
-
-								if (!operators[operator])
-										throw new Error("Handlerbars Helper 'compare' doesn't know the operator "+operator);
-
-								var result = operators[operator](lvalue,rvalue);
-
-								if( result ) {
-										return options.fn(this);
-								} else {
-										return options.inverse(this);
-								}
-							}
-						}});
-				})
 })
 
 	} else {
@@ -375,7 +496,7 @@ router.get('/event/:id/edit', function(req, res) {
   if(req.user) {
     Event.findById(req.params.id, function(err, event) {
       if(err) throw err;
-      var date = moment(event.date).utc().local().format("YYYY-MM-DD");
+      var date = moment(event.date).utc().format("YYYY-MM-DD");
       res.render('edit-event', {event: event, date: date});
     })
   } else {
@@ -478,84 +599,129 @@ router.post('/events/:id/comment', function(req, res) {
 				throw err;
 			} else {
 				User.findOneAndUpdate({_id: req.user._id}, {$push: {comments: comment._id}}, function(err, currentUser) {
-					if (err) {
-						throw err;
-					} else if(req.user._id==post.postedBy) {
-						let notificationToFollowers = new Notification({
-							type: 'Comment on Attending Event',
-							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the event \"" + post.title + "\" that you are attending.",
-							routeID: {
-								kind: 'Event',
-								item: post._id
-							}
-						})
-						notificationToFollowers.save(function(err, notificationToFollowers) {
-							if (err) {
-								throw err;
-							} else {
-								let promises = post.attendees.map(function(followerID) {
-									return new Promise(function(resolve, reject) {
-										User.findOneAndUpdate({_id: followerID}, {$push: {notifications: notificationToFollowers._id}}, function(err) {
-											if (err) {
-												throw reject(err);
-											} else {
-												resolve();
-											}
-										})
-									});
-								});
-								Promise.all(promises).then(function() {
-									res.redirect('/boards/' + post.board);
-								}).catch(console.error);
-							}
-						})
-					}
-					else {
-						let notificationToPoster = new Notification({
-							type: 'Comment on Created Event',
-							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on your event titled \"" + post.title + "\".",
-							routeID: {
-								kind: 'Event',
-								item: post._id
-							}
-						})
-						notificationToPoster.save(function(err, notificationToPoster) {
-							User.findOneAndUpdate({_id: post.postedBy}, {$push: {notifications: notificationToPoster._id}}, function(err) {
-								if (err) {
-									throw err;
-								} else {
-									let notificationToFollowers = new Notification({
-										type: 'Comment on Attending Event',
-										message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the event \"" + post.title + "\" that you are attending.",
-										routeID: {
-											kind: 'Event',
-											item: post._id
-										}
-									})
-									notificationToFollowers.save(function(err, notificationToFollowers) {
-										if (err) {
-											throw err;
-										} else {
-											let promises = post.attendees.map(function(followerID) {
-												return new Promise(function(resolve, reject) {
-													User.findOneAndUpdate({_id: followerID}, {$push: {notifications: notificationToFollowers._id}}, function(err) {
-														if (err) {
-															throw reject(err);
-														} else {
-															resolve();
-														}
-													})
-												});
-											});
-											Promise.all(promises).then(function() {
-												res.redirect('/boards/' + post.board);
-											}).catch(console.error);
-										}
-									})
-								}
-							})
-						})
-					}
+					if (err) throw err;
+          User.findOne({username: post.contact}, function(err, eventPoster) {
+            if(err) throw err;
+            if(eventPoster) {
+              if(req.user._id.toString()==eventPoster._id.toString()) {
+    						let notificationToFollowers = new Notification({
+    							type: 'Comment on Attending Event',
+    							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the event \"" + post.title + "\" that you are attending.",
+    							routeID: {
+    								kind: 'Event',
+    								item: post._id
+    							}
+    						})
+    						notificationToFollowers.save(function(err, notificationToFollowers) {
+    							if (err) {
+    								throw err;
+    							} else {
+    								let promises = post.attendees.map(function(followerID) {
+    									return new Promise(function(resolve, reject) {
+                        if(comment.postedBy.toString()==followerID.toString()) {
+                          resolve();
+                        } else {
+                          User.findOneAndUpdate({_id: followerID}, {$push: {notifications: notificationToFollowers._id}}, function(err) {
+                            if (err) {
+                              throw reject(err);
+                            } else {
+                              resolve();
+                            }
+                          })
+                        }
+    									});
+    								});
+    								Promise.all(promises).then(function() {
+    									res.redirect('/boards/' + post.board);
+    								}).catch(console.error);
+    							}
+    						})
+    					}
+    					else {
+    						let notificationToPoster = new Notification({
+    							type: 'Comment on Created Event',
+    							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on your event titled \"" + post.title + "\".",
+    							routeID: {
+    								kind: 'Event',
+    								item: post._id
+    							}
+    						})
+    						notificationToPoster.save(function(err, notificationToPoster) {
+    							User.findOneAndUpdate({username: post.contact}, {$push: {notifications: notificationToPoster._id}}, function(err) {
+    								if (err) {
+    									throw err;
+    								} else {
+    									let notificationToFollowers = new Notification({
+    										type: 'Comment on Attending Event',
+    										message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the event \"" + post.title + "\" that you are attending.",
+    										routeID: {
+    											kind: 'Event',
+    											item: post._id
+    										}
+    									})
+    									notificationToFollowers.save(function(err, notificationToFollowers) {
+    										if (err) {
+    											throw err;
+    										} else {
+    											let promises = post.attendees.map(function(followerID) {
+    												return new Promise(function(resolve, reject) {
+                              if(comment.postedBy.toString() == followerID.toString() || eventPoster._id.toString() == followerID.toString()) {
+                                resolve();
+                              } else {
+                                User.findOneAndUpdate({_id: followerID}, {$push: {notifications: notificationToFollowers._id}}, function(err) {
+      														if (err) {
+      															throw reject(err);
+      														} else {
+      															resolve();
+      														}
+      													})
+                              }
+    												});
+    											});
+    											Promise.all(promises).then(function() {
+    												res.redirect('/boards/' + post.board);
+    											}).catch(console.error);
+    										}
+    									})
+    								}
+    							})
+    						})
+    					}
+            } else {
+              let notificationToFollowers = new Notification({
+                type: 'Comment on Attending Event',
+                message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the event \"" + post.title + "\" that you are attending.",
+                routeID: {
+                  kind: 'Event',
+                  item: post._id
+                }
+              })
+              notificationToFollowers.save(function(err, notificationToFollowers) {
+                if (err) {
+                  throw err;
+                } else {
+                  let promises = post.attendees.map(function(followerID) {
+                    return new Promise(function(resolve, reject) {
+                      if(comment.postedBy.toString()==followerID.toString()) {
+                        resolve();
+                      } else {
+                        User.findOneAndUpdate({_id: followerID}, {$push: {notifications: notificationToFollowers._id}}, function(err) {
+                          if (err) {
+                            throw reject(err);
+                          } else {
+                            resolve();
+                          }
+                        })
+                      }
+                    });
+                  });
+                  Promise.all(promises).then(function() {
+                    res.redirect('/boards/' + post.board);
+                  }).catch(console.error);
+                }
+              })
+            }
+          })
 				})
 			}
 		})

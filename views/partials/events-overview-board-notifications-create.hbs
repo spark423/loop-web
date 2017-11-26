@@ -44,7 +44,7 @@
                                 </a>
                                 <select name="board">
                                   {{#each boards}}
-                                    <option value="{{_id}}">{{name}}</option>
+                                    <option value="{{_id}}">{{name}}{{#if active}}{{else}} (Deactivated){{/if}}</option>
                                   {{/each}}
                                 </select>
                             </li>

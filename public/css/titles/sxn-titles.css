@@ -11,12 +11,13 @@
     font-weight: 400;
 }
 #titles .uk-card-body div.uk-grid{
-    width: calc(100% - 120px);
+    width: calc(100%);
     margin: 0;
 }
 #titles .uk-card-body div div{
     padding: 20px;
     border-left: 1px solid #d1d2d3;
+    border-bottom: 1px solid #d1d2d3;
 }
 #titles .uk-card-body div div.uk-first-column{
     border-left: none;

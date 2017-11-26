@@ -20,6 +20,8 @@ router.get('/users/:id', function(req, res) {
 			if (err) throw err;
 			res.render('profile-user',{
 				"user": {
+					id: user._id,
+					blocked: user.blocked,
 					username: user.username,
 					firstName: user.firstName,
 					lastName: user.lastName,
@@ -93,6 +95,28 @@ router.post('/users/:id/edit', function(req, res) {
 			if (error)
 				throw error;
 			res.redirect('/users/' + updatedUser._id)
+		})
+	})
+})
+
+router.post('/user/:id/block', function(req, res) {
+	User.findById(req.params.id, function(err, user) {
+		if(err) throw err;
+		user.blocked = true;
+		user.save(function(err, updatedUser) {
+			if(err) throw err;
+			res.status(200);
+		})
+	})
+})
+
+router.post('/user/:id/unblock', function(req, res) {
+	User.findById(req.params.id, function(err, user) {
+		if(err) throw err;
+		user.blocked = false;
+		user.save(function(err, updatedUser) {
+			if(err) throw err;
+			res.status(200);
 		})
 	})
 })

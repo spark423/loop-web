@@ -8,7 +8,6 @@ $.getJSON('/notifications', function(data) {
   var addedOrganizationCount=0;
   var inviteEventCount=0;
   for(var i=0; i<data.length; i++) {
-    console.log(data.notifications[i].createdAt);
     if(data.notifications[i].type=="Comment on Created Post" && data.notifications[i].createdAt > localStorage.past) {
       createdPostCount++;
     }
@@ -37,11 +36,11 @@ $.getJSON('/notifications', function(data) {
     notifications.append(notification);
   }
   if(createdEventCount!=0) {
-    var notification="<li><a href='/all-notifications'><span uk-icon='icon: comment'></span>" + "<b>" + createdEventCount + "</b> people commented on a post you are following</a></li>";
+    var notification="<li><a href='/all-notifications'><span uk-icon='icon: comment'></span>" + "<b>" + createdEventCount + "</b> people commented on an event you created</a></li>";
     notifications.append(notification);
   }
   if(attendingEventCount!=0) {
-    var notification="<li><a href='/all-notifications'><span uk-icon='icon: comment'></span>" + "<b>" + attendingEventCount + "</b> people commented on a post you are following</a></li>";
+    var notification="<li><a href='/all-notifications'><span uk-icon='icon: comment'></span>" + "<b>" + attendingEventCount + "</b> people commented on an event you are attending</a></li>";
     notifications.append(notification);
   }
   if(addedOrganizationCount!=0) {

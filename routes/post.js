@@ -13,7 +13,9 @@ router.get('/posts/create', function(req, res) {
 		if(err) throw err;
 		var info = [];
 		for(var i=0; i<boards.length; i++) {
-			info.push({"name": boards[i].name, "_id": boards[i]._id});
+			if(boards[i].archive==false) {
+				info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
+			}
 		}
 		res.render("create-a-new-post", {boards: info});
 	})
@@ -105,7 +107,7 @@ router.post('/posts/:id', function(req, res) {
 
 //Follow a post
 router.post('/posts/:id/follow', function(req, res) {
-	Time.findOneAndUpdate({}, {$push: {follows: {createdAt: Date.now, post: req.params.id, user:req.user._id}}}, function(err, time) {
+	Time.findOneAndUpdate({}, {$push: {follows: {createdAt: Date.now(), post: req.params.id, user:req.user._id}}}, function(err, time) {
 		if (err) {
 			throw err;
 		} else {
@@ -164,7 +166,7 @@ router.post('/posts/:id/comment', function(req, res) {
 				User.findOneAndUpdate({_id: req.user._id}, {$push: {comments: comment._id}}, function(err, currentUser) {
 					if (err) {
 						throw err;
-					} else if (req.user._id==post.postedBy) {
+					} else if (req.user._id.toString()==post.postedBy.toString()) {
 						let notificationToFollowers = new Notification({
 							type: 'Comment on Following Post',
 							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the post \"" + post.title + "\" that you are following.",
@@ -179,13 +181,17 @@ router.post('/posts/:id/comment', function(req, res) {
 							} else {
 								let promises = post.followers.map(function(followerID) {
 									return new Promise(function(resolve, reject) {
-										User.findOneAndUpdate({_id: followerID}, {$push: {notifications: notificationToFollowers._id}}, function(err) {
-											if (err) {
-												throw reject(err);
-											} else {
-												resolve();
-											}
-										})
+										if(comment.postedBy.toString()==followerID.toString()) {
+											resolve();
+										} else {
+											User.findOneAndUpdate({_id: followerID}, {$push: {notifications: notificationToFollowers._id}}, function(err) {
+												if (err) {
+													throw reject(err);
+												} else {
+													resolve();
+												}
+											})
+										}
 									});
 								});
 								Promise.all(promises).then(function() {
@@ -222,13 +228,17 @@ router.post('/posts/:id/comment', function(req, res) {
 										} else {
 											let promises = post.followers.map(function(followerID) {
 												return new Promise(function(resolve, reject) {
-													User.findOneAndUpdate({_id: followerID}, {$push: {notifications: notificationToFollowers._id}}, function(err) {
-														if (err) {
-															throw reject(err);
-														} else {
-															resolve();
-														}
-													})
+													if(comment.postedBy.toString()==followerID.toString()) {
+														resolve();
+													} else {
+														User.findOneAndUpdate({_id: followerID}, {$push: {notifications: notificationToFollowers._id}}, function(err) {
+															if (err) {
+																throw reject(err);
+															} else {
+																resolve();
+															}
+														})
+													}
 												});
 											});
 											Promise.all(promises).then(function() {

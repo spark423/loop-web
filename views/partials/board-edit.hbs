@@ -3,7 +3,9 @@
 <div id="board-edit">
 
     <div class="uk-card uk-card-default uk-card-body">
-<form action="/boards/{{id}}/delete" method="post" id="delete"></form>
+<form action="/boards/{{id}}/deactivate" method="post" id="deactivate"></form>
+<form action="/boards/{{id}}/reactivate" method="post" id="reactivate"></form>
+
         <div class="create-wrap">
             <h4 class="inner">Edit Board</h4>
             <div class="divider"></div>
@@ -49,8 +51,9 @@
                                 </select>
                             </li>
                             <li>
-                              <a class="uk-button uk-button-primary uk-float-left" style="color: white; background-color:red; border-color: red" type="button" onclick="document.getElementById('delete').submit()">Deactivate</a>
-
+                              {{#if active}}<a class="uk-button uk-button-primary uk-float-left" style="color: white; background-color:red; border-color: red" type="button" onclick="document.getElementById('deactivate').submit()">Deactivate</a>
+                              {{else}}<a class="uk-button uk-button-primary uk-float-left" style="color: white; background-color: #00d283" type="button" onclick="document.getElementById('reactivate').submit()">Reactivate</a>
+                              {{/if}}
                             </li>
                         </ul>
                     </div>

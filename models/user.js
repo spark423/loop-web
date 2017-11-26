@@ -3,6 +3,9 @@ var bcrypt   = require('bcrypt-nodejs');
 
 var userSchema = new mongoose.Schema({
   createdAt: {type: Date, default: Date.now},
+  blocked: {type: Boolean},
+  blockedBy: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
+  blocking: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
   username: {type: String, lowercase: true, unique: true, required: true},
   password: {type: String, required: true},
   firstName: {type: String},
@@ -10,6 +13,7 @@ var userSchema = new mongoose.Schema({
   major: [{type: String}],
   classYear: {type: Number},
   description: {type: String},
+  admin: {type: Boolean},
   adminGroups: [{type: mongoose.Schema.Types.ObjectId, ref: 'Group'}],
   joinedGroups: [{type: mongoose.Schema.Types.ObjectId, ref: 'Group'}],
   posts: [{type: mongoose.Schema.Types.ObjectId, ref: 'Post'}],
