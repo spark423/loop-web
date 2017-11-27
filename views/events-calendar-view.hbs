@@ -4,7 +4,7 @@
     <div class="app">
 
         {{>topbar}}
-        {{>events-overview-header}}
+        {{>events-calendar-overview-header}}
         <br>
         {{>events-overview-board-notifications}}
         {{>calendar}}
@@ -15,21 +15,12 @@
 
 <div class="col-tog double-col" hidden>
 
-    <div class="side-col">
-        <div class="side-col-scroll">
-            {{>side-event-details}}
-            {{>side-event}}
-
-        </div>
-    </div>
-
     <div class="app double">
 
         {{>topbar-hidden}}
         {{>events-overview-header}}
         <br>
         {{>events-overview-board-notifications}}
-        {{>calendar}}
 
     </div>
 

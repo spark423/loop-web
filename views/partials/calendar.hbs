@@ -1,24 +1,256 @@
-<link rel="stylesheet" href="css/calendar/sxn-calendar.min.css" />
+<link rel="stylesheet" href="/css/calendar/sxn-calendar.min.css" />
+<script>
+var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+var currentMonth = months.indexOf('{{month}}');
+var currentYear = {{year}};
+$( document ).ready(function() {
+  var calendarDays = $('#calendarDays');
+  if({{lastMonthStart}}==1) {
+    var totalDays = {{thisMonth}};
+  } else {
+    var totalDays = {{lastMonth}} - {{lastMonthStart}} + {{thisMonth}} + 1;
+  }
+  if(totalDays%7!=0) {
+    totalDays += 7-totalDays%7;
+  }
+  var totalWeeks = totalDays/7;
+  var week = "<tr>";
+  var days = "";
+  var lastMonthStart = {{lastMonthStart}};
+  var thisMonth = {{thisMonth}};
+  var lastMonth = {{lastMonth}};
+  var start = 1;
+  var nextMonth = 1;
+  var tableRef = document.getElementById('table').getElementsByTagName('tbody')[0];
+  for(var i=0; i<totalWeeks; i++) {
+    var newRow = tableRef.insertRow(tableRef.rows.length);
+    for(var j=0; j<7; j++) {
+      if(lastMonthStart <= lastMonth && lastMonthStart!=1) {
+        days += '<span>' + lastMonthStart + '</span>';
+        totalDays--;
+        var newCell  = newRow.insertCell(j);
+        newCell.innerHTML = days;
+        newCell.className = "next-month";
+        newCell.id = currentMonth-1 + '-' + lastMonthStart;
+        lastMonthStart++;
+        days = "";
+      } else if (start <= thisMonth){
+        days += '<span>' + start + '</span>';
+        totalDays--;
+        var newCell  = newRow.insertCell(j);
+        newCell.innerHTML = days;
+        newCell.id = currentMonth + '-' + start;
+        start++;
+        days = "";
+      } else if (totalDays>0) {
+        days += '<span>' + nextMonth + '</span>';
+        totalDays--;
+        var newCell  = newRow.insertCell(j);
+        newCell.innerHTML = days;
+        newCell.className = "next-month";
+        newCell.id = currentMonth+1 + '-' + nextMonth;
+        nextMonth++;
+        days = "";
+      }
+    }
+  }
+  {{#each events}}
+  var date = new Date('{{date}}');
+  var editedDate = new Date(date.valueOf() + date.getTimezoneOffset()*60000);
+  var date = [editedDate.getMonth(), editedDate.getDate(), editedDate.getFullYear()];
+  var today = new Date().getDate();
+  var id = editedDate.getMonth() + '-' + editedDate.getDate();
+  {{#if EMSid}}
+  var temp = '<a href="/event/{{_id}}" class="affiliated event">{{title}}</a>';
+  {{else}}
+  var temp = '<a href="/event/{{_id}}" class="unaffiliated event">{{title}}</a>';
+  {{/if}}
+  document.getElementById(id).innerHTML = temp + document.getElementById(id).innerHTML;
+  {{/each}}
+})
 
+function left() {
+  if(currentMonth==0) {
+    currentMonth=11;
+    currentYear--;
+  } else {
+    currentMonth--;
+  }
+  document.getElementById('month').innerHTML = months[currentMonth] + ' ' + currentYear;
+  $("#calendarDays").empty();
+  $.ajax({
+    type:"POST",
+    dataType: "json",
+    data: {currentMonth: currentMonth, currentYear: currentYear},
+    url: '/events/change',
+    success: function(data) {
+      var calendarDays = $('#calendarDays');
+      if(data.lastMonthStart==1) {
+        var totalDays = data.thisMonth;
+      } else {
+        var totalDays = data.lastMonth - data.lastMonthStart + data.thisMonth+1;
+      }
+      if(totalDays%7!=0) {
+        totalDays += 7-totalDays%7;
+      }
+      var totalWeeks = totalDays/7;
+      var week = "<tr>";
+      var days = "";
+      var lastMonthStart = data.lastMonthStart;
+      var thisMonth = data.thisMonth;
+      var lastMonth = data.lastMonth;
+      var start = 1;
+      var nextMonth = 1;
+      var tableRef = document.getElementById('table').getElementsByTagName('tbody')[0];
+      for(var i=0; i<totalWeeks; i++) {
+        var newRow = tableRef.insertRow(tableRef.rows.length);
+        for(var j=0; j<7; j++) {
+          if(lastMonthStart <= lastMonth && lastMonthStart!=1) {
+            days += '<span>' + lastMonthStart + '</span>';
+            totalDays--;
+            var newCell  = newRow.insertCell(j);
+            newCell.innerHTML = days;
+            newCell.className = "next-month";
+            newCell.id = currentMonth-1 + '-' + lastMonthStart;
+            lastMonthStart++;
+            days = "";
+          } else if (start <= thisMonth){
+            days += '<span>' + start + '</span>';
+            totalDays--;
+            var newCell  = newRow.insertCell(j);
+            newCell.innerHTML = days;
+            newCell.id = currentMonth + '-' + start;
+            start++;
+            days = "";
+          } else if (totalDays>0) {
+            days += '<span>' + nextMonth + '</span>';
+            totalDays--;
+            var newCell  = newRow.insertCell(j);
+            newCell.innerHTML = days;
+            newCell.className = "next-month";
+            newCell.id = currentMonth+1 + '-' + nextMonth;
+            nextMonth++;
+            days = "";
+          }
+        }
+      }
+      for(var i=0; i<data.events.length; i++) {
+        var date = new Date(data.events[i].date);
+        var editedDate = new Date(date.valueOf() + date.getTimezoneOffset()*60000);
+        var date = [editedDate.getMonth(), editedDate.getDate(), editedDate.getFullYear()];
+        var today = new Date().getDate();
+        var id = editedDate.getMonth() + '-' + editedDate.getDate();
+        if(data.events[i].EMSid) {
+          var temp = '<a href="/event/' + data.events[i]._id + '" class="affiliated event">' + data.events[i].title + '</a>';
+        } else {
+          var temp = '<a href="/event/' + data.events[i]._id + '" class="unaffiliated event">' + data.events[i].title + '</a>';
+        }
+        document.getElementById(id).innerHTML = temp + document.getElementById(id).innerHTML;
+      }
+    }
+  });
+}
+
+function right() {
+  if(currentMonth==11) {
+    currentMonth=0;
+    currentYear++;
+  } else {
+    currentMonth++;
+  }
+  document.getElementById('month').innerHTML = months[currentMonth] + ' ' + currentYear;
+  $("#calendarDays").empty();
+  $.ajax({
+    type:"POST",
+    dataType: "json",
+    data: {currentMonth: currentMonth, currentYear: currentYear},
+    url: '/events/change',
+    success: function(data) {
+      var calendarDays = $('#calendarDays');
+      if(data.lastMonthStart==1) {
+        var totalDays = data.thisMonth;
+      } else {
+        var totalDays = data.lastMonth - data.lastMonthStart + data.thisMonth+1;
+      }
+      if(totalDays%7!=0) {
+        totalDays += 7-totalDays%7;
+      }
+      var totalWeeks = totalDays/7;
+      var week = "<tr>";
+      var days = "";
+      var lastMonthStart = data.lastMonthStart;
+      var thisMonth = data.thisMonth;
+      var lastMonth = data.lastMonth;
+      var start = 1;
+      var nextMonth = 1;
+      var tableRef = document.getElementById('table').getElementsByTagName('tbody')[0];
+      for(var i=0; i<totalWeeks; i++) {
+        var newRow = tableRef.insertRow(tableRef.rows.length);
+        for(var j=0; j<7; j++) {
+          if(lastMonthStart <= lastMonth && lastMonthStart!=1) {
+            days += '<span>' + lastMonthStart + '</span>';
+            totalDays--;
+            var newCell  = newRow.insertCell(j);
+            newCell.innerHTML = days;
+            newCell.className = "next-month";
+            newCell.id = currentMonth-1 + '-' + lastMonthStart;
+            lastMonthStart++;
+            days = "";
+          } else if (start <= thisMonth){
+            days += '<span>' + start + '</span>';
+            totalDays--;
+            var newCell  = newRow.insertCell(j);
+            newCell.innerHTML = days;
+            newCell.id = currentMonth + '-' + start;
+            start++;
+            days = "";
+          } else if (totalDays>0) {
+            days += '<span>' + nextMonth + '</span>';
+            totalDays--;
+            var newCell  = newRow.insertCell(j);
+            newCell.innerHTML = days;
+            newCell.className = "next-month";
+            newCell.id = currentMonth+1 + '-' + nextMonth;
+            nextMonth++;
+            days = "";
+          }
+        }
+      }
+      for(var i=0; i<data.events.length; i++) {
+        var date = new Date(data.events[i].date);
+        var editedDate = new Date(date.valueOf() + date.getTimezoneOffset()*60000);
+        var date = [editedDate.getMonth(), editedDate.getDate(), editedDate.getFullYear()];
+        var today = new Date().getDate();
+        var id = editedDate.getMonth() + '-' + editedDate.getDate();
+        if(data.events[i].EMSid) {
+          var temp = '<a href="/event/' + data.events[i]._id + '" class="affiliated event">' + data.events[i].title + '</a>';
+        } else {
+          var temp = '<a href="/event/' + data.events[i]._id + '" class="unaffiliated event">' + data.events[i].title + '</a>';
+        }
+        document.getElementById(id).innerHTML = temp + document.getElementById(id).innerHTML;
+      }
+    }
+  });
+}
+</script>
 <div id="calendar">
 
     <div class="calendar top">
         <h4>Calendar</h4>
-        <a href="" class="uk-float-right green"><span class="uk-icon" uk-icon="icon: list"></span>View as List</a>
-        <span class="key unaffiliated uk-float-right"><div></div>Unaffiliated Event</span>
-        <span class="key affiliated uk-float-right"><div></div>Affiliated Event</span>
+        <span class="key unaffiliated uk-float-right" style="left: 30px"><div></div>Unaffiliated Event</span>
+        <span class="key affiliated uk-float-right" style="left: 30px"><div></div>Affiliated Event</span>
     </div>
-<div id="July">
+<div>
     <div class="month">
-        <h2 class="uk-float-left">July</h2>
-        <a class="uk-float-left" href=""><span uk-icon="icon: chevron-left"></span></a>
-        <a class="uk-float-left" href=""><span uk-icon="icon: chevron-right"></span></a>
+        <h2 id="month" class="uk-float-left">{{month}} {{year}}</h2>
+        <a class="uk-float-left" onclick="left()"><span uk-icon="icon: chevron-left"></span></a>
+        <a class="uk-float-left" onclick="right()"><span uk-icon="icon: chevron-right"></span></a>
         <div class="uk-clearfix"></div>
     </div>
 
     <div class="calendar-grid uk-card uk-card-default uk-card-body">
         <div class="uk-overflow-auto">
-            <table class="uk-table uk-table-small uk-table-divider">
+            <table class="uk-table uk-table-small uk-table-divider" id="table" style="table-layout: fixed">
                 <thead>
                     <tr>
                         <th>Sun</th>
@@ -30,187 +262,7 @@
                         <th>Sat</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <a href="" class="affiliated event">
-                                Affiliated Event
-                            </a>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <span>16</span>
-                        </td>
-                        <td>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <span>17</span>
-                        </td>
-                        <td>
-                            <a href="" class="affiliated event">
-                                Affiliated Event
-                            </a>
-                            <a href="" class="affiliated event">
-                                Affiliated Event
-                            </a>
-                            <span>18</span>
-                        </td>
-                        <td>
-                            <a href="" class="affiliated event">
-                                Affiliated Event
-                            </a>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <span>19</span>
-                        </td>
-                        <td>
-                            <a href="" class="affiliated event">
-                                Affiliated Event
-                            </a>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <span>20</span>
-                        </td>
-                        <td>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <span>21</span>
-                        </td>
-                        <td>
-                            <a href="" class="affiliated event">
-                                Affiliated Event
-                            </a>
-                            <a href="" class="affiliated event">
-                                Affiliated Event
-                            </a>
-                            <span>22</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <span>23</span>
-                        </td>
-                        <td>
-                            <a href="" class="affiliated event">
-                                Affiliated Event
-                            </a>
-                            <span>24</span>
-                        </td>
-                        <td>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <span>25</span>
-                        </td>
-                        <td>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <span>26</span>
-                        </td>
-                        <td>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <span>27</span>
-                        </td>
-                        <td>
-                            <a href="" class="affiliated event">
-                                Affiliated Event
-                            </a>
-                            <span>28</span>
-                        </td>
-                        <td>
-                            <a href="" class="affiliated event">
-                                Affiliated Event
-                            </a>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <span>29</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <span>30</span>
-                        </td>
-                        <td>
-                            <a href="" class="affiliated event">
-                                Affiliated Event
-                            </a>
-                            <a href="" class="affiliated event">
-                                Affiliated Event
-                            </a>
-                            <a href="" class="affiliated event">
-                                Affiliated Event
-                            </a>
-                            <span>31</span>
-                        </td>
-                        <td class="next-month">
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <span>1</span>
-                        </td>
-                        <td class="next-month">
-                            <a href="" class="affiliated event">
-                                Affiliated Event
-                            </a>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <span>2</span>
-                        </td>
-                        <td class="next-month">
-                            <a href="" class="affiliated event">
-                                Affiliated Event
-                            </a>
-                            <span>3</span>
-                        </td>
-                        <td class="next-month">
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <a href="" class="unaffiliated event">
-                                Unaffiliated Event
-                            </a>
-                            <span>4</span>
-                        </td>
-                        <td class="next-month">
-                            <span>5</span>
-                        </td>
-                    </tr>
+                <tbody id="calendarDays">
                 </tbody>
             </table>
         </div>
