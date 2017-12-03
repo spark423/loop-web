@@ -423,7 +423,7 @@ router.get('/event/:id', function(req, res) {
 //Render all events
 router.get('/events', function(req, res) {
 	if(req.user) {
-    Event.find({$and: [{date: {$gte: moment(Date.now()).local().startOf('day').format().slice(0,-6) + '.000Z'}, archive: false}]}).populate('board').exec(function(err, events) {
+    Event.find({$and: [{date: {$gte: moment(Date.now()).local().startOf('day').format().slice(0,-6)}, archive: false}]}).populate('board').exec(function(err, events) {
       if(err) throw err;
   			let sortedEvents = quickSort(events, 0, events.length-1);
   			let eventObjects = sortedEvents.map(async function(event) {

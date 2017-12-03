@@ -3,6 +3,8 @@
 var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 var currentMonth = months.indexOf('{{month}}');
 var currentYear = {{year}};
+var currentDay = new Date().getDate();
+var actualMonth = currentMonth;
 $( document ).ready(function() {
   var calendarDays = $('#calendarDays');
   if({{lastMonthStart}}==1) {
@@ -54,6 +56,7 @@ $( document ).ready(function() {
       }
     }
   }
+  document.getElementById(actualMonth + '-' + currentDay).style.backgroundColor = '#e3fff4';
   {{#each events}}
   var date = new Date('{{date}}');
   var editedDate = new Date(date.valueOf() + date.getTimezoneOffset()*60000);
@@ -147,6 +150,7 @@ function left() {
         }
         document.getElementById(id).innerHTML = temp + document.getElementById(id).innerHTML;
       }
+      document.getElementById(actualMonth + '-' + currentDay).style.backgroundColor = '#e3fff4';
     }
   });
 }
@@ -229,6 +233,7 @@ function right() {
         }
         document.getElementById(id).innerHTML = temp + document.getElementById(id).innerHTML;
       }
+      document.getElementById(actualMonth + '-' + currentDay).style.backgroundColor = '#e3fff4';
     }
   });
 }

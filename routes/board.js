@@ -175,146 +175,7 @@ router.get('/boards/:id', function(req, res) {
     Board.findById(req.params.id).populate([{path: 'contents.item', populate: [{path: 'attendees'}, {path: 'comments', populate: [{path: 'postedBy'},{path: 'comments', populate: [{path: 'postedBy'}]}]}]}]).exec(function(err, board) {
       if (err) {
         throw err;
-      } else if (board.private) {
-        let contents = board.contents.reverse().map(async function(content) {
-          if (content.postedBy === req.user._id.toString()) {
-            let item = content.item;
-            let kind = content.kind;
-            let comments = [];
-            for (let j=0; j<item.comments.length; j++) {
-              let comment = item.comments[j];
-              let commentOfComments = comment.comments.map(function(commentOfComment) {
-                return {"id": commentOfComment._id, "createdAt": commentOfComment.createdAt, "postedBy": {"id": commentOfComment.postedBy._id, "firstName": commentOfComment.postedBy.firstName, "lastName": commentOfComment.postedBy.lastName}, "text": commentOfComment.text}
-              })
-              comments.push({
-                "id": comment._id,
-                "createdAt": moment(comment.createdAt).local().format('MMMM D, YYYY, h:mm a'),
-                "postedBy": {
-                  "id": comment.postedBy._id,
-                  "firstName": comment.postedBy.firstName,
-                  "lastName": comment.postedBy.lastName
-                },
-                "text": comment.text,
-                "comments": commentOfComments
-              });
-            }
-            if (kind == 'Post') {
-              let postCreator = await User.findById(item.postedBy);
-              let postObject = {
-                "own": req.user._id.toString() === postCreator._id.toString(),
-                "following": req.user.followingPosts.indexOf(item._id) > -1,
-                "id": item._id,
-                "board": item.board,
-                "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
-                "postedBy": {
-                  "id": postCreator._id,
-                  "firstName": postCreator.firstName,
-                  "lastName": postCreator.lastName
-                },
-                "title": item.title,
-                "text": item.text,
-                "flagged": item.flagged,
-                "comments": comments
-              }
-              return Promise.resolve(postObject)
-            } else {
-              let attendees = item.attendees.map(function(attendee) {
-                return {"id": attendee._id, "firstName": attendee.firstName, "lastName": attendee.lastName}
-              })
-              if(item.endTime) {
-                var endTime = moment(item.endTime, "HH:mm").local().format('h:mm a');
-              } else {
-                var endTime = "";
-              }
-              let eventCreator = await User.findOne({username: item.contact});
-              if (eventCreator) {
-                let eventObject = {
-                  "own": req.user.username === item.postedBy,
-                  "attending": req.user.attendedEvents.indexOf(item._id) > -1,
-                  "id": item._id,
-                  "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
-                  "postedBy": {
-                    "id": eventCreator._id,
-                    "firstName": eventCreator.firstName,
-                    "lastName": eventCreator.lastName,
-                    "isLoopUser": true
-                  },
-                  "title": item.title,
-                  "date": moment(item.date).utc().format('MMMM D, YYYY'),
-                  "startTime": moment(item.startTime, "HH:mm").local().format('h:mm a'),
-                  "endTime": endTime,
-                  "location": item.location,
-                  "description": item.description,
-                  "comments": comments,
-                  "attendees": attendees
-                }
-                return Promise.resolve(eventObject);
-              } else {
-                let eventObject = {
-                  "own": req.user.username === item.postedBy,
-                  "attending": req.user.attendedEvents.indexOf(item._id) > -1,
-                  "id": item._id,
-                  "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
-                  "postedBy": {
-                    "username": event.contact,
-                    "isLoopUser": false
-                  },
-                  "title": item.title,
-                  "date": moment(item.date).utc().format('MMMM D, YYYY'),
-                  "startTime": moment(item.startTime, "HH:mm").local().format('h:mm a'),
-                  "endTime": endTime,
-                  "location": item.location,
-                  "description": item.description,
-                  "comments": comments,
-                  "attendees": attendees
-                };
-                return Promise.resolve(eventObject);
-              }
-            }
-          }
-        });
-        Promise.all(contents).then(function(contents) {
-          res.render('board-overview', {
-            board: {
-              id: board._id,
-              create: board.create,
-              unsubscribable: board.unsubscribable,
-              subscribed: req.user.subscribedBoards.indexOf(board._id) > -1,
-              name: board.name,
-              description: board.description,
-              contents: contents}, helpers: {
-              		compare: function(lvalue, rvalue, options) {
-              			if (arguments.length < 3)
-              					throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
-
-              			var operator = options.hash.operator || "==";
-
-              			var operators = {
-              					'==':       function(l,r) { return l == r; },
-              					'===':      function(l,r) { return l === r; },
-              					'!=':       function(l,r) { return l != r; },
-              					'<':        function(l,r) { return l < r; },
-              					'>':        function(l,r) { return l > r; },
-              					'<=':       function(l,r) { return l <= r; },
-              					'>=':       function(l,r) { return l >= r; },
-              					'typeof':   function(l,r) { return typeof l == r; }
-              			}
-
-              			if (!operators[operator])
-              					throw new Error("Handlerbars Helper 'compare' doesn't know the operator "+operator);
-
-              			var result = operators[operator](lvalue,rvalue);
-
-              			if( result ) {
-              					return options.fn(this);
-              			} else {
-              					return options.inverse(this);
-              			}
-              		}
-                }
-          })
-        })
-      } else {
+      }
         let contents = board.contents.reverse().map(async function(content) {
           let item = content.item;
           let kind = content.kind;
@@ -411,6 +272,9 @@ router.get('/boards/:id', function(req, res) {
           }
         });
         Promise.all(contents).then(function(contents) {
+          let notifications = board.notifications.map(function(notification) {
+            return {"id": notification._id, "createdAt": moment(notification.createdAt).local().format('MMM D, YYYY, h:mm a'), "message": notification.message, "routeID": notification.routeID.item}
+          });
           res.render('board-overview', {
             board: {
               id: board._id,
@@ -420,7 +284,7 @@ router.get('/boards/:id', function(req, res) {
               name: board.name,
               active: board.active,
               description: board.description,
-              contents: contents}, helpers: {
+              contents: contents, notifications: notifications}, helpers: {
               		compare: function(lvalue, rvalue, options) {
               			if (arguments.length < 3)
               					throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
@@ -452,7 +316,6 @@ router.get('/boards/:id', function(req, res) {
                 }
           })
         }, function(error) {console.log(error)})
-      }
     })
   }
   else {

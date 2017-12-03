@@ -7,6 +7,7 @@ $.getJSON('/notifications', function(data) {
   var attendingEventCount=0;
   var addedOrganizationCount=0;
   var inviteEventCount=0;
+  var flaggedPostCount=0;
   for(var i=0; i<data.length; i++) {
     if(data.notifications[i].type=="Comment on Created Post" && data.notifications[i].createdAt > localStorage.past) {
       createdPostCount++;
@@ -25,6 +26,9 @@ $.getJSON('/notifications', function(data) {
     }
     else if(data.notifications[i].type=="Invited to Event" && data.notifications[i].createdAt > localStorage.past) {
       inviteEventCount++;
+    }
+    else if(data.notifications[i].type=="Flagged Post" && data.notifications[i].createdAt > localStorage.past) {
+      flaggedPostCount++;
     }
   }
   if(createdPostCount!=0) {
@@ -49,6 +53,10 @@ $.getJSON('/notifications', function(data) {
   }
   if(inviteEventCount!=0) {
     var notification="<li><a href='/all-notifications'><span uk-icon='icon: calendar'></span>You have been invited to " + "<b>" + inviteEventCount + "</b> event(s)</a></li>";
+    notifications.append(notification);
+  }
+  if(flaggedPostCount!=0) {
+    var notification = "<li><a href='/all-notifications'><span uk-icon='icon: bookmark'></span><b>" + flaggedPostCount + "</b> posts have been flagged";
     notifications.append(notification);
   }
   notifications.append("<li><a class='green' href='/all-notifications'>See all notifications</a></li>");

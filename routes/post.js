@@ -7,6 +7,37 @@ var Comment = require('../models/comment');
 var Notification = require('../models/notification')
 var Time = require('../models/time')
 
+//Unflag a post
+router.post('/posts/:id/unflag', function(req, res) {
+	Post.findOneAndUpdate({_id: req.params.id}, {$set:{"flagged": false}}, function(err, post) {
+		if(err) throw err;
+		Board.findOneAndUpdate({_id: post.board}, {$pull: {notifications: {item: post._id}}}, function(err) {
+			if(err) throw err;
+			res.redirect('back');
+		})
+	})
+})
+
+//Remove flagged post
+router.post('/posts/:id/delete-flagged', function(req, res) {
+	Post.findById(req.params.id, function(err, post) {
+		if (err) {
+			throw err;
+		} else {
+			post.archive=true;
+			post.save(function(err, updatedPost) {
+				Board.findOneAndUpdate({_id: updatedPost.board}, {$pull: {contents: {item: req.params.id}, notifications: {item: updatedPost._id}}}, function(err, board) {
+					if (err) {
+						throw err;
+					} else {
+						res.redirect('back');
+					}
+				})
+			})
+		}
+	})
+})
+
 //Render create a post page
 router.get('/posts/create', function(req, res) {
 	Board.find({}, function(err, boards) {

@@ -15,7 +15,7 @@ a:hover {
 </style>
 <script>
 function deactivate_check_board(name, id) {
-  document.getElementById('deactivate-info').innerHTML = "Are you sure you want to deactivate the Board, " + name + "?";
+  document.getElementById('deactivate-info').innerHTML = "Are you sure you want to deactivate the " + name + " Board?";
   document.getElementById("deactivate-button").setAttribute("onclick", "javascript: deactivate_board('"+ id +"')");
 }
 function deactivate_check_group(name, id) {
@@ -23,7 +23,7 @@ function deactivate_check_group(name, id) {
   document.getElementById("deactivate-button").setAttribute("onclick", "javascript: deactivate_group('"+ id +"')");
 }
 function delete_check_board(name, id) {
-  document.getElementById('delete-info').innerHTML = "Are you sure you want to delete the Board, " + name + "?";
+  document.getElementById('delete-info').innerHTML = "Are you sure you want to delete the " + name + " Board?";
   document.getElementById("delete-button").setAttribute("onclick", "javascript: delete_board('"+ id +"')");
 }
 function delete_check_group(name, id) {

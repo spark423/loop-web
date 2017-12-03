@@ -1,181 +1,57 @@
 <link rel="stylesheet" href="/css/board-notifications/sxn-board-notifications.v7.min.css" />
 
 <script>
+var currentSlide = 0;
+var numSlides = 0;
 function right() {
-  document.getElementById('slide-0').style.display = "none";
-  document.getElementById('slide-1').style.display = "";
+  if(currentSlide==numSlides-1) {
+    document.getElementById('right').className += "disabled";
+  } else if(currentSlide==0){
+    document.getElementById('left').classList.remove('disabled');
+  }
+  document.getElementById('slide-' + currentSlide).style.display = "none";
+  currentSlide++;
+  document.getElementById('slide-' + currentSlide).style.display = "";
 }
 function left() {
-  document.getElementById('slide-1').style.display = "none";
-  document.getElementById('slide-0').style.display = "";
+  if(currentSlide==numSlides-1) {
+    document.getElementById('right').classList.remove('disabled');
+  } else if (currentSlide==1) {
+    document.getElementById('left').className += "disabled";
+  }
+  document.getElementById('slide-' + currentSlide).style.display = "none";
+  currentSlide--;
+  document.getElementById('slide-' + currentSlide).style.display = "";
 }
+$( document ).ready(function() {
+  var body = $("#notifications-body");
+  {{#if notifications}}
+  body.append('<div class="slide-link left" onclick="left()"><a id="left" class="uk-slidenav-large disabled" uk-slidenav-previous></a></div><div class="slide-link right" onclick="right()"><a id="right" class="uk-slidenav-large" uk-slidenav-next></a></div>');
+  {{#each notifications}}
+  var numSlides++;
+  var slideID = {{@index}}/3;
+  var message = {{message}};
+  var array = message.split('"');
+  if({{@index}}==0) {
+    body.append('<div class="app-link uk-grid-match uk-child-width-1-3@m triple-wrap" id="slide-"' + slideID + 'uk-grid><div><form method="post" id="unflag-{{@index}}" action="/posts/{{id}}/unflag" style="display:none"></form><form method="post" id="delete-flagged-{{@index}}"action="/posts/{{id}}/delete-flagged" style="display:none"></form><div class="uk-grid-match" uk-grid><div class="uk-width-1-3@m"><span uk-icon="icon: warning"></span></div><div class="uk-width-2-3@m"><p>' + array[0] + '<span class="green"><a href="#{{id}}">' + array[1] + '</a></span>' + array[2] + '</p><p class="text-light">{{createdAt}}</p><span class="green">Approve?<a class="approval yes" onclick="document.getElementById("unflag-{{@index}}").submit()">Unflag</a><a class="approval" onclick="document.getElementById("delete-flagged-{{@index}}")">Delete</a></span></div></div></div>');
+  } else if({{@index}}%3==0) {
+    body.append('</div><div style="display:none" class="app-link uk-grid-match uk-child-width-1-3@m triple-wrap" id="slide-"' + slideID + 'uk-grid><div><form method="post" id="unflag-{{@index}}" action="/posts/{{id}}/unflag" style="display:none"></form><form method="post" id="delete-flagged-{{@index}}"action="/posts/{{id}}/delete-flagged" style="display:none"></form><div class="uk-grid-match" uk-grid><div class="uk-width-1-3@m"><span uk-icon="icon: warning"></span></div><div class="uk-width-2-3@m"><p>' + array[0] + '<span class="green"><a href="#{{id}}">' + array[1] + '</a></span>' + array[2] + '</p><p class="text-light">{{createdAt}}</p><span class="green">Approve?<a class="approval yes" onclick="document.getElementById("unflag-{{@index}}").submit()">Unflag</a><a class="approval" onclick="document.getElementById("delete-flagged-{{@index}}")">Delete</a></span></div></div></div>');
+  } else {
+    var slide = $('#slide-' + slideID);
+    slide.append('<div><form method="post" id="unflag-{{@index}}" action="/posts/{{id}}/unflag" style="display:none"></form><form method="post" id="delete-flagged-{{@index}}"action="/posts/{{id}}/delete-flagged" style="display:none"></form><div class="uk-grid-match" uk-grid><div class="uk-width-1-3@m"><span uk-icon="icon: warning"></span></div><div class="uk-width-2-3@m"><p>' + array[0] + '<span class="green"><a href="#{{id}}">' + array[1] + '</a></span>' + array[2] + '</p><p class="text-light">{{createdAt}}</p><span class="green">Approve?<a class="approval yes" onclick="document.getElementById("unflag-{{@index}}").submit()">Unflag</a><a class="approval" onclick="document.getElementById("delete-flagged-{{@index}}")">Delete</a></span></div></div></div>');
+  }
+  {{/each}}
+  body.append('</div>');
+  {{/if}}
+  body.append('<div class="new-post-toggle" hidden><div class="create-wrap"><h4 class="inner">New Post</h4><div class="divider"></div><div class="create-grid" uk-grid><div class="poll-wrap uk-width-3-5@m"><div class="form-wrap"><form id="postform" method="post" action="/boards/{{board.id}}/post"><input class="uk-input uk-form-large uk-form-blank uk-form-width-large" type="text" name="title" placeholder="Add a title"></input><textarea class="uk-textarea uk-form-blank uk-form-width-large" type="text" name="text" placeholder="Add a description" style="overflow: hidden; resize: vertical"></textarea><a class="uk-button uk-button-primary" type="button" onclick="document.getElementById("postform").submit();">Create</a><a class="uk-button uk-button-cancel" type="button">Back</a></form></div></div></div></div></div><div class="new-post-toggle add-comment" uk-grid><div class="uk-width-expand@m"><form><div><a uk-toggle="target: .new-post-toggle"><input class="uk-input" type="text" placeholder="+ Create a new post"></a></div></form></div></div>');
+  if(numSlides==0) {
+    document.getElementById('right').className += "disabled";
+  }
+})
 </script>
 <div id="board-notifications">
     <div id="notifications-body" class="uk-card uk-card-default uk-card-body">
-      <div class="slide-link left" onclick="left()">
-          <a id="left" class="uk-slidenav-large disabled" uk-slidenav-previous></a>
-      </div>
-      <div class="slide-link right" onclick="right()">
-          <a id="right" class="uk-slidenav-large" uk-slidenav-next></a>
-      </div>
 
-      <div class="app-link uk-grid-match uk-child-width-1-3@m triple-wrap" id="slide-0" uk-grid>
-          <div>
-              <div class="uk-grid-match" uk-grid>
-                  <div class="uk-width-1-3@m">
-                      <span uk-icon="icon: user"></span>
-                  </div>
-                  <div class="uk-width-2-3@m">
-                      <p class="title">David Chang</p>
-                      <p class="text-light">Yesterday at 4:56pm</p>
-                      <p>The post,  <span class="green">I hate dogs!!!</span>, has been flagged.</p>
-                      <span class="green">Approve?<a class="approval yes" href="#">Yes</a><a class="approval" href="#">No</a></span>
-                  </div>
-              </div>
-          </div>
-          <div>
-              <div class="uk-grid-match" uk-grid>
-                  <div class="uk-width-1-3@m">
-                      <span uk-icon="icon: user"></span>
-                  </div>
-                  <div class="uk-width-2-3@m">
-                      <p class="title">Firstname Lastname</p>
-                      <p class="text-light">Yesterday at 4:56pm</p>
-                      <p>Lorem ipsum dolor sit amet, sed do eiusmod.</p>
-                      <span class="green">Approve?<a class="approval yes" href="#">Yes</a><a class="approval" href="#">No</a></span>
-                  </div>
-              </div>
-          </div>
-
-      </div>
-
-      <div class="app-link uk-grid-match uk-child-width-1-3@m triple-wrap" id="slide-1" style="display:none" uk-grid>
-
-          <div>
-              <div class="uk-grid-match" uk-grid>
-                  <div class="uk-width-1-3@m">
-                      <span uk-icon="icon: user"></span>
-                  </div>
-                  <div class="uk-width-2-3@m">
-                      <p class="title">Firstname Lastname</p>
-                      <p class="text-light">Yesterday at 4:56pm</p>
-                      <p>Lorem ipsum dolor sit amet, sed do eiusmod.</p>
-                      <span class="green">Approve?<a class="approval yes" href="#">Yes</a><a class="approval" href="#">No</a></span>
-                  </div>
-              </div>
-          </div>
-          <div>
-              <div class="uk-grid-match" uk-grid>
-                  <div class="uk-width-1-3@m">
-                      <span uk-icon="icon: warning"></span>
-                  </div>
-                  <div class="uk-width-2-3@m">
-                      <p class="title">Firstname Lastname</p>
-                      <p class="text-light">Yesterday at 4:56pm</p>
-                      <p>Lorem ipsum dolor sit amet, sed do eiusmod.</p>
-                      <span class="green">Approve?<a class="approval yes" href="#">Yes</a><a class="approval" href="#">No</a></span>
-                  </div>
-              </div>
-          </div>
-      </div>
-
-      <!-- Double Col -->
-
-      <div class="app-link uk-grid-match uk-child-width-1-2@m triple-wrap" uk-grid hidden>
-
-          <div>
-              <div class="uk-grid-match" uk-grid>
-                  <div class="uk-width-1-3@m">
-                      <span uk-icon="icon: user"></span>
-                  </div>
-                  <div class="uk-width-2-3@m">
-                      <p class="title">Firstname Lastname</p>
-                      <p class="text-light">Yesterday at 4:56pm</p>
-                      <p>Lorem ipsum dolor sit amet, sed do eiusmod.</p>
-                      <span class="green">Approve?<a class="approval yes" href="#">Yes</a><a class="approval" href="#">No</a></span>
-                  </div>
-              </div>
-          </div>
-          <div>
-              <div class="uk-grid-match" uk-grid>
-                  <div class="uk-width-1-3@m">
-                      <span uk-icon="icon: user"></span>
-                  </div>
-                  <div class="uk-width-2-3@m">
-                      <p class="title">Firstname Lastname</p>
-                      <p class="text-light">Yesterday at 4:56pm</p>
-                      <p>Lorem ipsum dolor sit amet, sed do eiusmod.</p>
-                      <span class="green">Approve?<a class="approval yes" href="#">Yes</a><a class="approval" href="#">No</a></span>
-                  </div>
-              </div>
-          </div>
-
-      </div>
-
-
-      <!-- Double Col -->
-
-      <div class="app-link uk-grid-match uk-child-width-1-2@m triple-wrap" uk-grid hidden>
-
-          <div>
-              <div class="uk-grid-match" uk-grid>
-                  <div class="uk-width-1-3@m">
-                      <span uk-icon="icon: user"></span>
-                  </div>
-                  <div class="uk-width-2-3@m">
-                      <p class="title">Firstname Lastname</p>
-                      <p class="text-light">Yesterday at 4:56pm</p>
-                      <p>Lorem ipsum dolor sit amet, sed do eiusmod.</p>
-                      <span class="green">Approve?<a class="approval yes" href="#">Yes</a><a class="approval" href="#">No</a></span>
-                  </div>
-              </div>
-          </div>
-          <div>
-              <div class="uk-grid-match" uk-grid>
-                  <div class="uk-width-1-3@m">
-                      <span uk-icon="icon: user"></span>
-                  </div>
-                  <div class="uk-width-2-3@m">
-                      <p class="title">Firstname Lastname</p>
-                      <p class="text-light">Yesterday at 4:56pm</p>
-                      <p>Lorem ipsum dolor sit amet, sed do eiusmod.</p>
-                      <span class="green">Approve?<a class="approval yes" href="#">Yes</a><a class="approval" href="#">No</a></span>
-                  </div>
-              </div>
-          </div>
-
-      </div>
-
-        <div class="new-post-toggle" hidden>
-            <div class="create-wrap">
-                <h4 class="inner">New Post</h4>
-                <div class="divider"></div>
-                <div class="create-grid" uk-grid>
-                    <div class="poll-wrap uk-width-3-5@m">
-                        <div class="form-wrap">
-                            <form id="postform" method="post" action="/boards/{{board.id}}/post">
-                                <input class="uk-input uk-form-large uk-form-blank uk-form-width-large" type="text" name="title" placeholder="Add a title"></input>
-                                <textarea class="uk-textarea uk-form-blank uk-form-width-large" type="text" name="text" placeholder="Add a description" style="overflow: hidden; resize: vertical"></textarea>
-                                <a class="uk-button uk-button-primary" type="button" onclick="document.getElementById('postform').submit();">Create</a>
-                                <a class="uk-button uk-button-cancel" type="button">Back</a>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="new-post-toggle add-comment" uk-grid>
-            <div class="uk-width-expand@m">
-                <form>
-                    <div>
-                        <a uk-toggle="target: .new-post-toggle">
-                            <input class="uk-input" type="text" placeholder="+ Create a new post">
-                        </a>
-                    </div>
-                </form>
-            </div>
-        </div>
 
     </div>
 </div>
