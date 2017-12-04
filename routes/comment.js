@@ -12,7 +12,6 @@ router.post('/comments/:id/edit', function(req, res) {
 		if(err) throw err;
 		comment.text=req.body.text;
 		comment.save(function(err, updatedComment) {
-			console.log(updatedComment);
 			if(err) throw err;
 			res.status(200);
 		})

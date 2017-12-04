@@ -69,7 +69,6 @@ router.post('/events/change', function(req, res) {
   Event.find({$and: [{date: {$lte: afterDay}}, {date: {$gte: beforeDay}}]}, function(err, events) {
     if(err) throw err;
     let sortedEvents = quickSort(events, 0, events.length-1);
-    console.log(sortedEvents);
     startofMonth = moment({year: req.body.currentYear, month: req.body.currentMonth});
     var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     var info = {events: sortedEvents, month: months[req.body.currentMonth], year: req.body.currentYear, thisMonth: moment({year: req.body.currentYear, month: req.body.currentMonth}).daysInMonth(), lastMonth: moment({year: req.body.currentYear, month: req.body.currentMonth}).add('month', -1).daysInMonth(), lastMonthStart: startofMonth.add('days', 0-startofMonth.day()).date()};

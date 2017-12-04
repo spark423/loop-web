@@ -17,7 +17,6 @@ Bottom 3:
 6. Total number of Board Subscriptions*/
 router.get('/home', function(req, res) {
 	if(req.user) {
-		console.log(moment(Date.now()));
 		var post_counter = 0;
 		var event_counter = 0;
 		var follow_counter = 0;
