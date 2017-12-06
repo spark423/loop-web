@@ -7,11 +7,67 @@ var Comment = require('../models/comment');
 var Notification = require('../models/notification')
 var Time = require('../models/time')
 
+router.post('/posts/:id/flag', function(req, res) {
+  	Post.findOneAndUpdate({_id: req.params.id}, {$set: {flagged: true}},function(err,post) {
+			console.log(post._id);
+  		let notificationToPoster = new Notification({
+  			type: 'Flagged Post',
+  			message: "Your post \"" + post.title + "\" has been flagged. Please wait for the admin's review.",
+  			routeID: {
+  				kind: 'Post',
+  				item: post._id
+  			}
+      })
+      notificationToPoster.save(function(err, notificationToPoster) {
+      	if (err) {
+      		throw err;
+      	} else {
+      		User.findOneAndUpdate({_id: req.user._id}, {$push: {notifications: notificationToPoster}}, function(err,user) {
+      			if (err) {
+      				throw err;
+      			} else {
+      				let notificationToAdmin = new Notification({
+      					type: "Flagged Post",
+      					message: "The post titled \"" + post.title + "\" has been flagged.",
+      					routeID: {
+      						kind: 'Post',
+      						item: post._id
+      					}
+      				})
+      				notificationToAdmin.save(function(err, notificationToAdmin) {
+      					if (err) {
+      						throw err;
+      					} else {
+      						User.updateMany({admin: true}, {$push: {notifications: notificationToAdmin}}, function(err, admin) {
+      							if (err) {
+      								throw err;
+      							} else {
+                      console.log("got here")
+                      Board.findOneAndUpdate({_id: post.board}, {$push: {notifications: notificationToAdmin}}, function(err, originBoard) {
+                        if (err) {
+                          throw err;
+                        } else {
+                          res.json({success: true});
+                        }
+                      })
+      							}
+      						})
+      					}
+      				})
+      			}
+      		})
+      	}
+      })
+  	})
+  })
+
+
+
 //Unflag a post
-router.post('/posts/:id/unflag', function(req, res) {
+router.post('/posts/:id/unflag/:notification', function(req, res) {
 	Post.findOneAndUpdate({_id: req.params.id}, {$set:{"flagged": false}}, function(err, post) {
 		if(err) throw err;
-		Board.findOneAndUpdate({_id: post.board}, {$pull: {notifications: {item: post._id}}}, function(err) {
+		Board.findOneAndUpdate({_id: post.board}, {$pull: {notifications: req.params.notification}}, function(err) {
 			if(err) throw err;
 			res.redirect('back');
 		})
@@ -19,14 +75,14 @@ router.post('/posts/:id/unflag', function(req, res) {
 })
 
 //Remove flagged post
-router.post('/posts/:id/delete-flagged', function(req, res) {
+router.post('/posts/:id/delete-flagged/:notification', function(req, res) {
 	Post.findById(req.params.id, function(err, post) {
 		if (err) {
 			throw err;
 		} else {
 			post.archive=true;
 			post.save(function(err, updatedPost) {
-				Board.findOneAndUpdate({_id: updatedPost.board}, {$pull: {contents: {item: req.params.id}, notifications: {item: updatedPost._id}}}, function(err, board) {
+				Board.findOneAndUpdate({_id: updatedPost.board}, {$pull: {contents: {item: req.params.id}, notifications: req.params.notification}}, function(err, board) {
 					if (err) {
 						throw err;
 					} else {

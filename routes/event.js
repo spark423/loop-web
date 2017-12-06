@@ -48,13 +48,13 @@ function quickSort(items, left, right) {
 }
 router.get('/events/calendar', function(req, res) {
   if(req.user) {
-    var afterDay = moment(Date.now()).endOf('month').add('days', 6-moment(Date.now()).endOf('month').day()).format().slice(0,-6) + '.000Z';
-    var beforeDay = moment(Date.now()).startOf('month').add('days', 0-moment(Date.now()).startOf('month').day()).format().slice(0,-6) + '.000Z';
+    var afterDay = moment(Date.now()).endOf('month').add(6-moment(Date.now()).endOf('month').day(), 'days').format().slice(0,-6) + '.000Z';
+    var beforeDay = moment(Date.now()).startOf('month').add(0-moment(Date.now()).startOf('month').day(),'days').format().slice(0,-6) + '.000Z';
     Event.find({$and: [{date: {$lte: afterDay}}, {date: {$gte: beforeDay}}]}, function(err, events) {
       if(err) throw err;
       let sortedEvents = quickSort(events, 0, events.length-1);
       var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-      res.render('events-calendar-view', {events: sortedEvents, month: months[moment().month()], year: moment().local().year(), thisMonth: moment().local().daysInMonth(), lastMonth: moment().local().add('month', -1).daysInMonth(), lastMonthStart: moment().local().startOf('month').add('days', 0-moment().startOf('month').day()).date()});
+      res.render('events-calendar-view', {events: sortedEvents, month: months[moment().month()], year: moment().local().year(), thisMonth: moment().local().daysInMonth(), lastMonth: moment().local().add(-1, 'month').daysInMonth(), lastMonthStart: moment().local().startOf('month').add(0-moment().startOf('month').day(), 'days').date()});
     })
   } else {
     res.redirect('/');
@@ -64,14 +64,14 @@ router.get('/events/calendar', function(req, res) {
 router.post('/events/change', function(req, res) {
   var endofMonth = moment({year: req.body.currentYear, month: req.body.currentMonth}).endOf('month');
   var startofMonth = moment({year: req.body.currentYear, month: req.body.currentMonth});
-  var afterDay = endofMonth.add('days', 6-endofMonth.day()).format().slice(0,-6) + '.000Z';
-  var beforeDay = startofMonth.add('days', 0-startofMonth.day()).format().slice(0,-6) + '.000Z';
+  var afterDay = endofMonth.add(6-endofMonth.day(), 'days').format().slice(0,-6) + '.000Z';
+  var beforeDay = startofMonth.add(0-startofMonth.day(), 'days').format().slice(0,-6) + '.000Z';
   Event.find({$and: [{date: {$lte: afterDay}}, {date: {$gte: beforeDay}}]}, function(err, events) {
     if(err) throw err;
     let sortedEvents = quickSort(events, 0, events.length-1);
     startofMonth = moment({year: req.body.currentYear, month: req.body.currentMonth});
     var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    var info = {events: sortedEvents, month: months[req.body.currentMonth], year: req.body.currentYear, thisMonth: moment({year: req.body.currentYear, month: req.body.currentMonth}).daysInMonth(), lastMonth: moment({year: req.body.currentYear, month: req.body.currentMonth}).add('month', -1).daysInMonth(), lastMonthStart: startofMonth.add('days', 0-startofMonth.day()).date()};
+    var info = {events: sortedEvents, month: months[req.body.currentMonth], year: req.body.currentYear, thisMonth: moment({year: req.body.currentYear, month: req.body.currentMonth}).daysInMonth(), lastMonth: moment({year: req.body.currentYear, month: req.body.currentMonth}).add(-1, 'month').daysInMonth(), lastMonthStart: startofMonth.add(0-startofMonth.day(), 'days').date()};
     res.send(info);
   })
 })

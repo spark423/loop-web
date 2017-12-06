@@ -25,33 +25,37 @@ function left() {
 }
 $( document ).ready(function() {
   var body = $("#notifications-body");
-  {{#if notifications}}
+  {{#if board.notifications}}
   body.append('<div class="slide-link left" onclick="left()"><a id="left" class="uk-slidenav-large disabled" uk-slidenav-previous></a></div><div class="slide-link right" onclick="right()"><a id="right" class="uk-slidenav-large" uk-slidenav-next></a></div>');
-  {{#each notifications}}
-  var numSlides++;
-  var slideID = {{@index}}/3;
-  var message = {{message}};
-  var array = message.split('"');
+  {{#each board.notifications}}
+  console.log('{{id}}');
+  var slideID = Math.floor({{@index}}/3);
+  var message = '{{message}}';
+  var array = message.split('&quot;');
   if({{@index}}==0) {
-    body.append('<div class="app-link uk-grid-match uk-child-width-1-3@m triple-wrap" id="slide-"' + slideID + 'uk-grid><div><form method="post" id="unflag-{{@index}}" action="/posts/{{id}}/unflag" style="display:none"></form><form method="post" id="delete-flagged-{{@index}}"action="/posts/{{id}}/delete-flagged" style="display:none"></form><div class="uk-grid-match" uk-grid><div class="uk-width-1-3@m"><span uk-icon="icon: warning"></span></div><div class="uk-width-2-3@m"><p>' + array[0] + '<span class="green"><a href="#{{id}}">' + array[1] + '</a></span>' + array[2] + '</p><p class="text-light">{{createdAt}}</p><span class="green">Approve?<a class="approval yes" onclick="document.getElementById("unflag-{{@index}}").submit()">Unflag</a><a class="approval" onclick="document.getElementById("delete-flagged-{{@index}}")">Delete</a></span></div></div></div>');
+    numSlides++;
+    console.log("here");
+    body.append('<div class="app-link uk-grid-match uk-child-width-1-3@m triple-wrap" id="slide-' + slideID + '" uk-grid><div><form method="post" id="unflag-{{@index}}" action="/posts/{{routeID}}/unflag/{{id}}" style="display:none"></form><form method="post" id="delete-flagged-{{@index}}" action="/posts/{{routeID}}/delete-flagged/{{id}}" style="display:none"></form><div class="uk-grid-match" uk-grid><div class="uk-width-1-3@m"><span uk-icon="icon: warning"></span></div><div class="uk-width-2-3@m"><p>' + array[0] + '<span class="green"><a href="#{{routeID}}">' + array[1] + '</a></span>' + array[2] + '</p><p class="text-light">{{createdAt}}</p><span class="green">Approve?<a class="approval yes" onclick="document.getElementById(' + "'unflag-{{@index}}'" + ').submit()">Unflag</a><a class="approval" onclick="document.getElementById(' + "'delete-flagged-{{@index}}'" + ').submit()">Delete</a></span></div></div></div>');
   } else if({{@index}}%3==0) {
-    body.append('</div><div style="display:none" class="app-link uk-grid-match uk-child-width-1-3@m triple-wrap" id="slide-"' + slideID + 'uk-grid><div><form method="post" id="unflag-{{@index}}" action="/posts/{{id}}/unflag" style="display:none"></form><form method="post" id="delete-flagged-{{@index}}"action="/posts/{{id}}/delete-flagged" style="display:none"></form><div class="uk-grid-match" uk-grid><div class="uk-width-1-3@m"><span uk-icon="icon: warning"></span></div><div class="uk-width-2-3@m"><p>' + array[0] + '<span class="green"><a href="#{{id}}">' + array[1] + '</a></span>' + array[2] + '</p><p class="text-light">{{createdAt}}</p><span class="green">Approve?<a class="approval yes" onclick="document.getElementById("unflag-{{@index}}").submit()">Unflag</a><a class="approval" onclick="document.getElementById("delete-flagged-{{@index}}")">Delete</a></span></div></div></div>');
+    console.log("here2");
+    body.append('</div><div style="display:none" class="app-link uk-grid-match uk-child-width-1-3@m triple-wrap" id="slide-' + slideID + '" uk-grid><div><form method="post" id="unflag-{{@index}}" action="/posts/{{routeID}}/unflag/{{id}}" style="display:none"></form><form method="post" id="delete-flagged-{{@index}}" action="/posts/{{routeID}}/delete-flagged/{{id}}" style="display:none"></form><div class="uk-grid-match" uk-grid><div class="uk-width-1-3@m"><span uk-icon="icon: warning"></span></div><div class="uk-width-2-3@m"><p>' + array[0] + '<span class="green"><a href="#{{routeID}}">' + array[1] + '</a></span>' + array[2] + '</p><p class="text-light">{{createdAt}}</p><span class="green">Approve?<a class="approval yes" onclick="document.getElementById(' + "'unflag-{{@index}}'" + ').submit()">Unflag</a><a class="approval" onclick="document.getElementById(' + "'delete-flagged-{{@index}}'" + ').submit()">Delete</a></span></div></div></div>');
   } else {
+    console.log("here3");
     var slide = $('#slide-' + slideID);
-    slide.append('<div><form method="post" id="unflag-{{@index}}" action="/posts/{{id}}/unflag" style="display:none"></form><form method="post" id="delete-flagged-{{@index}}"action="/posts/{{id}}/delete-flagged" style="display:none"></form><div class="uk-grid-match" uk-grid><div class="uk-width-1-3@m"><span uk-icon="icon: warning"></span></div><div class="uk-width-2-3@m"><p>' + array[0] + '<span class="green"><a href="#{{id}}">' + array[1] + '</a></span>' + array[2] + '</p><p class="text-light">{{createdAt}}</p><span class="green">Approve?<a class="approval yes" onclick="document.getElementById("unflag-{{@index}}").submit()">Unflag</a><a class="approval" onclick="document.getElementById("delete-flagged-{{@index}}")">Delete</a></span></div></div></div>');
+    slide.append('<div><form method="post" id="unflag-{{@index}}" action="/posts/{{routeID}}/unflag/{{id}}" style="display:none"></form><form method="post" id="delete-flagged-{{@index}}" action="/posts/{{routeID}}/delete-flagged/{{id}}" style="display:none"></form><div class="uk-grid-match" uk-grid><div class="uk-width-1-3@m"><span uk-icon="icon: warning"></span></div><div class="uk-width-2-3@m"><p>' + array[0] + '<span class="green"><a href="#{{routeID}}">' + array[1] + '</a></span>' + array[2] + '</p><p class="text-light">{{createdAt}}</p><span class="green">Approve?<a class="approval yes" onclick="document.getElementById(' + "'unflag-{{@index}}'" + ').submit()">Unflag</a><a class="approval" onclick="document.getElementById(' + "'delete-flagged-{{@index}}'" + ').submit()">Delete</a></span></div></div></div>');
   }
   {{/each}}
+  if(numSlides==1) {
+    document.getElementById('right').className += " disabled";
+  }
   body.append('</div>');
   {{/if}}
-  body.append('<div class="new-post-toggle" hidden><div class="create-wrap"><h4 class="inner">New Post</h4><div class="divider"></div><div class="create-grid" uk-grid><div class="poll-wrap uk-width-3-5@m"><div class="form-wrap"><form id="postform" method="post" action="/boards/{{board.id}}/post"><input class="uk-input uk-form-large uk-form-blank uk-form-width-large" type="text" name="title" placeholder="Add a title"></input><textarea class="uk-textarea uk-form-blank uk-form-width-large" type="text" name="text" placeholder="Add a description" style="overflow: hidden; resize: vertical"></textarea><a class="uk-button uk-button-primary" type="button" onclick="document.getElementById("postform").submit();">Create</a><a class="uk-button uk-button-cancel" type="button">Back</a></form></div></div></div></div></div><div class="new-post-toggle add-comment" uk-grid><div class="uk-width-expand@m"><form><div><a uk-toggle="target: .new-post-toggle"><input class="uk-input" type="text" placeholder="+ Create a new post"></a></div></form></div></div>');
-  if(numSlides==0) {
-    document.getElementById('right').className += "disabled";
-  }
+  body.append('<div class="new-post-toggle" hidden><div class="create-wrap"><h4 class="inner">New Post</h4><div class="divider"></div><div class="create-grid" uk-grid><div class="poll-wrap uk-width-3-5@m"><div class="form-wrap"><form id="postform" method="post" action="/boards/{{board.id}}/post"><input class="uk-input uk-form-large uk-form-blank uk-form-width-large" type="text" name="title" placeholder="Add a title"></input><textarea class="uk-textarea uk-form-blank uk-form-width-large" type="text" name="text" placeholder="Add a description" style="overflow: hidden; resize: vertical"></textarea><a class="uk-button uk-button-primary" type="button" onclick="document.getElementById("postform").submit();">Create</a><a class="uk-button uk-button-cancel" type="button">Back</a></form></div></div></div></div></div>');
+  body.append('<div class="new-post-toggle add-comment" uk-grid><div class="uk-width-expand@m"><form><div><a uk-toggle="target: .new-post-toggle"><input class="uk-input" type="text" placeholder="+ Create a new post"></a></div></form></div></div>');
 })
 </script>
 <div id="board-notifications">
     <div id="notifications-body" class="uk-card uk-card-default uk-card-body">
-
 
     </div>
 </div>

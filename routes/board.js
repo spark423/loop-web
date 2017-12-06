@@ -172,7 +172,7 @@ router.post('/boards/:id/delete', function(req, res) {
 //Retrieving a board page
 router.get('/boards/:id', function(req, res) {
   if(req.user) {
-    Board.findById(req.params.id).populate([{path: 'contents.item', populate: [{path: 'attendees'}, {path: 'comments', populate: [{path: 'postedBy'},{path: 'comments', populate: [{path: 'postedBy'}]}]}]}]).exec(function(err, board) {
+    Board.findById(req.params.id).populate([{path: 'contents.item', populate: [{path: 'attendees'}, {path: 'comments', populate: [{path: 'postedBy'},{path: 'comments', populate: [{path: 'postedBy'}]}]}]}]).populate('notifications').exec(function(err, board) {
       if (err) {
         throw err;
       }
@@ -275,6 +275,7 @@ router.get('/boards/:id', function(req, res) {
           let notifications = board.notifications.map(function(notification) {
             return {"id": notification._id, "createdAt": moment(notification.createdAt).local().format('MMM D, YYYY, h:mm a'), "message": notification.message, "routeID": notification.routeID.item}
           });
+          console.log(notifications);
           res.render('board-overview', {
             board: {
               id: board._id,
@@ -284,7 +285,8 @@ router.get('/boards/:id', function(req, res) {
               name: board.name,
               active: board.active,
               description: board.description,
-              contents: contents, notifications: notifications}, helpers: {
+              contents: contents,
+              notifications: notifications}, helpers: {
               		compare: function(lvalue, rvalue, options) {
               			if (arguments.length < 3)
               					throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
