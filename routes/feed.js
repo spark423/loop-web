@@ -149,7 +149,7 @@ function quickSort(items, left, right) {
                       "id": item._id,
                       "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
                       "postedBy": {
-                        "username": event.contact,
+                        "username": item.contact,
                         "isLoopUser": false
                       },
                       "title": item.title,

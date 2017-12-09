@@ -85,7 +85,10 @@ passport.use('local-signup', new LocalStrategy({
             newUser.password = newUser.hashPassword(req.body.password),
             newUser.firstName = req.body.firstName,
             newUser.lastName = req.body.lastName,
-            newUser.admin = true
+            newUser.admin = true,
+            newUser.classYear = "",
+            newUser.major= "",
+            newUser.blocked = false
             newUser.save(function(err) {
               if (err)
                 throw err;
