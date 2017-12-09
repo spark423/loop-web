@@ -28,6 +28,9 @@ function unattend() {
   document.getElementById("attend").innerHTML = "<a onclick='attend1()' class='uk-float-right uk-link'>Attend</a>";
   document.getElementById("number_attendees").innerHTML = {{event.attendees.length}} - 1;
 }
+$( document ).ready(function() {
+  console.log('{{event.postedBy.firstName}}')
+})
 </script>
 <div id="event-detail-header">
 
@@ -39,7 +42,7 @@ function unattend() {
 
     <div class="event-detail-header" class="uk-child-width-1-2@m" uk-grid>
         <div>
-            <p class="created-by">Created by {{#if isLoopUser}}<a href="/users/{{event.postedBy.id}}" style="color: gray">{{event.postedBy.firstName}} {{event.postedBy.lastName}}</a>{{else}}{{event.postedBy.username}}{{/if}}<span>at {{event.createdAt}} in <a href="/boards/{{event.board}}">{{board}}</a></span></p>
+            <p class="created-by">Created by {{#if event.postedBy.isLoopUser}}<a href="/users/{{event.postedBy.id}}" style="color: gray">{{event.postedBy.firstName}} {{event.postedBy.lastName}}</a>{{else}}{{event.postedBy.username}}{{/if}}<span>at {{event.createdAt}} in <a href="/boards/{{event.board}}">{{board}}</a></span></p>
             <span>{{event.date}}, {{event.startTime}} {{#compare event.endTime "" operator="!="}}to {{event.endTime}}{{/compare}}</span>
         </div>
         <div>

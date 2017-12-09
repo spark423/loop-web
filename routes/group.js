@@ -60,7 +60,7 @@ router.post('/groups/create', function(req, res) {
           message: "You have been added to a new Organization, " + newGroup.name + ".",
           routeID: {
             kind: 'Group',
-            item: newGroup._id
+            id: newGroup._id
           }
         });
         members[i].save(function(err, updatedUser) {
@@ -132,7 +132,7 @@ router.post('/groups/:id/deactivate', function(req, res) {
         message: "The Organization, " + updatedGroup.name + ", that you are a part of has been deactivated.",
         routeID: {
           kind: 'Group',
-          item: updatedGroup._id
+          id: updatedGroup._id
         }
       })
       notificationToMembers.save(function(err, notificationToMembers) {
@@ -157,7 +157,7 @@ router.post('/groups/:id/reactivate', function(req, res) {
         message: "The Organization, " + updatedGroup.name + ", that you are a part of has been reactivated.",
         routeID: {
           kind: 'Group',
-          item: updatedGroup._id
+          id: updatedGroup._id
         }
       })
       notificationToMembers.save(function(err, notificationToMembers) {
@@ -182,7 +182,7 @@ router.post('/groups/:id/delete', function(req, res) {
         message: "The Organization, " + updatedGroup.name + ", that you are a part of has been deleted.",
         routeID: {
           kind: 'Group',
-          item: updatedGroup._id
+          id: updatedGroup._id
         }
       })
       notificationToMembers.save(function(err, notificationToMembers) {
@@ -268,10 +268,15 @@ router.get('/groups/:id/edit', function(req, res) {
       User.find({}, function(err, users) {
         if(err) throw err;
         var user_info = [];
+        var group_members=[];
         for(var i=0; i<users.length; i++) {
-          user_info.push({"firstName": users[i].firstName, "lastName": users[i].lastName, "username": users[i].username});
+          if(group.members.indexOf(users[i]._id)>-1) {
+            group_members.push({"firstName": users[i].firstName, "lastName": users[i].lastName, "username": users[i].username});
+          } else {
+            user_info.push({"firstName": users[i].firstName, "lastName": users[i].lastName, "username": users[i].username, "major": users[i].major, "classYear": users[i].classYear});
+          }
         }
-        res.render('edit-org', {id: req.params.id, name: group.name, description: group.description, admin: group.admin, active: group.active, users: user_info, helpers: {
+        res.render('edit-org', {id: req.params.id, name: group.name, description: group.description, admin: group.admin, active: group.active, users: user_info, members: group_members, helpers: {
             compare: function(lvalue, rvalue, options) {
               if (arguments.length < 3)
                   throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
@@ -310,17 +315,94 @@ router.get('/groups/:id/edit', function(req, res) {
 
 //Edit group page
 router.post('/groups/:id/edit', function(req, res) {
+  console.log(req.body);
 	Group.findById(req.params.id, function(error, group) {
 		if (error)
 			throw error;
 		group.description = req.body.description;
     group.name = req.body.name;
-    group.admin = req.body.admin;
-		group.save(function(error, updatedGroup) {
-			if (error)
-				throw error;
-			res.redirect('/groups/' + updatedGroup._id)
-		})
+    var addMembers = req.body.addMembers.split(',');
+    var removeMembers = req.body.removeMembers.split(',');
+    for(var i=0; i<removeMembers.length; i++) {
+      for(var j=0; j<addMembers.length; j++) {
+        if(removeMembers[i]==addMembers[j]) {
+          addMembers.splice(j, 1);
+        }
+      }
+    }
+    console.log(addMembers);
+    if(group.admin==req.body.admin) {
+      User.find({'username': addMembers}, function(err, members) {
+        console.log(members);
+        for(var i=0; i<members.length; i++) {
+          group.members.push(members[i]._id);
+        }
+        group.save(function(err, updatedGroup) {
+          if(err) throw err;
+          for(var i=0; i<members.length; i++) {
+            members[i].joinedGroups.push(updatedGroup._id);
+            var newNotification = new Notification({
+              type: 'Added to Organization',
+              message: "You have been added to a new Organization, " + updatedGroup.name + ".",
+              routeID: {
+                kind: 'Group',
+                id: updatedGroup._id
+              }
+            });
+            members[i].save(function(err, updatedUser) {
+              if(err) throw err;
+              newNotification.save(function(err, notification) {
+                if(err) throw err;
+                updatedUser.notifications.push(notification._id);
+                updatedUser.save(function(err, completeUser) {
+                  if(err) throw err;
+                })
+              })
+            });
+          }
+          res.redirect('/groups/' + updatedGroup._id);
+        })
+      })
+    } else {
+      var oldAdmin = group.admin;
+      group.admin = req.body.admin;
+      User.findOneAndUpdate({'username': oldAdmin}, {$pull: {adminGroups: group._id}}, function(err) {
+        if(err) throw err;
+        User.findOneAndUpdate({'username': group.admin}, {$push: {adminGroups: group._id}}, function(err) {
+          if(err) throw err;
+          User.find({'username': addMembers}, function(err, members) {
+            for(var i=0; i<members.length; i++) {
+              group.members.push(members[i]._id);
+            }
+            group.save(function(err, updatedGroup) {
+              if(err) throw err;
+              for(var i=0; i<members.length; i++) {
+                members[i].joinedGroups.push(updatedGroup._id);
+                var newNotification = new Notification({
+                  type: 'Added to Organization',
+                  message: "You have been added to a new Organization, " + updatedGroup.name + ".",
+                  routeID: {
+                    kind: 'Group',
+                    id: updatedUserGroup._id
+                  }
+                });
+                members[i].save(function(err, updatedUser) {
+                  if(err) throw err;
+                  newNotification.save(function(err, notification) {
+                    if(err) throw err;
+                    updatedUser.notifications.push(notification._id);
+                    updatedUser.save(function(err, completeUser) {
+                      if(err) throw err;
+                    })
+                  })
+                });
+              }
+              res.redirect('/groups/' + updatedGroup._id);
+            })
+          })
+        })
+      })
+    }
 	})
 })
 

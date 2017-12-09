@@ -34,7 +34,7 @@ $( document ).ready(function() {
     addedHeader = true;
   }
   if(previousDate==date) {
-    notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.item}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.item}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.item}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>';
+    notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>';
     if({{../notifications.length}}=={{@index}}+1) {
       notifications+= '</div>';
       if(date == currentDate) {
@@ -63,7 +63,7 @@ $( document ).ready(function() {
         notifications += header;
         addedHeader = true;
       }
-      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.item}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.item}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.item}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
+      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
       if({{../notifications.length}}=={{@index}}+1) {
         notifications+= '</div>';
         if(date == currentDate) {
@@ -92,7 +92,7 @@ $( document ).ready(function() {
         notifications += header;
         addedHeader = true;
       }
-      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.item}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.item}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.item}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
+      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
       if({{../notifications.length}}=={{@index}}+1) {
         notifications+= '</div><br>';
         if(date == currentDate) {
@@ -116,7 +116,7 @@ $( document ).ready(function() {
         notifications += header;
         addedHeader = true;
       }
-      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.item}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.item}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.item}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
+      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
       if({{../notifications.length}}=={{@index}}+1) {
         notifications+= '</div><br>';
         if(date == currentDate) {
@@ -140,7 +140,7 @@ $( document ).ready(function() {
         notifications += header;
         addedHeader = true;
       }
-      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.item}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.item}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.item}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
+      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
       if({{../notifications.length}}=={{@index}}+1) {
         notifications+= '</div><br>';
         if(date == currentDate) {

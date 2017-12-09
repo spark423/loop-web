@@ -31,7 +31,7 @@ router.get('/users/:id', function(req, res) {
 					adminGroups: user.adminGroups,
 					joinedGroups: user.joinedGroups,
 					subscribedBoards: user.subscribedBoards
-				}, helpers: {
+				}, self: req.user._id==user.id, helpers: {
 						compare: function(lvalue, rvalue, options) {
 							if (arguments.length < 3)
 									throw new Error("Handlerbars Helper 'compare' needs 2 parameters");

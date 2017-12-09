@@ -15,7 +15,7 @@ router.post('/posts/:id/flag', function(req, res) {
   			message: "Your post \"" + post.title + "\" has been flagged. Please wait for the admin's review.",
   			routeID: {
   				kind: 'Post',
-  				item: post._id
+  				id: post._id
   			}
       })
       notificationToPoster.save(function(err, notificationToPoster) {
@@ -31,7 +31,7 @@ router.post('/posts/:id/flag', function(req, res) {
       					message: "The post titled \"" + post.title + "\" has been flagged.",
       					routeID: {
       						kind: 'Post',
-      						item: post._id
+      						id: post._id
       					}
       				})
       				notificationToAdmin.save(function(err, notificationToAdmin) {
@@ -259,7 +259,7 @@ router.post('/posts/:id/comment', function(req, res) {
 							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the post \"" + post.title + "\" that you are following.",
 							routeID: {
 								kind: 'Post',
-								item: post._id
+								id: post._id
 							}
 						})
 						notificationToFollowers.save(function(err, notificationToFollowers) {
@@ -293,7 +293,7 @@ router.post('/posts/:id/comment', function(req, res) {
 							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on your post titled \"" + post.title + "\".",
 							routeID: {
 								kind: 'Post',
-								item: post._id
+								id: post._id
 							}
 						})
 						notificationToPoster.save(function(err, notificationToPoster) {
@@ -306,7 +306,7 @@ router.post('/posts/:id/comment', function(req, res) {
 										message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the post \"" + post.title + "\" that you are following.",
 										routeID: {
 											kind: 'Post',
-											item: post._id
+											id: post._id
 										}
 									})
 									notificationToFollowers.save(function(err, notificationToFollowers) {

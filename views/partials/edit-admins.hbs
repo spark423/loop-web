@@ -18,7 +18,7 @@ function search() {
 function makeAdmin(index) {
   var name_tag = "name-" + index;
   var username_tag = "username-" + index;
-  for(var i=0; i<{{users.length}}; i++) {
+  for(var i=0; i<{{members.length}}; i++) {
     if(document.getElementById("name-" + i).innerHTML.indexOf('✔')!=-1) {
       document.getElementById("name-" + i).innerHTML = document.getElementById("name-" + i).innerHTML.substring(0, document.getElementById("name-" + i).innerHTML.length-2);
     }
@@ -31,7 +31,7 @@ function makeAdmin(index) {
 </script>
 <div id="designate-admins">
 
-    <h2>Designate Admin</h2>
+    <h3>Designate Admin</h3>
 
     <div class="uk-card uk-card-default uk-card-body">
       <input id="admin" type="text" name="admin" style="display: none" value="{{admin}}">
@@ -40,9 +40,9 @@ function makeAdmin(index) {
             <input id="input" class="uk-input" type="text" placeholder="Search to add another admin" onkeyup="search()">
         </div>
 
-        <div class="admins" id="admins" uk-grid>
+        <div class="admins" id="admins" uk-grid style="max-height: 400px; overflow-y: scroll">
             <div class="col uk-width-1-2@m">
-              {{#each users}}
+              {{#each members}}
                 <div class="member" uk-grid>
                     <div class="uk-width-auto@m">
                         <div class="img-wrap"></div>
@@ -54,6 +54,7 @@ function makeAdmin(index) {
                     </div>
                 </div>
               {{/each}}
+              <br>
             </div>
 
 

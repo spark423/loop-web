@@ -71,7 +71,7 @@ router.post('/boards/:id/deactivate', function(req, res) {
         message: "The Board, " + updatedBoard.name + ", that you are subscribed to has been deactivated.",
         routeID: {
           kind: 'Board',
-          item: updatedBoard._id
+          id: updatedBoard._id
         }
       })
       notificationToSubscribers.save(function(err, notificationToSubscribers) {
@@ -96,7 +96,7 @@ router.post('/boards/:id/reactivate', function(req, res) {
         message: "The Board, " + updatedBoard.name + ", that you are subscribed to has been reactivated.",
         routeID: {
           kind: 'Board',
-          item: updatedBoard._id
+          id: updatedBoard._id
         }
       })
       notificationToSubscribers.save(function(err, notificationToSubscribers) {
@@ -155,7 +155,7 @@ router.post('/boards/:id/delete', function(req, res) {
         message: "The Board, " + updatedBoard.name + ", that you are subscribed to has been deleted.",
         routeID: {
           kind: 'Board',
-          item: updatedBoard._id
+          id: updatedBoard._id
         }
       })
       notificationToSubscribers.save(function(err, notificationToSubscribers) {
@@ -221,7 +221,7 @@ router.get('/boards/:id', function(req, res) {
               return {"id": attendee._id, "firstName": attendee.firstName, "lastName": attendee.lastName}
             })
             if(item.endTime) {
-              var endTime = moment(item.endTime, "HH:mm").local().format('h:mm a');
+              var endTime = moment(item.endTime, "HH:mm").utc().format('h:mm a');
             } else {
               var endTime = "";
             }
@@ -240,7 +240,7 @@ router.get('/boards/:id', function(req, res) {
                 },
                 "title": item.title,
                 "date": moment(item.date).utc().format('MMMM D, YYYY'),
-                "startTime": moment(item.startTime, "HH:mm").local().format('h:mm a'),
+                "startTime": moment(item.startTime, "HH:mm").utc().format('h:mm a'),
                 "endTime": endTime,
                 "location": item.location,
                 "description": item.description,
@@ -260,7 +260,7 @@ router.get('/boards/:id', function(req, res) {
                 },
                 "title": item.title,
                 "date": moment(item.date).utc().format('MMMM D, YYYY'),
-                "startTime": moment(item.startTime, "HH:mm").local().format('h:mm a'),
+                "startTime": moment(item.startTime, "HH:mm").utc().format('h:mm a'),
                 "endTime": endTime,
                 "location": item.location,
                 "description": item.description,
@@ -275,7 +275,6 @@ router.get('/boards/:id', function(req, res) {
           let notifications = board.notifications.map(function(notification) {
             return {"id": notification._id, "createdAt": moment(notification.createdAt).local().format('MMM D, YYYY, h:mm a'), "message": notification.message, "routeID": notification.routeID.item}
           });
-          console.log(notifications);
           res.render('board-overview', {
             board: {
               id: board._id,

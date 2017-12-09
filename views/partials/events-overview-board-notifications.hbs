@@ -7,10 +7,11 @@
                 <div class="uk-width-3-5@m">
                   <div class="form-wrap">
                       <form id="postform" action="/event-invite" method="post">
-                          <input class="uk-input uk-form-large uk-form-blank uk-form-width-large" type="text" name="title" placeholder="Add a title"></input>
-                          <textarea class="uk-textarea uk-form-blank uk-form-width-large" type="text" name="description" placeholder="Add a description" style="overflow: hidden; resize: vertical; height: 175px"></textarea>
-                      <a class="uk-button uk-button-primary" type="button" onclick="document.getElementById('postform').submit();">Next</a>
-                      <a class="uk-button uk-button-cancel" type="button">Back</a>
+                          <input class="uk-input uk-form-large uk-form-blank uk-form-width-large" type="text" name="title" placeholder="Add a title" required></input>
+                          <textarea class="uk-textarea uk-form-blank uk-form-width-large" type="text" name="description" placeholder="Add a description" style="overflow: hidden; resize: vertical; height: 175px" required></textarea>
+                      <a class="uk-button uk-button-primary" type="button" onclick="document.getElementById('submitbutton').click();">Next</a>
+                      <input type="submit" style="display: none" id="submitbutton"></input>
+                      <a class="uk-button uk-button-cancel" uk-toggle="target: .create-event-toggle" type="button">Back</a>
                   </div>
                 </div>
                 <div class="uk-width-2-5@m">
@@ -18,22 +19,22 @@
                         <ul>
                             <li>
                                 <a>
-                                    <span uk-icon="icon: calendar"></span><span>Set date </span><input type="date" name="date" style="width: 130px">
+                                    <span uk-icon="icon: calendar"></span><span>Set date </span><input type="date" name="date" style="width: 130px" required>
                                 </a>
                             </li>
                             <li>
                                 <a>
-                                    <span uk-icon="icon: clock"></span><span>Start time </span><input type="time" name="startTime" style="width: 100px">
+                                    <span uk-icon="icon: clock"></span><span>Start time </span><input type="time" name="startTime" style="width: 100px" required>
                                 </a>
                             </li>
                             <li>
                                 <a>
-                                    <span uk-icon="icon: clock"></span><span>End time </span><input type="time" name="endTime" style="width: 100px">
+                                    <span uk-icon="icon: clock"></span><span>End time </span><input type="time" name="endTime" style="width: 100px" required>
                                 </a>
                             </li>
                             <li>
                                 <a>
-                                    <span uk-icon="icon: bell"></span><span>Set location </span><input type="text" name="location" style="width:100px">
+                                    <span uk-icon="icon: bell"></span><span>Set location </span><input type="text" name="location" style="width:100px" required>
                                 </a>
                             </li>
                             <li>

@@ -18,10 +18,10 @@ function partition(items, left, right) {
       i       = left,
       j       = right;
     while (i <= j) {
-        while ((moment(items[i].date).utc() + moment(items[i].startTime, "HH:mm")) < (moment(pivot.date).utc() + moment(pivot.startTime, "HH:mm"))) {
+        while ((moment(items[i].startTime).utc()) < (moment(pivot.startTime).utc())) {
             i++;
         }
-        while ((moment(items[j].date).utc() + moment(items[j].startTime, "HH:mm")) > (moment(pivot.date).utc() + moment(pivot.startTime, "HH:mm"))) {
+        while ((moment(items[j].startTime).utc()) > (moment(pivot.startTime).utc())) {
             j--;
         }
         if (i <= j) {
@@ -97,20 +97,21 @@ router.get('/events/past', function(req, res) {
   if(req.user) {
     Event.find({$and: [{date: {$lte: moment(Date.now()).local().startOf('day').format().slice(0,-6) + '.000Z'}, archive: false}]}).populate('board').exec(function(err, events) {
       let sortedEvents = quickSort(events, 0, events.length-1).reverse();
+      console.log(sortedEvents);
       let eventObjects = sortedEvents.filter(function(event) {
         if(event.endTime) {
-          var endTime = moment(event.endTime, "HH:mm").local().format('h:mm a');
+          var endTime = moment(event.endTime).utc().format('h:mm a');
         } else {
           var endTime = "";
         }
-        if(moment(Date.now()).local().format('MMMM D, YYYY')==moment(event.date).utc().format('MMMM D, YYYY') && (endTime > moment(Date.now()).local().format('h:mm a') || startTime > moment(Date.now()).local().format('h:mm a'))) {
+        if(moment(Date.now()).local().format('MMMM D, YYYY')==moment(event.date).utc().format('MMMM D, YYYY') && (endTime > moment(Date.now()).local().format('h:mm a') || moment(event.startTime).utc().format('h:mm a') > moment(Date.now()).local().format('h:mm a'))) {
           return false;
         }
         return true;
       }).map(async function(event) {
         var user = await User.findOne({username: event.contact});
         if(event.endTime) {
-          var endTime = moment(event.endTime, "HH:mm").local().format('h:mm a');
+          var endTime = moment(event.endTime).utc().format('h:mm a');
         } else {
           var endTime = "";
         }
@@ -132,7 +133,7 @@ router.get('/events/past', function(req, res) {
                 "archive": event.archive,
                 "description": event.description,
                 "date": moment(event.date).utc().format('MMMM D, YYYY'),
-                "startTime": moment(event.startTime, "HH:mm").local().format('h:mm a'),
+                "startTime": moment(event.startTime).utc().format('h:mm a'),
                 "endTime": endTime,
                 "location": event.location,
                 "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
@@ -158,7 +159,7 @@ router.get('/events/past', function(req, res) {
             "archive": event.archive,
             "description": event.description,
             "date": moment(event.date).utc().format('MMMM D, YYYY'),
-            "startTime": moment(event.startTime, "HH:mm").local().format('h:mm a'),
+            "startTime": moment(event.startTime).utc().format('h:mm a'),
             "endTime": endTime,
             "location": event.location,
             "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
@@ -252,12 +253,19 @@ router.get('/create-a-new-event-invite', function(req, res) {
 })
 //Create a new event
 router.post('/events/create', function(req, res) {
+  var start = moment(req.body.startTime, "HH:mm").local();
+  var end = moment(req.body.endTime, "HH:mm").local();
+  var startTime = moment(req.body.date).utc().add(start.get('hour'), 'hour').add(start.get('minute'), 'minute');
+  var endTime = moment(req.body.date).utc().add(end.get('hour'), 'hour').add(end.get('minute'), 'minute');
+  var difference = moment(req.body.date).utc().get('hour') - moment(req.body.date).local().get('hour');
+  startTime.add(-difference, 'hour');
+  endTime.add(-difference, 'hour');
   var newEvent = new Event({
     title: req.body.title,
 		description: req.body.description,
     board: req.body.board,
-    startTime: req.body.startTime,
-    endTime: req.body.endTime,
+    startTime: startTime,
+    endTime: endTime,
     location: req.body.location,
     date: req.body.date,
 		contact: req.user.username
@@ -291,7 +299,7 @@ router.post('/events/create', function(req, res) {
                 message: "You have been invited to a new Event, " + newEvent.title + ".",
                 routeID: {
                   kind: 'Event',
-                  item: newEvent._id
+                  id: newEvent._id
                 }
               });
               newNotification.save(function(err, notification) {
@@ -331,7 +339,7 @@ router.get('/event/:id', function(req, res) {
             return {"id": comment._id, "createdAt": moment(comment.createdAt).local().format('MMMM D, YYYY, h:mm a'), "postedBy": {"id": comment.postedBy._id, "firstName": comment.postedBy.firstName, "lastName": comment.postedBy.lastName}, "text": comment.text}
           })
           if(event.endTime) {
-            var endTime = moment(event.endTime, "HH:mm").local().format('h:mm a');
+            var endTime = moment(event.endTime).utc().format('h:mm a');
           } else {
             var endTime = "";
           }
@@ -351,7 +359,7 @@ router.get('/event/:id', function(req, res) {
                 "board": event.board,
                 "archive": event.archive,
                 "date": moment(event.date).utc().format('MMMM D, YYYY'),
-                "startTime": moment(event.startTime, "HH:mm").local().format('h:mm a'),
+                "startTime": moment(event.startTime).utc().format('h:mm a'),
                 "endTime": endTime,
                 "location": event.location,
                 "description": event.description,
@@ -371,7 +379,7 @@ router.get('/event/:id', function(req, res) {
                 "board": event.board,
                 "archive": event.archive,
                 "date": moment(event.date).utc().format('MMMM D, YYYY'),
-                "startTime": moment(event.startTime, "HH:mm").local().format('h:mm a'),
+                "startTime": moment(event.startTime).utc().format('h:mm a'),
                 "endTime": endTime,
                 "location": event.location,
                 "description": event.description,
@@ -380,6 +388,7 @@ router.get('/event/:id', function(req, res) {
                 "attending": attending
               }
             }
+            console.log(eventObject);
             res.render('event-detail', {"event": eventObject, "board": board.name, helpers: {
   							compare: function(lvalue, rvalue, options) {
   								if (arguments.length < 3)
@@ -428,7 +437,7 @@ router.get('/events', function(req, res) {
   			let eventObjects = sortedEvents.map(async function(event) {
           var user = await User.findOne({username: event.contact});
           if(event.endTime) {
-            var endTime = moment(event.endTime, "HH:mm").local().format('h:mm a');
+            var endTime = moment(event.endTime).utc().format('h:mm a');
           } else {
             var endTime = "";
           }
@@ -450,7 +459,7 @@ router.get('/events', function(req, res) {
                   "archive": event.archive,
                   "description": event.description,
                   "date": moment(event.date).utc().format('MMMM D, YYYY'),
-                  "startTime": moment(event.startTime, "HH:mm").local().format('h:mm a'),
+                  "startTime": moment(event.startTime).utc().format('h:mm a'),
                   "endTime": endTime,
                   "location": event.location,
                   "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
@@ -476,7 +485,7 @@ router.get('/events', function(req, res) {
               "archive": event.archive,
               "description": event.description,
               "date": moment(event.date).utc().format('MMMM D, YYYY'),
-              "startTime": moment(event.startTime, "HH:mm").local().format('h:mm a'),
+              "startTime": moment(event.startTime).utc().format('h:mm a'),
               "endTime": endTime,
               "location": event.location,
               "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
@@ -583,7 +592,7 @@ router.put('/events/:id', function(req, res) {
 								message: currentUser.firstName + " " + currentUser.lastName + " is attending your event: " + event.title,
 								routeID: {
 									kind: 'Event',
-									item: event._id
+									id: event._id
 								}
 							})
 							notificationToCreator.save(function(err, notificationToCreator){
@@ -652,7 +661,7 @@ router.post('/events/:id/comment', function(req, res) {
     							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the event \"" + post.title + "\" that you are attending.",
     							routeID: {
     								kind: 'Event',
-    								item: post._id
+    								id: post._id
     							}
     						})
     						notificationToFollowers.save(function(err, notificationToFollowers) {
@@ -686,7 +695,7 @@ router.post('/events/:id/comment', function(req, res) {
     							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on your event titled \"" + post.title + "\".",
     							routeID: {
     								kind: 'Event',
-    								item: post._id
+    								id: post._id
     							}
     						})
     						notificationToPoster.save(function(err, notificationToPoster) {
@@ -699,7 +708,7 @@ router.post('/events/:id/comment', function(req, res) {
     										message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the event \"" + post.title + "\" that you are attending.",
     										routeID: {
     											kind: 'Event',
-    											item: post._id
+    											id: post._id
     										}
     									})
     									notificationToFollowers.save(function(err, notificationToFollowers) {
@@ -736,7 +745,7 @@ router.post('/events/:id/comment', function(req, res) {
                 message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the event \"" + post.title + "\" that you are attending.",
                 routeID: {
                   kind: 'Event',
-                  item: post._id
+                  id: post._id
                 }
               })
               notificationToFollowers.save(function(err, notificationToFollowers) {
@@ -787,7 +796,7 @@ router.post('/events/:id/attend', function(req, res) {
 				event.save(function(error, updatedEvent) {
 					if (error)
 						throw error;
-					res.status(200);
+					res.redirect('back');
 				})
 			})
 		})
@@ -814,7 +823,7 @@ router.post('/events/:id/unattend', function(req, res) {
 				event.save(function(error, updatedEvent) {
 					if (error)
 						throw error;
-					res.status(200);
+					res.redirect('back');
 				})
 			})
 		})

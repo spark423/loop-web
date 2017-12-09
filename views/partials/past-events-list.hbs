@@ -18,6 +18,8 @@ $( document ).ready(function() {
   {{#each events}}
   if({{@index}}==0) {
     previousDate = '{{date}}';
+    var date = '{{date}}';
+    var previousArray = date.split(/[ ,]+/);
   }
   var date = '{{date}}';
   var dateArray = date.split(/[ ,]+/);
@@ -40,8 +42,7 @@ $( document ).ready(function() {
       events+= '</div><br>';
       if('{{date}}' == '{{currentDate}}') {
         today.append(events);
-        console.log("hello");
-      } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] > begofWeek) {
+      } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] >= begofWeek) {
         week.append(events);
       } else if(dateArray[0] == currentMonth) {
         month.append(events);
@@ -50,12 +51,13 @@ $( document ).ready(function() {
       }
     }
   } else {
-    if('{{date}}' == '{{currentDate}}') {
+    if(previousDate == '{{currentDate}}') {
       events += '</div><br>'
       today.append(events);
-      console.log("hello2");
       events = "";
       previousDate = '{{date}}';
+      date = '{{date}}';
+      var previousArray = date.split(/[ ,]+/);
       addedHeader=false;
       if(dateArray[0] == currentMonth && dateArray[1]==currentDay-1 && addedHeader==false) {
         header = '<h4 class="today">YESTERDAY</h4><div class="uk-card uk-card-default uk-card-body">';
@@ -71,7 +73,6 @@ $( document ).ready(function() {
         events+= '</div><br>';
         if('{{date}}' == '{{currentDate}}') {
           today.append(events);
-          console.log("hello3");
         } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] >= begofWeek) {
           week.append(events);
         } else if(dateArray[0] == currentMonth) {
@@ -80,11 +81,13 @@ $( document ).ready(function() {
           past.append(events);
         }
       }
-    } else if (dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] >= begofWeek) {
+    } else if (previousArray[0] == currentMonth && previousArray[1] < currentDay && previousArray[1] >= begofWeek) {
       events += '</div><br>'
       week.append(events);
       events = "";
       previousDate = '{{date}}';
+      date = '{{date}}';
+      var previousArray = date.split(/[ ,]+/);
       addedHeader=false;
       if(dateArray[0] == currentMonth && dateArray[1]==currentDay-1 && addedHeader==false) {
         header = '<h4 class="today">YESTERDAY</h4><div class="uk-card uk-card-default uk-card-body">';
@@ -101,7 +104,6 @@ $( document ).ready(function() {
         events+= '</div><br>';
         if('{{date}}' == '{{currentDate}}') {
           today.append(events);
-          console.log("hello4");
         } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] >= begofWeek) {
           week.append(events);
         } else if(dateArray[0] == currentMonth) {
@@ -110,11 +112,13 @@ $( document ).ready(function() {
           past.append(events);
         }
       }
-    } else if (dateArray[0] == currentMonth) {
+    } else if (previousArray[0] == currentMonth) {
       events += '</div><br>'
       month.append(events);
       events = "";
       previousDate = '{{date}}';
+      date = '{{date}}';
+      var previousArray = date.split(/[ ,]+/);
       addedHeader=false;
       if(addedHeader==false){
         header = '<h4 class="today">{{date}}</h4><div class="uk-card uk-card-default uk-card-body">';
@@ -126,7 +130,6 @@ $( document ).ready(function() {
         events+= '</div><br>';
         if('{{date}}' == '{{currentDate}}') {
           today.append(events);
-          console.log("hello5");
         } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] >= begofWeek) {
           week.append(events);
         } else if(dateArray[0] == currentMonth) {
@@ -140,6 +143,8 @@ $( document ).ready(function() {
       past.append(events);
       events = "";
       previousDate = '{{date}}';
+      date = '{{date}}';
+      var previousArray = date.split(/[ ,]+/);
       addedHeader=false;
       if(addedHeader==false){
         header = '<h4 class="today">{{date}}</h4><div class="uk-card uk-card-default uk-card-body">';
@@ -151,7 +156,6 @@ $( document ).ready(function() {
         events+= '</div><br>';
         if('{{date}}' == '{{currentDate}}') {
           today.append(events);
-          console.log("hello6");
         } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] >= begofWeek) {
           week.append(events);
         } else if(dateArray[0] == currentMonth) {

@@ -1,17 +1,32 @@
 <link rel="stylesheet" href="/css/bio/sxn-bio.min.css" />
-
+<script>
+function editBio() {
+  document.getElementById('description').style.display = "none";
+  document.getElementById('edit-description').style.display = "";
+  document.getElementById('pencil').setAttribute("onclick", "back()");
+}
+function back() {
+  document.getElementById('description').style.display = "";
+  document.getElementById('edit-description').style.display = "none";
+  document.getElementById('pencil').setAttribute("onclick", "editBio()");
+}
+</script>
 <div id="bio">
 
-    <h4>Bio</h4>
+    <h4>Bio {{#if self}}<a id="pencil" onclick="editBio()"><span class="uk-icon" uk-icon="icon: pencil"></a>{{/if}}</h4>
 
     <div class="uk-card uk-card-default uk-card-body">
-
-        <p>{{#if user.description}}
+        <p id="description" style="margin: 0px">{{#if user.description}}
           {{user.description}}
         {{else}}
       N/A
     {{/if}}</p>
-
+      <div id='edit-description' style='display: none;'>
+        <form id="edituser" method="post" action="/users/{{user.id}}/edit">
+        <textarea id="edit-description" class="uk-textarea uk-form-blank uk-form-width-large" type="text" name="description" style="overflow: hidden;">{{user.description}}</textarea><br>
+        <a id="save" onclick="document.getElementById('edituser').submit()" class="green"><span class="uk-icon" uk-icon="icon: check"></span>Save Changes</a>
+      </form>
+      </div>
     </div>
 
 </div>

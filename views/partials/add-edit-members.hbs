@@ -1,72 +1,75 @@
-<link rel="stylesheet" href="/css/add-edit-members/sxn-add-edit-members.v2.min.css" />
-
-<div id="add-edit-members">
-
-    <h2>Add/Edit Members</h2>
-
+<link rel="stylesheet" href="/css/new-org-add-members/sxn-new-org-add-members.v3.min.css" />
+<script>
+function search1() {
+  var input, filter, table, tr, td, i;
+  input = document.getElementById("input1");
+  filter = input.value.toUpperCase();
+  table = document.getElementById("users");
+  tr = table.getElementsByTagName("li");
+  for (i = 0; i < tr.length; i++) {
+    p = tr[i].getElementsByTagName("p")[1];
+    if (p.innerHTML.toUpperCase().indexOf(filter) > -1) {
+      tr[i].style.display = "";
+    } else {
+      tr[i].style.display = "none";
+    }
+  }
+}
+function addMember(index) {
+  var username_tag = "member-username-" + index;
+  if(document.getElementById("icon1-" + index).style.display=="") {
+    document.getElementById("icon1-" + index).style.display="none";
+    document.getElementById("icon2-" + index).style.display="";
+    document.getElementById("addMembers").value += document.getElementById(username_tag).innerHTML + ",";
+  }
+  else {
+    document.getElementById("icon1-" + index).style.display="";
+    document.getElementById("icon2-" + index).style.display="none";
+    document.getElementById("removeMembers").value += document.getElementById(username_tag).innerHTML + ",";
+  }
+}
+</script>
+<div id="new-org-add-members">
+    <h3>Add Members</h3>
     <div class="uk-card uk-card-default uk-card-body">
-
-        <div class="uk-inline">
-            <span class="uk-form-icon" uk-icon="icon: hashtag"></span>
-            <input class="uk-input" placeholder="Search to add another member">
+        <div class="add-members-wrap">
+            <ul class="add-members-row-wrap">
+                <li class="add-members-row">
+                    <div>
+                      <input id="input1" class="uk-input" type="text" placeholder="Search for users" onkeyup="search1()">
+                    </div>
+                </li>
+                <input type="text" id="addMembers" name="addMembers" style="display: none">
+                <input type="text" id="removeMembers" name="removeMembers" style="display: none">
+                <li class="add-members-row inner-list-wrap">
+                    <div class="inner-list" id="users" style="max-height:400px">
+                        <ul>
+                          {{#each users}}
+                            <li>
+                                <div class="member" uk-grid>
+                                    <div class="uk-width-auto@m">
+                                        <div class="img-wrap one"></div>
+                                    </div>
+                                    <div class="uk-width-expand@m">
+                                      <p id="member-username-{{@index}}" style="display: none">{{username}}</p>
+                                        <p class="name">{{firstName}} {{lastName}}</p>
+                                        <p class="major">{{major}}, {{classYear}}</p>
+                                    </div>
+                                    <div class="uk-width-auto@m" id="icons">
+                                        <div class="invite-icon">
+                                            <span onclick="addMember({{@index}})" id="icon1-{{@index}}" class="uk-icon" uk-icon="icon: plus" style="display:"></span>
+                                        </div>
+                                        <div class="invite-icon green">
+                                            <span onclick="addMember({{@index}})" id="icon2-{{@index}}" class="uk-icon" uk-icon="icon: check" style="display:none"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                </li>
+            </ul>
         </div>
-
-        <div class="admins" uk-grid>
-            <div class="col uk-width-1-1@m">
-                <div class="member" uk-grid>
-                    <div class="uk-width-auto@m">
-                        <div class="img-wrap"></div>
-                    </div>
-                    <div class="uk-width-expand@m">
-                        <p class="name">Alex Reekie</p>
-                        <span class="major">English Literature, 2017</span>
-                    </div>
-                </div>
-                <div class="more">
-                    <div class="uk-inline">
-                        <a href="#" class="uk-icon-link" uk-icon="icon: more-vertical"></a>
-                        <?php include 'elements/element-member-menu.php'; ?>
-                    </div>
-                </div>
-            </div>
-            <div class="divider"></div>
-            <div class="col uk-width-1-1@m">
-                <div class="member" uk-grid>
-                    <div class="uk-width-auto@m">
-                        <div class="img-wrap"></div>
-                    </div>
-                    <div class="uk-width-expand@m">
-                        <p class="name">Alex Reekie</p>
-                        <span class="major">English Literature, 2017</span>
-                    </div>
-                </div>
-                <div class="more">
-                    <div class="uk-inline">
-                        <a href="#" class="uk-icon-link" uk-icon="icon: more-vertical"></a>
-                        <?php include 'elements/element-member-menu.php'; ?>
-                    </div>
-                </div>
-            </div>
-            <div class="divider"></div>
-            <div class="col uk-width-1-1@m">
-                <div class="member" uk-grid>
-                    <div class="uk-width-auto@m">
-                        <div class="img-wrap"></div>
-                    </div>
-                    <div class="uk-width-expand@m">
-                        <p class="name">Alex Reekie</p>
-                        <span class="major">English Literature, 2017</span>
-                    </div>
-                </div>
-                <div class="more">
-                    <div class="uk-inline">
-                        <a href="#" class="uk-icon-link" uk-icon="icon: more-vertical"></a>
-                        <?php include 'elements/element-member-menu.php'; ?>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     </div>
-
 </div>
