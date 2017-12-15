@@ -121,6 +121,16 @@ router.get('/create-a-new-org-invite', function(req, res) {
   }
 })
 
+router.get('/organizations', function(req, res) {
+  if(req.user) {
+    Group.find({'archive': false}, function(err, groups) {
+      console.log(groups);
+      res.render('org-list', {groups: groups});
+    })
+  } else {
+    res.redirect('/');
+  }
+})
 router.post('/groups/:id/deactivate', function(req, res) {
   Group.findById(req.params.id, function(err, group) {
     if(err) throw err;

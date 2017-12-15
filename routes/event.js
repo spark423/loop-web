@@ -50,7 +50,7 @@ router.get('/events/calendar', function(req, res) {
   if(req.user) {
     var afterDay = moment(Date.now()).endOf('month').add(6-moment(Date.now()).endOf('month').day(), 'days').format().slice(0,-6) + '.000Z';
     var beforeDay = moment(Date.now()).startOf('month').add(0-moment(Date.now()).startOf('month').day(),'days').format().slice(0,-6) + '.000Z';
-    Event.find({$and: [{date: {$lte: afterDay}}, {date: {$gte: beforeDay}}]}, function(err, events) {
+    Event.find({$and: [{date: {$lte: afterDay}}, {date: {$gte: beforeDay}}, {"archive": false}]}, function(err, events) {
       if(err) throw err;
       let sortedEvents = quickSort(events, 0, events.length-1);
       var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -66,7 +66,7 @@ router.post('/events/change', function(req, res) {
   var startofMonth = moment({year: req.body.currentYear, month: req.body.currentMonth});
   var afterDay = endofMonth.add(6-endofMonth.day(), 'days').format().slice(0,-6) + '.000Z';
   var beforeDay = startofMonth.add(0-startofMonth.day(), 'days').format().slice(0,-6) + '.000Z';
-  Event.find({$and: [{date: {$lte: afterDay}}, {date: {$gte: beforeDay}}]}, function(err, events) {
+  Event.find({$and: [{date: {$lte: afterDay}}, {date: {$gte: beforeDay}}, {"archive": false}]}, function(err, events) {
     if(err) throw err;
     let sortedEvents = quickSort(events, 0, events.length-1);
     startofMonth = moment({year: req.body.currentYear, month: req.body.currentMonth});
@@ -336,7 +336,7 @@ router.get('/event/:id', function(req, res) {
             var attending = false;
           }
           let comments = event.comments.map(function(comment) {
-            return {"id": comment._id, "createdAt": moment(comment.createdAt).local().format('MMMM D, YYYY, h:mm a'), "postedBy": {"id": comment.postedBy._id, "firstName": comment.postedBy.firstName, "lastName": comment.postedBy.lastName}, "text": comment.text}
+            return {"id": comment._id, "createdAt": moment(comment.createdAt).local().format('MMMM D, YYYY, h:mm a'), "postedBy": {"id": comment.postedBy._id, "firstName": comment.postedBy.firstName, "lastName": comment.postedBy.lastName}, "text": comment.text, "flagged": comment.flagged}
           })
           if(event.endTime) {
             var endTime = moment(event.endTime).utc().format('h:mm a');
@@ -363,6 +363,7 @@ router.get('/event/:id', function(req, res) {
                 "endTime": endTime,
                 "location": event.location,
                 "description": event.description,
+                "flagged": event.flagged,
                 "comments": comments,
                 "attendees": attendees,
                 "attending": attending
@@ -383,6 +384,7 @@ router.get('/event/:id', function(req, res) {
                 "endTime": endTime,
                 "location": event.location,
                 "description": event.description,
+                "flagged": event.flagged,
                 "comments": comments,
                 "attendees": attendees,
                 "attending": attending
@@ -431,7 +433,7 @@ router.get('/event/:id', function(req, res) {
 //Render all events
 router.get('/events', function(req, res) {
 	if(req.user) {
-    Event.find({$and: [{date: {$gte: moment(Date.now()).local().startOf('day').format().slice(0,-6)}, archive: false}]}).populate('board').exec(function(err, events) {
+    Event.find({$and: [{date: {$gte: moment(Date.now()).local().startOf('day').format().slice(0,-6) + '.000Z'}, archive: false}]}).populate('board').exec(function(err, events) {
       if(err) throw err;
   			let sortedEvents = quickSort(events, 0, events.length-1);
   			let eventObjects = sortedEvents.map(async function(event) {
@@ -462,6 +464,7 @@ router.get('/events', function(req, res) {
                   "startTime": moment(event.startTime).utc().format('h:mm a'),
                   "endTime": endTime,
                   "location": event.location,
+                  "flagged": event.flagged,
                   "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
                   "currentTime": moment(Date.now()).local().format('h:mm a')
                 }
@@ -484,6 +487,7 @@ router.get('/events', function(req, res) {
               },
               "archive": event.archive,
               "description": event.description,
+              "flagged": event.flagged,
               "date": moment(event.date).utc().format('MMMM D, YYYY'),
               "startTime": moment(event.startTime).utc().format('h:mm a'),
               "endTime": endTime,
@@ -495,6 +499,7 @@ router.get('/events', function(req, res) {
           }
         })
         Promise.all(eventObjects).then(function(events) {
+          console.log(events);
             Board.find({}, function(err, boards) {
               if(err) throw err;
               var info = [];
@@ -549,7 +554,13 @@ router.get('/event/:id/edit', function(req, res) {
     Event.findById(req.params.id, function(err, event) {
       if(err) throw err;
       var date = moment(event.date).utc().format("YYYY-MM-DD");
-      res.render('edit-event', {event: event, date: date});
+      var startTime = moment(event.startTime).utc().format("HH:mm");
+      if(event.endTime) {
+        var endTime = moment(event.endTime).utc().format("HH:mm");
+      } else {
+        var endTime = "";
+      }
+      res.render('edit-event', {event: event, date: date, startTime: startTime, endTime: endTime});
     })
   } else {
     res.redirect('/');
@@ -613,6 +624,49 @@ router.put('/events/:id', function(req, res) {
 						}
 					})
 				}
+			})
+		}
+	})
+})
+router.post('/events/:id/unflag', function(req, res) {
+	Event.findById(req.params.id, function(err, event) {
+		event.flagged = false;
+		event.save(function(err, updatedEvent) {
+			Board.findById(updatedEvent.board).populate('notifications').exec(function(err, board) {
+				for(var i=0; i<board.notifications.length; i++) {
+					if(board.notifications[i].routeID.id.toString() == updatedEvent._id.toString()) {
+						board.notifications.splice(i, 1);
+						board.save(function(err, updatedBoard) {
+							res.redirect('/boards/' + updatedBoard._id);
+						})
+					}
+				}
+			})
+		})
+	})
+})
+
+router.post('/events/:id/delete', function(req, res) {
+	Event.findById(req.params.id, function(err, event) {
+		if (err) {
+			throw err;
+		} else {
+			event.archive=true;
+			event.save(function(err, updatedEvent) {
+				Board.findOneAndUpdate({_id: updatedEvent.board}, {$pull: {contents: {item: req.params.id}}}).populate('notifications').exec(function(err, board) {
+					if (err) {
+						throw err;
+					} else {
+						for(var i=0; i<board.notifications.length; i++) {
+							if(board.notifications[i].routeID.id.toString() == updatedEvent._id.toString()) {
+								board.notifications.splice(i, 1);
+								board.save(function(err, updatedBoard) {
+									res.redirect('/boards/' + updatedBoard._id);
+								})
+							}
+						}
+					}
+				})
 			})
 		}
 	})

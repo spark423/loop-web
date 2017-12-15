@@ -125,7 +125,7 @@ function delete_group(id) {
               <p style="display: inline">
                   <a href="/boards/{{id}}"><b style="color: white;">
                     {{name}}
-                  </b></a><a href="#deactivate" onclick="deactivate_check_board('{{name}}', '{{_id}}')" class="uk-icon" uk-icon="icon: ban" style="display: inline; color:white; float: right" uk-toggle></a>
+                  </b></a><a href="#deactivate" onclick='deactivate_check_board("{{name}}", "{{_id}}")' class="uk-icon" uk-icon="icon: ban" style="display: inline; color:white; float: right" uk-toggle></a>
                   <br/>
                   <span style="color: white">(Active)</span>
               </p>
@@ -142,10 +142,10 @@ function delete_group(id) {
               <p style="display: inline">
                   <a href="/boards/{{id}}"><b style="color: white;">
                     {{name}}
-                  </b><a href="#delete" onclick="delete_check_board('{{name}}', '{{_id}}')" class="uk-icon" uk-icon="icon: close" style="display: inline; color:white; float: right" uk-toggle></a>
+                  </b><a href="#delete" onclick='delete_check_board("{{name}}", "{{_id}}")' class="uk-icon" uk-icon="icon: close" style="display: inline; color:white; float: right" uk-toggle></a>
                   <br/>
                   <span style="color: white">(Deactivated)</span>
-                  <a href="#reactivate" onclick="reactivate_check_board('{{name}}', '{{_id}}')" class="uk-icon" uk-icon="icon: refresh" style="display: inline; color:white; float: right" uk-toggle></a>
+                  <a href="#reactivate" onclick='reactivate_check_board("{{name}}", "{{_id}}")' class="uk-icon" uk-icon="icon: refresh" style="display: inline; color:white; float: right" uk-toggle></a>
               </p>
           </div>
           {{/if}}
@@ -167,7 +167,7 @@ function delete_group(id) {
               <p style="display: inline">
                   <a href="/groups/{{id}}"><b style="color: white;">
                     {{name}}
-                  </b><a href="#deactivate" onclick="deactivate_check_group('{{name}}', '{{_id}}')" class="uk-icon" uk-icon="icon: ban" style="display: inline; color:white; float: right" uk-toggle></a>
+                  </b><a href="#deactivate" onclick='deactivate_check_group("{{name}}", "{{_id}}")' class="uk-icon" uk-icon="icon: ban" style="display: inline; color:white; float: right" uk-toggle></a>
                   <br/>
                   <span style="color: white">(Active)</span>
               </p>
@@ -184,10 +184,10 @@ function delete_group(id) {
                 <p style="display: inline">
                     <a href="/groups/{{id}}"><b style="color: white;">
                       {{name}}
-                    </b><a href="#delete" onclick="delete_check_group('{{name}}', '{{_id}}')" class="uk-icon" uk-icon="icon: close" style="display: inline; color:white; float: right" uk-toggle></a>
+                    </b><a href="#delete" onclick='delete_check_group("{{name}}", "{{_id}}")' class="uk-icon" uk-icon="icon: close" style="display: inline; color:white; float: right" uk-toggle></a>
                     <br/>
                     <span style="color: white">(Deactivated)</span>
-                    <a href="#reactivate" onclick="reactivate_check_group('{{name}}', '{{_id}}')" class="uk-icon" uk-icon="icon: refresh" style="display: inline; color:white; float: right" uk-toggle></a>
+                    <a href="#reactivate" onclick='reactivate_check_group("{{name}}", "{{_id}}")' class="uk-icon" uk-icon="icon: refresh" style="display: inline; color:white; float: right" uk-toggle></a>
                 </p>
             </div>
             {{/if}}

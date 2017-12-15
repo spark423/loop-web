@@ -9,6 +9,7 @@ var commentSchema = new mongoose.Schema({
   },
   text: {type: String},
   archive: {type: Boolean, default: false},
+  flagged: {type: Boolean, default: false},
   comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Comment'}]
 });
 

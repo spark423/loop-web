@@ -12,6 +12,7 @@ var eventSchema = new mongoose.Schema({
   location: {type: String},
   description: {type: String},
   archive: {type: Boolean, default: false},
+  flagged: {type: Boolean, default: false},
   attendees: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
   comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Comment'}]
 });

@@ -11,12 +11,18 @@ $( document ).ready(function() {
   var begofWeek = current.getDate() - current.getDay();
   var currentDay = current.getDate();
   var currentMonth = current.getMonth();
+  var currentYear = current.getFullYear();
   var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   currentMonth = months[currentMonth];
   var currentDate = currentMonth + ' ' + currentDay + ', ' + current.getFullYear();
   var previousDate = currentMonth + ' ' + currentDay + ', ' + current.getFullYear();
   var addedHeader = false;
   {{#each notifications}}
+  if({{@index}}==0) {
+    previousDate = '{{createdAt}}';
+    var date = '{{createdAt}}';
+    var previousArray = date.split(/[ ,]+/);
+  }
   var date = '{{createdAt}}';
   var dateArray = date.split(/[ ,]+/);
   date = dateArray[0] + ' ' + dateArray[1] + ', ' + dateArray[2];
@@ -24,7 +30,7 @@ $( document ).ready(function() {
     header = '<h4 class="today">TODAY</h4>';
     notifications += header;
     addedHeader = true;
-  } else if(dateArray[0] == currentMonth && dateArray[1]==currentDay-1 && addedHeader==false) {
+  } else if(dateArray[0] == currentMonth && dateArray[1]==currentDay-1 && dateArray[2]==currentYear && addedHeader==false) {
     header = '<h4 class="today">YESTERDAY</h4>';
     notifications += header;
     addedHeader = true;
@@ -33,28 +39,31 @@ $( document ).ready(function() {
     notifications += header;
     addedHeader = true;
   }
-  if(previousDate==date) {
-    notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>';
+  if(previousDate=='{{createdAt}}') {
+    notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Comment' operator="=="}}href="/comment/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Board' operator="=="}}href="/boards/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>';
     if({{../notifications.length}}=={{@index}}+1) {
       notifications+= '</div>';
-      if(date == currentDate) {
+      if(dateArray[0]==currentMonth && dateArray[1]==currentDay && dateArray[2] == currentYear) {
         today.append(notifications);
-      } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] > begofWeek) {
+      } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] > begofWeek && dateArray[2]==currentYear) {
         week.append(notifications);
-      } else if(dateArray[0] == currentMonth) {
+      } else if(dateArray[0] == currentMonth && dateArray[2] == currentYear) {
         month.append(notifications);
       } else {
         past.append(notifications);
       }
     }
   } else {
-    if(previousDate == currentDate) {
+    if(previousArray[0] == currentMonth && previousArray[1]==currentDay && previousArray[2]==currentYear) {
       notifications += '</div>';
       today.append(notifications);
       notifications = "";
-      previousDate = date;
+      previousDate = '{{createdAt}}';
+      date = '{{createdAt}}';
+      dateArray = date.split(/[ ,]+/);
+      previousArray = date.split(/[ ,]+/);
       addedHeader=false;
-      if(dateArray[0] == currentMonth && dateArray[1]==currentDay-1 && addedHeader==false) {
+      if(dateArray[0] == currentMonth && dateArray[1]==currentDay-1 && dateArray[2]==currentYear && addedHeader==false) {
         header = '<h4 class="today">YESTERDAY</h4>';
         notifications += header;
         addedHeader = true;
@@ -63,26 +72,29 @@ $( document ).ready(function() {
         notifications += header;
         addedHeader = true;
       }
-      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
+      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Comment' operator="=="}}href="/comment/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Board' operator="=="}}href="/boards/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
       if({{../notifications.length}}=={{@index}}+1) {
         notifications+= '</div>';
-        if(date == currentDate) {
+        if(dateArray[0]==currentMonth && dateArray[1]==currentDay && dateArray[2] == currentYear) {
           today.append(notifications);
-        } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] >= begofWeek) {
+        } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] > begofWeek && dateArray[2]==currentYear) {
           week.append(notifications);
-        } else if(dateArray[0] == currentMonth) {
+        } else if(dateArray[0] == currentMonth && dateArray[2] == currentYear) {
           month.append(notifications);
         } else {
           past.append(notifications);
         }
       }
-    } else if (dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] >= begofWeek) {
+    } else if (previousArray[0] == currentMonth && previousArray[1] < currentDay && previousArray[1] >= begofWeek && previousArray[2]==currentYear) {
       notifications += '</div><br>';
       week.append(notifications);
       notifications = "";
-      previousDate = date;
+      previousDate = '{{createdAt}}';
+      date = '{{createdAt}}';
+      dateArray = date.split(/[ ,]+/);
+      previousArray = date.split(/[ ,]+/);
       addedHeader=false;
-      if(dateArray[0] == currentMonth && dateArray[1]==currentDay-1 && addedHeader==false) {
+      if(dateArray[0] == currentMonth && dateArray[1]==currentDay-1 && dateArray[2]==currentYear && addedHeader==false) {
         header = '<h4 class="today">YESTERDAY</h4>';
         notifications += header;
         addedHeader = true;
@@ -92,38 +104,41 @@ $( document ).ready(function() {
         notifications += header;
         addedHeader = true;
       }
-      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
+      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Comment' operator="=="}}href="/comment/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Board' operator="=="}}href="/boards/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
       if({{../notifications.length}}=={{@index}}+1) {
         notifications+= '</div><br>';
-        if(date == currentDate) {
+        if(dateArray[0]==currentMonth && dateArray[1]==currentDay && dateArray[2] == currentYear) {
           today.append(notifications);
-        } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] >= begofWeek) {
+        } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] > begofWeek && dateArray[2]==currentYear) {
           week.append(notifications);
-        } else if(dateArray[0] == currentMonth) {
+        } else if(dateArray[0] == currentMonth && dateArray[2] == currentYear) {
           month.append(notifications);
         } else {
           past.append(notifications);
         }
       }
-    } else if (dateArray[0] == currentMonth) {
+    } else if (previousArray[0] == currentMonth && previousArray[2]==currentYear) {
       notifications += '</div><br>';
       month.append(notifications);
       notifications = "";
-      previousDate = date;
+      previousDate = '{{createdAt}}';
+      date = '{{createdAt}}';
+      dateArray = date.split(/[ ,]+/);
+      previousArray = date.split(/[ ,]+/);
       addedHeader=false;
       if(addedHeader==false){
         header = '<h4 class="today">' + date + '</h4>';
         notifications += header;
         addedHeader = true;
       }
-      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
+      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Comment' operator="=="}}href="/comment/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Board' operator="=="}}href="/boards/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
       if({{../notifications.length}}=={{@index}}+1) {
         notifications+= '</div><br>';
-        if(date == currentDate) {
+        if(dateArray[0]==currentMonth && dateArray[1]==currentDay && dateArray[2] == currentYear) {
           today.append(notifications);
-        } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] >= begofWeek) {
+        } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] > begofWeek && dateArray[2]==currentYear) {
           week.append(notifications);
-        } else if(dateArray[0] == currentMonth) {
+        } else if(dateArray[0] == currentMonth && dateArray[2] == currentYear) {
           month.append(notifications);
         } else {
           past.append(notifications);
@@ -133,21 +148,24 @@ $( document ).ready(function() {
       notifications += '</div><br>';
       past.append(notifications);
       notifications = "";
-      previousDate = date;
+      previousDate = '{{createdAt}}';
+      date = '{{createdAt}}';
+      dateArray = date.split(/[ ,]+/);
+      previousArray = date.split(/[ ,]+/);
       addedHeader=false;
       if(addedHeader==false){
         header = '<h4 class="today">' + date + '</h4>';
         notifications += header;
         addedHeader = true;
       }
-      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
+      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Comment' operator="=="}}href="/comment/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Board' operator="=="}}href="/boards/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
       if({{../notifications.length}}=={{@index}}+1) {
         notifications+= '</div><br>';
-        if(date == currentDate) {
+        if(dateArray[0]==currentMonth && dateArray[1]==currentDay && dateArray[2] == currentYear) {
           today.append(notifications);
-        } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] >= begofWeek) {
+        } else if(dateArray[0] == currentMonth && dateArray[1] < currentDay && dateArray[1] > begofWeek && dateArray[2]==currentYear) {
           week.append(notifications);
-        } else if(dateArray[0] == currentMonth) {
+        } else if(dateArray[0] == currentMonth && dateArray[2] == currentYear) {
           month.append(notifications);
         } else {
           past.append(notifications);

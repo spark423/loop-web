@@ -59,6 +59,7 @@
             <li class="uk-active"><a href="/home"><span uk-icon="icon: home"></span>Home</a></li>
             <li><a href="/feed"><span uk-icon="icon: rss"></span>Feed</a></li>
             <li><a href="/events"><span uk-icon="icon: calendar"></span>Events</a></li>
+            <li><a href="/organizations"><span uk-icon="icon: users"></span>Organizations</a></li>
             <li class="uk-parent">
                 <a href="#"><span uk-icon="icon: album"></span>Boards</a>
                 <ul class="uk-nav-sub" id="side-boards">
@@ -89,26 +90,6 @@
                         if(added == false) {
                           var board = "<li><a href=/boards/" + data.info[i]._id + "><span uk-icon='icon: album'></span>" + data.info[i].name + "</a></li>";
                           side_boards.append(board);
-                        }
-                      }
-                    });
-                    </script>
-                </ul>
-            </li>
-            <li class="uk-parent">
-                <a href="#"><span uk-icon="icon: users"></span>Organizations</a>
-                <ul class="uk-nav-sub" id="side-groups">
-                    <script>
-                    var side_groups = $('#side-groups');
-                    $.getJSON('/groupinfo', function(data) {
-                      for(var i=0; i<data.length; i++) {
-                        if(data[i].active==false) {
-                          var group = "<li><a href=/groups/" + data[i]._id + "><span uk-icon='icon: users'></span>" + data[i].name + " (Deactivated)</a></li>";
-                          side_groups.append(group);
-                        }
-                        else {
-                          var group = "<li><a href=/groups/" + data[i]._id + "><span uk-icon='icon: users'></span>" + data[i].name + "</a></li>";
-                          side_groups.append(group);
                         }
                       }
                     });

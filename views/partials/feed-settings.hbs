@@ -1,0 +1,63 @@
+<link rel="stylesheet" href="/css/new-org-add-members/sxn-new-org-add-members.v3.min.css" />
+<script>
+function subscribe(board, index) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/boards/" + board + "/subscribe", true);
+  xhttp.send();
+  document.getElementById("icon1-" + index).style.display = "none";
+  document.getElementById("icon2-" + index).style.display = "";
+}
+function unsubscribe(board, index) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/boards/" + board + "/unsubscribe", true);
+  xhttp.send();
+  document.getElementById("icon2-" + index).style.display = "none";
+  document.getElementById("icon1-" + index).style.display = "";
+}
+</script>
+<div id="new-org-add-members">
+    <div class="uk-card uk-card-default uk-card-body">
+        <div class="add-members-wrap">
+            <ul class="add-members-row-wrap">
+                <li class="add-members-row inner-list-wrap">
+                    <div class="inner-list" id="users" style="overflow: hidden">
+                        <ul>
+                          {{#each boards}}
+                            <li>
+                                <div class="member" uk-grid>
+                                    <div class="uk-width-auto@m">
+                                        <div class="img-wrap one"></div>
+                                    </div>
+                                    <div class="uk-width-expand@m">
+                                      <p id="username-{{@index}}" style="display: none">{{username}}</p>
+                                        <p class="name"><a href="/boards/{{_id}}">{{name}}</a></p>
+                                        <p class="major">{{description}}</p>
+                                    </div>
+                                    <div class="uk-width-auto@m" id="icons">
+                                      {{#if subscribed}}
+                                      <div class="invite-icon green">
+                                          <span onclick="unsubscribe('{{id}}', {{@index}})" id="icon2-{{@index}}" class="uk-icon" uk-icon="icon: check" style="display:"></span>
+                                      </div>
+                                      <div class="invite-icon">
+                                          <span onclick="subscribe('{{id}}', {{@index}})" id="icon1-{{@index}}" class="uk-icon" uk-icon="icon: plus" style="display:none"></span>
+                                      </div>
+                                      {{else}}
+                                      <div class="invite-icon">
+                                          <span onclick="subscribe('{{id}}', {{@index}})" id="icon1-{{@index}}" class="uk-icon" uk-icon="icon: plus" style="display:"></span>
+                                      </div>
+                                      <div class="invite-icon green">
+                                          <span onclick="unsubscribe('{{id}}', {{@index}})" id="icon2-{{@index}}" class="uk-icon" uk-icon="icon: check" style="display:none;"></span>
+                                      </div>
+                                      {{/if}}
+                                    </div>
+                                </div>
+                            </li>
+                            {{/each}}
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+        </div>
+</form>
+    </div>
+</div>

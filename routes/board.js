@@ -177,6 +177,7 @@ router.get('/boards/:id', function(req, res) {
         throw err;
       }
         let contents = board.contents.reverse().map(async function(content) {
+          console.log(content);
           let item = content.item;
           let kind = content.kind;
           let comments = [];
@@ -194,6 +195,7 @@ router.get('/boards/:id', function(req, res) {
                 "lastName": comment.postedBy.lastName
               },
               "text": comment.text,
+              "flagged": comment.flagged,
               "comments": commentOfComments
             });
           }
@@ -244,6 +246,7 @@ router.get('/boards/:id', function(req, res) {
                 "endTime": endTime,
                 "location": item.location,
                 "description": item.description,
+                "flagged": item.flagged,
                 "comments": comments,
                 "attendees": attendees
               }
@@ -264,6 +267,7 @@ router.get('/boards/:id', function(req, res) {
                 "endTime": endTime,
                 "location": item.location,
                 "description": item.description,
+                "flagged": item.flagged,
                 "comments": comments,
                 "attendees": attendees
               };
@@ -273,7 +277,7 @@ router.get('/boards/:id', function(req, res) {
         });
         Promise.all(contents).then(function(contents) {
           let notifications = board.notifications.map(function(notification) {
-            return {"id": notification._id, "createdAt": moment(notification.createdAt).local().format('MMM D, YYYY, h:mm a'), "message": notification.message, "routeID": notification.routeID.item}
+            return {"id": notification._id, "createdAt": moment(notification.createdAt).local().format('MMM D, YYYY, h:mm a'), "message": notification.message, "routeID": notification.routeID.id, "kind": notification.routeID.kind}
           });
           res.render('board-overview', {
             board: {

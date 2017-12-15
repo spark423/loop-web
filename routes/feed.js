@@ -206,4 +206,17 @@ function quickSort(items, left, right) {
     }
   });
 
+router.get('/feed-settings', function(req, res) {
+  if(req.user) {
+    Board.find({"active": true}, function(err, allBoards) {
+      let boards = allBoards.map(function(board) {
+        return {"id": board._id, "name": board.name, "description": board.description, "subscribed": req.user.subscribedBoards.indexOf(board._id) > -1};
+      })
+      res.render('feed-settings', {boards: boards});
+    })
+  } else {
+    res.redirect('/');
+  }
+})
+
 module.exports = router;

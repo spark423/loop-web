@@ -8,9 +8,10 @@
             <div class="create-grid" uk-grid>
                 <div class="poll-wrap uk-width-3-5@m">
                     <div class="form-wrap">
+                      <form id="delete" action="/events/{{event.id}}" method="post"></form>
                         <form id="eventform" action="/event/{{event.id}}/edit" method="post">
                             <input class="uk-input uk-form-large uk-form-blank uk-form-width-large" type="text" name="title" value="{{event.title}}"></input>
-                            <textarea class="uk-textarea uk-form-blank uk-form-width-large" type="text" name="description" placeholder="Add a description" style="overflow: hidden; resize: vertical">{{event.description}}</textarea>
+                            <textarea class="uk-textarea uk-form-blank uk-form-width-large" type="text" name="description" placeholder="Add a description" style="overflow: hidden; resize: vertical;">{{event.description}}</textarea>
                         <a class="uk-button uk-button-primary" type="button" onclick="document.getElementById('eventform').submit();">Save</a>
                         <a class="uk-button uk-button-cancel" href="javascript:history.back()" type="button">Back</a>
                     </div>
@@ -25,18 +26,22 @@
                             </li>
                             <li>
                                 <a>
-                                    <span uk-icon="icon: clock"></span><span>Start time </span><input type="time" name="startTime" style="width: 100px" value="{{event.startTime}}">
+                                    <span uk-icon="icon: clock"></span><span>Start time </span><input type="time" name="startTime" style="width: 100px" value="{{startTime}}">
                                 </a>
                             </li>
                             <li>
                                 <a>
-                                    <span uk-icon="icon: clock"></span><span>End time </span><input type="time" name="endTime" style="width: 100px" value="{{event.endTime}}">
+                                    <span uk-icon="icon: clock"></span><span>End time </span><input type="time" name="endTime" style="width: 100px" value="{{endTime}}">
                                 </a>
                             </li>
                             <li>
                                 <a>
                                     <span uk-icon="icon: bell"></span><span>Set location </span><input type="text" name="location" style="width:100px" value="{{event.location}}">
                                 </a>
+                            </li>
+                            <li>
+                              <a class="uk-button uk-button-primary" style="color: white; background-color:red; border-color: red" type="button" onclick="document.getElementById('delete').submit()">Delete</a>
+
                             </li>
                         </ul>
                     </div>

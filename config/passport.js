@@ -115,6 +115,8 @@ passport.use('local-login', new LocalStrategy({
           return done(null, false, req.flash('loginMessage', 'There is no user with that email.'));
         } else if (!user.validatePassword(password)) {
           return done(null, false, req.flash('loginMessage', 'Password is incorrect.'));
+        } else if(user.admin!=true) {
+          return done(null, false, req.flash('loginMessage', 'You are not a registered admin.'));
         } else {
           //Found the user and logs the user in
           return done(null, user);

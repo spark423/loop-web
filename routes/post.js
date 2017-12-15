@@ -74,6 +74,50 @@ router.post('/posts/:id/unflag/:notification', function(req, res) {
 	})
 })
 
+router.post('/posts/:id/unflag', function(req, res) {
+	Post.findById(req.params.id, function(err, post) {
+		post.flagged = false;
+		post.save(function(err, updatedPost) {
+			Board.findById(post.board).populate('notifications').exec(function(err, board) {
+				for(var i=0; i<board.notifications.length; i++) {
+					if(board.notifications[i].routeID.id.toString() == updatedPost._id.toString()) {
+						board.notifications.splice(i, 1);
+						board.save(function(err, updatedBoard) {
+							res.redirect('/boards/' + updatedBoard._id);
+						})
+					}
+				}
+			})
+		})
+	})
+})
+
+router.post('/posts/:id/delete', function(req, res) {
+	Post.findById(req.params.id, function(err, post) {
+		if (err) {
+			throw err;
+		} else {
+			post.archive=true;
+			post.save(function(err, updatedPost) {
+				Board.findOneAndUpdate({_id: updatedPost.board}, {$pull: {contents: {item: req.params.id}}}).populate('notifications').exec(function(err, board) {
+					if (err) {
+						throw err;
+					} else {
+						for(var i=0; i<board.notifications.length; i++) {
+							if(board.notifications[i].routeID.id.toString() == updatedPost._id.toString()) {
+								board.notifications.splice(i, 1);
+								board.save(function(err, updatedBoard) {
+									res.redirect('/boards/' + updatedBoard._id);
+								})
+							}
+						}
+					}
+				})
+			})
+		}
+	})
+})
+
 //Remove flagged post
 router.post('/posts/:id/delete-flagged/:notification', function(req, res) {
 	Post.findById(req.params.id, function(err, post) {

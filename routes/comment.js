@@ -6,6 +6,20 @@ var Post = require('../models/post');
 var Event = require('../models/event');
 var Comment = require('../models/comment')
 
+router.get('/comments/:id', function(req, res) {
+	Comment.findById(req.params.id, function(err, comment) {
+		if(comment.source.kind=="Event") {
+			res.redirect('/event/' + comment.source.item);
+		} else if(comment.source.kind=="Post") {
+			Post.findById(comment.source.item, function(err, post) {
+				Board.findById(post.board, function(err, board) {
+					res.redirect('/boards/' + board._id + '#' + post._id);
+				})
+			})
+		}
+	})
+});
+
 //Editing comment
 router.post('/comments/:id/edit', function(req, res) {
 	Comment.findById(req.params.id, function(err, comment) {
@@ -17,6 +31,69 @@ router.post('/comments/:id/edit', function(req, res) {
 		})
 	})
 });
+
+router.post('/comments/:id/unflag', function(req, res) {
+	Comment.findById(req.params.id).populate('source.item').exec(function(err, comment) {
+		comment.flagged = false;
+		comment.save(function(err, updatedComment) {
+			Board.findById(updatedComment.source.item.board).populate('notifications').exec(function(err, board) {
+				for(var i=0; i<board.notifications.length; i++) {
+					if(board.notifications[i].routeID.id.toString() == updatedComment._id.toString()) {
+						board.notifications.splice(i, 1);
+						board.save(function(err, updatedBoard) {
+							res.redirect('/boards/' + updatedBoard._id);
+						})
+					}
+				}
+			})
+		})
+	})
+})
+
+router.post('/comments/:id/delete', function(req, res) {
+	Comment.findById(req.params.id, function(err, comment) {
+		if (err) {
+			throw err;
+		} else {
+			comment.archive=true;
+			comment.save(function(err, updatedComment) {
+				if (updatedComment.source.kind === 'Post') {
+					Post.findOneAndUpdate({_id: comment.source.item}, {$pull: {comments: req.params.id}}, function(err, post) {
+						if (err) {
+							throw err;
+						}
+						Board.findById(post.board).populate('notifications').exec(function(err, board) {
+							for(var i=0; i<board.notifications.length; i++) {
+								if(board.notifications[i].routeID.id.toString() == updatedComment._id.toString()) {
+									board.notifications.splice(i, 1);
+									board.save(function(err, updatedBoard) {
+										res.redirect('/boards/' + updatedBoard._id);
+									})
+								}
+							}
+						})
+					})
+				} else if (updatedComment.source.kind === 'Event') {
+					Event.findOneAndUpdate({_id: comment.source.item}, {$pull: {comments: req.params.id}}, function(err, event) {
+						if (err) {
+							throw err;
+						}
+						Board.findById(post.board).populate('notifications').exec(function(err, board) {
+							for(var i=0; i<board.notifications.length; i++) {
+								if(board.notifications[i].routeID.id.toString() == updatedComment._id.toString()) {
+									board.notifications.splice(i, 1);
+									board.save(function(err, updatedBoard) {
+										res.redirect('/boards/' + updatedBoard._id);
+									})
+								}
+							}
+						})
+					})
+				}
+			})
+		}
+	})
+})
 /*router.post('/comments/:id/edit', function(req, res) {
 	Comment.findById(req.params.id, function(error, comment) {
 		if (error)

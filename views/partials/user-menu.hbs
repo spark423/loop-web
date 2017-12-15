@@ -19,11 +19,26 @@
               Edit Post
             </a>
           </li>
-            <li>
-              <a href="#" onclick="document.getElementById('delete-post-{{@index}}').submit();">
-                Delete Post
-              </a>
-            </li>
+          {{#if this.flagged}}
+          <form method="post" id="unflag-post-{{@index}}" action="/posts/{{this.id}}/unflag"></form>
+          <li>
+            <a href="#" onclick="document.getElementById('unflag-post-{{@index}}').submit();">
+              Unflag Post
+            </a>
+          </li>
+          <form method="post" id="delete-flagged-post-{{@index}}" action="/posts/{{this.id}}/delete"></form>
+          <li>
+            <a href="#" onclick="document.getElementById('delete-flagged-post-{{@index}}').submit();">
+              Delete Post
+            </a>
+          </li>
+          {{else}}
+          <li>
+            <a href="#" onclick="document.getElementById('delete-post-{{@index}}').submit();">
+              Delete Post
+            </a>
+          </li>
+          {{/if}}
         </ul>
     </div>
 </div>

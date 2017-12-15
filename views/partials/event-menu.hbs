@@ -15,15 +15,30 @@
             </li>
             {{/compare}}
             <li>
-              <a href="#" onclick="document.getElementById('delete-event-{{@index}}').submit();">
-                Delete Event
-              </a>
-            </li>
-            <li>
               <a href="/event/{{id}}/edit">
                 Edit Event
               </a>
             </li>
+            {{#if this.flagged}}
+            <form method="post" id="unflag-event-{{@index}}" action="/events/{{this.id}}/unflag"></form>
+            <li>
+              <a href="#" onclick="document.getElementById('unflag-event-{{@index}}').submit();">
+                Unflag Event
+              </a>
+            </li>
+            <form method="post" id="delete-flagged-event-{{@index}}" action="/events/{{this.id}}/delete"></form>
+            <li>
+              <a href="#" onclick="document.getElementById('delete-flagged-event-{{@index}}').submit();">
+                Delete Event
+              </a>
+            </li>
+            {{else}}
+            <li>
+              <a href="#" onclick="document.getElementById('delete-event-{{@index}}').submit();">
+                Delete Event
+              </a>
+            </li>
+            {{/if}}
         </ul>
     </div>
 </div>

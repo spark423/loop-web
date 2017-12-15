@@ -20,6 +20,8 @@ $( document ).ready(function() {
     previousDate = '{{date}}';
     var date = '{{date}}';
     var previousArray = date.split(/[ ,]+/);
+    console.log('{{currentDate}}');
+    console.log(date);
   }
   var date = '{{date}}';
   var dateArray = date.split(/[ ,]+/);
@@ -37,7 +39,7 @@ $( document ).ready(function() {
     addedHeader = true;
   }
   if(previousDate=='{{date}}') {
-    events += '<li><div class="challenge-submissions" uk-grid><div class="uk-width-1-2@m"><div class="img-wrap"></div></div><div class="uk-width-expand@m"><p class="title"><a href="/event/{{id}}">{{title}} {{#compare archive true operator="=="}}<b style="color: red">(DELETED)</b>{{/compare}}</a></p>  <p class="created-by">Created by {{#if postedBy.isLoopUser}}<a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a>{{else}}{{postedBy.username}}{{/if}}</p><p class="timestamp">at {{createdAt}} in <a href="boards/{{board.id}}">{{board.name}}</a></p><p class="description">{{date}}<br/>{{startTime}} {{#compare endTime "" operator="!="}}to {{endTime}}{{/compare}}<br/>{{location}}</p></div></div></li>'
+    events += '<li><div class="challenge-submissions" uk-grid><div class="uk-width-1-2@m"><div class="img-wrap"></div></div><div class="uk-width-expand@m"><p class="title"><a href="/event/{{id}}">{{title}} {{#if flagged}}<b style="color: red">(FLAGGED)</b>{{/if}}</a></p>  <p class="created-by">Created by {{#if postedBy.isLoopUser}}<a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a>{{else}}{{postedBy.username}}{{/if}}</p><p class="timestamp">at {{createdAt}} in <a href="boards/{{board.id}}">{{board.name}}</a></p><p class="description">{{date}}<br/>{{startTime}} {{#compare endTime "" operator="!="}}to {{endTime}}{{/compare}}<br/>{{location}}</p></div></div></li>'
     if({{../events.length}}=={{@index}}+1) {
       events+= '</div><br>';
       if('{{date}}' == '{{currentDate}}') {
@@ -68,7 +70,7 @@ $( document ).ready(function() {
         events += header;
         addedHeader = true;
       }
-      events += '<li><div class="challenge-submissions" uk-grid><div class="uk-width-1-2@m"><div class="img-wrap"></div></div><div class="uk-width-expand@m"><p class="title"><a href="/event/{{id}}">{{title}} {{#compare archive true operator="=="}}<b style="color: red">(DELETED)</b>{{/compare}}</a></p>  <p class="created-by">Created by {{#if postedBy.isLoopUser}}<a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a>{{else}}{{postedBy.username}}{{/if}}</p><p class="timestamp">at {{createdAt}} in <a href="boards/{{board.id}}">{{board.name}}</a></p><p class="description">{{date}}<br/>{{startTime}} {{#compare endTime "" operator="!="}}to {{endTime}}{{/compare}}<br/>{{location}}</p></div></div></li>'
+      events += '<li><div class="challenge-submissions" uk-grid><div class="uk-width-1-2@m"><div class="img-wrap"></div></div><div class="uk-width-expand@m"><p class="title"><a href="/event/{{id}}">{{title}} {{#if flagged}}<b style="color: red">(FLAGGED)</b>{{/if}}</a></p>  <p class="created-by">Created by {{#if postedBy.isLoopUser}}<a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a>{{else}}{{postedBy.username}}{{/if}}</p><p class="timestamp">at {{createdAt}} in <a href="boards/{{board.id}}">{{board.name}}</a></p><p class="description">{{date}}<br/>{{startTime}} {{#compare endTime "" operator="!="}}to {{endTime}}{{/compare}}<br/>{{location}}</p></div></div></li>'
       if({{../events.length}}=={{@index}}+1) {
         events+= '</div><br>';
         if('{{date}}' == '{{currentDate}}') {
@@ -99,7 +101,7 @@ $( document ).ready(function() {
         events += header;
         addedHeader = true;
       }
-      events += '<li><div class="challenge-submissions" uk-grid><div class="uk-width-1-2@m"><div class="img-wrap"></div></div><div class="uk-width-expand@m"><p class="title"><a href="/event/{{id}}">{{title}} {{#compare archive true operator="=="}}<b style="color: red">(DELETED)</b>{{/compare}}</a></p>  <p class="created-by">Created by {{#if postedBy.isLoopUser}}<a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a>{{else}}{{postedBy.username}}{{/if}}</p><p class="timestamp">at {{createdAt}} in <a href="boards/{{board.id}}">{{board.name}}</a></p><p class="description">{{date}}<br/>{{startTime}} {{#compare endTime "" operator="!="}}to {{endTime}}{{/compare}}<br/>{{location}}</p></div></div></li>'
+      events += '<li><div class="challenge-submissions" uk-grid><div class="uk-width-1-2@m"><div class="img-wrap"></div></div><div class="uk-width-expand@m"><p class="title"><a href="/event/{{id}}">{{title}} {{#if flagged}}<b style="color: red">(FLAGGED)</b>{{/if}}</a></p>  <p class="created-by">Created by {{#if postedBy.isLoopUser}}<a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a>{{else}}{{postedBy.username}}{{/if}}</p><p class="timestamp">at {{createdAt}} in <a href="boards/{{board.id}}">{{board.name}}</a></p><p class="description">{{date}}<br/>{{startTime}} {{#compare endTime "" operator="!="}}to {{endTime}}{{/compare}}<br/>{{location}}</p></div></div></li>'
       if({{../events.length}}=={{@index}}+1) {
         events+= '</div><br>';
         if('{{date}}' == '{{currentDate}}') {
@@ -125,7 +127,7 @@ $( document ).ready(function() {
         events += header;
         addedHeader = true;
       }
-      events += '<li><div class="challenge-submissions" uk-grid><div class="uk-width-1-2@m"><div class="img-wrap"></div></div><div class="uk-width-expand@m"><p class="title"><a href="/event/{{id}}">{{title}} {{#compare archive true operator="=="}}<b style="color: red">(DELETED)</b>{{/compare}}</a></p>  <p class="created-by">Created by {{#if postedBy.isLoopUser}}<a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a>{{else}}{{postedBy.username}}{{/if}}</p><p class="timestamp">at {{createdAt}} in <a href="boards/{{board.id}}">{{board.name}}</a></p><p class="description">{{date}}<br/>{{startTime}} {{#compare endTime "" operator="!="}}to {{endTime}}{{/compare}}<br/>{{location}}</p></div></div></li>'
+      events += '<li><div class="challenge-submissions" uk-grid><div class="uk-width-1-2@m"><div class="img-wrap"></div></div><div class="uk-width-expand@m"><p class="title"><a href="/event/{{id}}">{{title}} {{#if flagged}}<b style="color: red">(FLAGGED)</b>{{/if}}</a></p>  <p class="created-by">Created by {{#if postedBy.isLoopUser}}<a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a>{{else}}{{postedBy.username}}{{/if}}</p><p class="timestamp">at {{createdAt}} in <a href="boards/{{board.id}}">{{board.name}}</a></p><p class="description">{{date}}<br/>{{startTime}} {{#compare endTime "" operator="!="}}to {{endTime}}{{/compare}}<br/>{{location}}</p></div></div></li>'
       if({{../events.length}}=={{@index}}+1) {
         events+= '</div><br>';
         if('{{date}}' == '{{currentDate}}') {
@@ -151,7 +153,7 @@ $( document ).ready(function() {
         events += header;
         addedHeader = true;
       }
-      events += '<li><div class="challenge-submissions" uk-grid><div class="uk-width-1-2@m"><div class="img-wrap"></div></div><div class="uk-width-expand@m"><p class="title"><a href="/event/{{id}}">{{title}} {{#compare archive true operator="=="}}<b style="color: red">(DELETED)</b>{{/compare}}</a></p>  <p class="created-by">Created by {{#if postedBy.isLoopUser}}<a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a>{{else}}{{postedBy.username}}{{/if}}</p><p class="timestamp">at {{createdAt}} in <a href="boards/{{board.id}}">{{board.name}}</a></p><p class="description">{{date}}<br/>{{startTime}} {{#compare endTime "" operator="!="}}to {{endTime}}{{/compare}}<br/>{{location}}</p></div></div></li>'
+      events += '<li><div class="challenge-submissions" uk-grid><div class="uk-width-1-2@m"><div class="img-wrap"></div></div><div class="uk-width-expand@m"><p class="title"><a href="/event/{{id}}">{{title}} {{#if flagged}}<b style="color: red">(FLAGGED)</b>{{/if}}</a></p>  <p class="created-by">Created by {{#if postedBy.isLoopUser}}<a href="/users/{{postedBy.id}}">{{postedBy.firstName}} {{postedBy.lastName}}</a>{{else}}{{postedBy.username}}{{/if}}</p><p class="timestamp">at {{createdAt}} in <a href="boards/{{board.id}}">{{board.name}}</a></p><p class="description">{{date}}<br/>{{startTime}} {{#compare endTime "" operator="!="}}to {{endTime}}{{/compare}}<br/>{{location}}</p></div></div></li>'
       if({{../events.length}}=={{@index}}+1) {
         events+= '</div><br>';
         if('{{date}}' == '{{currentDate}}') {

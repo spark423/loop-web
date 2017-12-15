@@ -1,13 +1,21 @@
 <script>
 var notifications = $('#notifications')
 $.getJSON('/notifications', function(data) {
-  var createdPostCount=0;
-  var followingPostCount=0;
-  var createdEventCount=0;
-  var attendingEventCount=0;
-  var addedOrganizationCount=0;
-  var inviteEventCount=0;
-  var flaggedPostCount=0;
+  var createdPostCount = 0;
+  var followingPostCount = 0;
+  var createdEventCount = 0;
+  var attendingEventCount = 0;
+  var addedOrganizationCount = 0;
+  var inviteEventCount = 0;
+  var flaggedPostCount = 0;
+  var flaggedCommentCount = 0;
+  var flaggedEventCount = 0;
+  var deactivatedOrgCount = 0;
+  var reactivatedOrgCount = 0;
+  var deletedOrgCount = 0;
+  var deactivatedBoardCount = 0;
+  var reactivatedBoardCount = 0;
+  var deletedBoardCount = 0;
   for(var i=0; i<data.length; i++) {
     if(data.notifications[i].type=="Comment on Created Post" && data.notifications[i].createdAt > localStorage.past) {
       createdPostCount++;
@@ -29,6 +37,30 @@ $.getJSON('/notifications', function(data) {
     }
     else if(data.notifications[i].type=="Flagged Post" && data.notifications[i].createdAt > localStorage.past) {
       flaggedPostCount++;
+    }
+    else if(data.notifications[i].type=="Flagged Comment" && data.notifications[i].createdAt > localStorage.past) {
+      flaggedCommentCount++;
+    }
+    else if(data.notifications[i].type=="Flagged Event" && data.notifications[i].createdAt > localStorage.past) {
+      flaggedEventCount++;
+    }
+    else if(data.notifications[i].type=="Deactivated Organization" && data.notifications[i].createdAt > localStorage.past) {
+      deactivatedOrgCount++;
+    }
+    else if(data.notifications[i].type=="Reactivated Organization" && data.notifications[i].createdAt > localStorage.past) {
+      reactivatedOrgCount++;
+    }
+    else if(data.notifications[i].type=="Deleted Organization" && data.notifications[i].createdAt > localStorage.past) {
+      deletedOrgCount++;
+    }
+    else if(data.notifications[i].type=="Deactivated Board" && data.notifications[i].createdAt > localStorage.past) {
+      deactivatedBoardCount++;
+    }
+    else if(data.notifications[i].type=="Reactivated Board" && data.notifications[i].createdAt > localStorage.past) {
+      reactivatedBoardCount++;
+    }
+    else if(data.notifications[i].type=="Deleted Board" && data.notifications[i].createdAt > localStorage.past) {
+      deletedBoardCount++;
     }
   }
   if(createdPostCount!=0) {
@@ -56,7 +88,39 @@ $.getJSON('/notifications', function(data) {
     notifications.append(notification);
   }
   if(flaggedPostCount!=0) {
-    var notification = "<li><a href='/all-notifications'><span uk-icon='icon: bookmark'></span><b>" + flaggedPostCount + "</b> posts have been flagged";
+    var notification = "<li><a href='/all-notifications'><span uk-icon='icon: bookmark'></span><b>" + flaggedPostCount + "</b> post(s) have been flagged";
+    notifications.append(notification);
+  }
+  if(flaggedCommentCount!=0) {
+    var notification = "<li><a href='/all-notifications'><span uk-icon='icon: bookmark'></span><b>" + flaggedCommentCount + "</b> comment(s) have been flagged";
+    notifications.append(notification);
+  }
+  if(flaggedEventCount!=0) {
+    var notification = "<li><a href='/all-notifications'><span uk-icon='icon: bookmark'></span><b>" + flaggedEventCount + "</b> event(s) have been flagged";
+    notifications.append(notification);
+  }
+  if(deactivatedOrgCount!=0) {
+    var notification = "<li><a href='/all-notifications'><span uk-icon='icon: users'></span><b>" + deactivatedOrgCount + "</b> organization(s) have been deactivated";
+    notifications.append(notification);
+  }
+  if(reactivatedOrgCount!=0) {
+    var notification = "<li><a href='/all-notifications'><span uk-icon='icon: users'></span><b>" + reactivatedOrgCount + "</b> organization(s) have been reactivated";
+    notifications.append(notification);
+  }
+  if(deletedOrgCount!=0) {
+    var notification = "<li><a href='/all-notifications'><span uk-icon='icon: users'></span><b>" + deletedOrgCount + "</b> organizations(s) have been deleted";
+    notifications.append(notification);
+  }
+  if(deactivatedBoardCount!=0) {
+    var notification = "<li><a href='/all-notifications'><span uk-icon='icon: album'></span><b>" + deactivatedBoardCount + "</b> board(s) have been deactivated";
+    notifications.append(notification);
+  }
+  if(reactivatedBoardCount!=0) {
+    var notification = "<li><a href='/all-notifications'><span uk-icon='icon: album'></span><b>" + reactivatedBoardCount + "</b> board(s) have been reactivated";
+    notifications.append(notification);
+  }
+  if(deletedBoardCount!=0) {
+    var notification = "<li><a href='/all-notifications'><span uk-icon='icon: album'></span><b>" + deletedBoardCount + "</b> board(s) have been deleted";
     notifications.append(notification);
   }
   notifications.append("<li><a class='green' href='/all-notifications'>See all notifications</a></li>");

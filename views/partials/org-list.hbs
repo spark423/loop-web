@@ -1,0 +1,78 @@
+<link rel="stylesheet" href="css/notifications/sxn-notifications.v2.min.css" />
+<script>
+function deactivate_check_group(name, id) {
+  document.getElementById('deactivate-info').innerHTML = "Are you sure you want to deactivate the Organization, " + name + "?";
+  document.getElementById("deactivate-button").setAttribute("onclick", "javascript: deactivate_group('"+ id +"')");
+}
+function reactivate_check_group(name, id) {
+  document.getElementById('reactivate-info').innerHTML = "Are you sure you want to reactivate the Organization, " + name + "?";
+  document.getElementById("reactivate-button").setAttribute("onclick", "javascript: reactivate_group('"+ id +"')");
+}
+function delete_check_group(name, id) {
+  document.getElementById('delete-info').innerHTML = "Are you sure you want to delete the Organization, " + name + "?";
+  document.getElementById("delete-button").setAttribute("onclick", "javascript: delete_group('"+ id +"')");
+}
+function deactivate_group(id) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/groups/" + id + "/deactivate", true);
+  xhttp.send();
+  xhttp.onreadystatechange = function() {
+    if(this.status==200) {
+      location.reload();
+    }
+  }
+}
+function reactivate_group(id) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/groups/" + id + "/reactivate", true);
+  xhttp.send();
+  xhttp.onreadystatechange = function() {
+    if(this.status==200) {
+      location.reload();
+    }
+  }
+}
+function delete_group(id) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/groups/" + id + "/delete", true);
+  xhttp.send();
+  xhttp.onreadystatechange = function() {
+    if(this.status==200) {
+      location.reload();
+    }
+  }
+}
+</script>
+<div id="notifications">
+    <div class="notifications-item">
+      {{#each groups}}
+
+        <div class="uk-card uk-card-default uk-card-body">
+
+            <div class="main-post">
+                <div class="poster-avi uk-float-left">
+                    <img src="img/user.png" alt="Alex Reekie" />
+                </div>
+                <div class="poster-info uk-float-left">
+                    <span class="name"><a href="/groups/{{_id}}">{{name}}</a></span><span class="timestamp" {{#if active}}>(Members: {{members.length}}){{else}}style="color: red"> (DEACTIVATED){{/if}}</span><br />
+                    <span>{{description}}</span>
+                </div>
+                <div style="float:right">
+                   <a style="padding-top: 23px;margin-right: 50px" class="uk-icon" uk-icon="icon: file-edit" href="/groups/{{_id}}/edit">Edit </a>
+                   {{#if active}}<a href="#deactivate" onclick='deactivate_check_group("{{name}}", "{{_id}}")' class="uk-icon" uk-icon="icon: ban" uk-toggle>Deactivate </a>
+                   {{else}}
+                   <a href='#reactivate' onclick='reactivate_check_group("{{name}}", "{{_id}}")' class="uk-icon" uk-icon="icon: refresh" style="margin-right: 50px" uk-toggle>Reactivate </a>
+                   <a href="#delete" onclick='delete_check_group("{{name}}", "{{_id}}")' class="uk-icon" uk-icon="icon: close" uk-toggle>Delete </a>
+                   {{/if}}
+                 </div>
+            </div>
+
+        </div>
+        {{/each}}
+
+    </div>
+
+</div>
+{{>deactivate-modal}}
+{{>reactivate-modal}}
+{{>delete-modal}}
