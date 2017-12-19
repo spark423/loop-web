@@ -52,23 +52,19 @@ function quickSort(items, left, right) {
 //Render feed page
   router.get('/feed', function(req, res) {
     if(req.user) {
-      console.log(req.user.subscribedBoards);
       User.findById(req.user._id, function(err, user) {
         if (err) {
           throw err;
         } else {
-          console.log(user);
           Board.find({$and: [{$or: [{unsubscribable: true},{_id: {$in: user.subscribedBoards}}]}, {active: true}]}).populate([{path: 'contents.item', populate: [{path: 'attendees'}, {path: 'comments', populate: [{path: 'postedBy'},{path: 'comments', populate: [{path: 'postedBy'}]}]}]}]).exec(function(err, boards) {
             if (err) {
               throw err;
             } else {
-              console.log(boards);
               let contents = [];
               for (let i=0; i<boards.length; i++) {
                 contents = contents.concat(boards[i].contents)
               }
               let sortedContents = quickSort(contents, 0, contents.length - 1);
-              console.log(sortedContents);
               let feed = sortedContents.reverse().map(async function(content) {
                 let item = content.item;
                 let kind = content.kind;

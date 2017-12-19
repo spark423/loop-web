@@ -2,17 +2,25 @@
 <script>
 function subscribe(board, index) {
   var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if(this.status==200 && this.readyState==4) {
+      document.getElementById("icon1-" + index).style.display = "none";
+      document.getElementById("icon2-" + index).style.display = "";
+    }
+  }
   xhttp.open("POST", "/boards/" + board + "/subscribe", true);
   xhttp.send();
-  document.getElementById("icon1-" + index).style.display = "none";
-  document.getElementById("icon2-" + index).style.display = "";
 }
 function unsubscribe(board, index) {
   var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if(this.status==200 && this.readyState==4) {
+      document.getElementById("icon2-" + index).style.display = "none";
+      document.getElementById("icon1-" + index).style.display = "";
+    }
+  }
   xhttp.open("POST", "/boards/" + board + "/unsubscribe", true);
   xhttp.send();
-  document.getElementById("icon2-" + index).style.display = "none";
-  document.getElementById("icon1-" + index).style.display = "";
 }
 </script>
 <div id="new-org-add-members">

@@ -367,7 +367,7 @@ router.post('/boards/:id/subscribe', function(req, res) {
         user.save(function(error, updatedUser) {
           if (error)
             throw error;
-          res.status(200);
+          res.send();
         })
       })
     }
@@ -387,7 +387,7 @@ router.post('/boards/:id/unsubscribe', function(req, res) {
         user.save(function(error, updatedUser) {
           if (error)
             throw error;
-          res.status(200);
+          res.send();
         })
       })
     }
