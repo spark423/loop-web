@@ -1,0 +1,59 @@
+# GitLab CI Docker Image
+image: node:6.11.1
+
+# Build - Build necessary JS files
+# Test - Run tests
+# Deploy - Deploy application to S3/ElasticBeanstalk
+stages:
+  - build
+  - test
+  - deploy
+
+# Configuration
+variables:
+  AWS_ACCESS_KEY_ID: "AKIAI6RGDBVPUNY6AQGA"
+  AWS_SECRET_ACCESS_KEY: "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"
+  AWS_DEFAULT_REGION: "us-east-2"
+  EB_APP_NAME: "loop-web-staging"
+  EB_APP_ENV: "e-3qcd9zcykj"
+
+# Cache node modules between deploys
+cache:
+  paths:
+  - node_modules/
+
+# Job: Build
+# Installs npm packages, transpiles ES6 -> ES5
+# Passes node_modules/, dist/ onto next steps using artifacts
+build:
+  stage: build
+  script:
+    - npm install
+    - ./scripts/build
+  artifacts:
+    paths:
+      - node_modules/
+      - dist/
+  tags:
+    - nodejs-app
+
+# Job: Test (disabled for now)
+# Run tests against our application
+# If this fails, we do not deploy
+.test:
+  stage: test
+  script:
+    - ./scripts/test
+  tags:
+    - nodejs-app
+
+# Job: Deploy
+# Zips the contents of our built application, uploads to S3
+# Configures a new EB version and switches to that version
+deploy:
+  stage: deploy
+  script:
+    - ./scripts/deploy
+  tags:
+    - nodejs-app
+  when: manual
