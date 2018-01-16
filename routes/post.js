@@ -9,20 +9,20 @@ var Time = require('../models/time')
 
 router.post('/posts/:id/flag', function(req, res) {
   	Post.findOneAndUpdate({_id: req.params.id}, {$set: {flagged: true}},function(err,post) {
-			console.log(post._id);
   		let notificationToPoster = new Notification({
   			type: 'Flagged Post',
   			message: "Your post \"" + post.title + "\" has been flagged. Please wait for the admin's review.",
   			routeID: {
   				kind: 'Post',
-  				id: post._id
+  				id: post._id,
+          boardId: post.board
   			}
       })
       notificationToPoster.save(function(err, notificationToPoster) {
       	if (err) {
       		throw err;
       	} else {
-      		User.findOneAndUpdate({_id: req.user._id}, {$push: {notifications: notificationToPoster}}, function(err,user) {
+      		User.findOneAndUpdate({_id: post.postedBy}, {$push: {notifications: notificationToPoster}}, function(err,user) {
       			if (err) {
       				throw err;
       			} else {
@@ -31,7 +31,8 @@ router.post('/posts/:id/flag', function(req, res) {
       					message: "The post titled \"" + post.title + "\" has been flagged.",
       					routeID: {
       						kind: 'Post',
-      						id: post._id
+      						id: post._id,
+                  boardId: post.board
       					}
       				})
       				notificationToAdmin.save(function(err, notificationToAdmin) {
@@ -47,7 +48,7 @@ router.post('/posts/:id/flag', function(req, res) {
                         if (err) {
                           throw err;
                         } else {
-                          res.json({success: true});
+                          res.redirect('back');
                         }
                       })
       							}
@@ -148,7 +149,7 @@ router.get('/posts/create', function(req, res) {
 				info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
 			}
 		}
-		res.render("create-a-new-post", {boards: info});
+		res.render("create-a-new-post", {boards: info, admin: req.user.admin});
 	})
 })
 
@@ -191,7 +192,7 @@ router.get('/posts/:id/edit', function(req, res) {
 	if(req.user) {
 		Post.findById(req.params.id, function(err, post) {
 			if(err) throw err;
-			res.render('edit-post', {title: post.title, text: post.text, id: post._id});
+			res.render('edit-post', {title: post.title, text: post.text, id: post._id, admin: req.user.admin});
 		})
 	} else {
 		res.redirect('/');
@@ -303,7 +304,8 @@ router.post('/posts/:id/comment', function(req, res) {
 							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the post \"" + post.title + "\" that you are following.",
 							routeID: {
 								kind: 'Post',
-								id: post._id
+								id: post._id,
+                boardId: post.board
 							}
 						})
 						notificationToFollowers.save(function(err, notificationToFollowers) {
@@ -337,7 +339,8 @@ router.post('/posts/:id/comment', function(req, res) {
 							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on your post titled \"" + post.title + "\".",
 							routeID: {
 								kind: 'Post',
-								id: post._id
+								id: post._id,
+                boardId: post.board
 							}
 						})
 						notificationToPoster.save(function(err, notificationToPoster) {
@@ -350,7 +353,8 @@ router.post('/posts/:id/comment', function(req, res) {
 										message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the post \"" + post.title + "\" that you are following.",
 										routeID: {
 											kind: 'Post',
-											id: post._id
+											id: post._id,
+                      boardId: post.board
 										}
 									})
 									notificationToFollowers.save(function(err, notificationToFollowers) {

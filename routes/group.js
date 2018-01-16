@@ -48,6 +48,9 @@ router.post('/groups/create', function(req, res) {
     for(var i=0; i<members.length; i++) {
       newGroup.members.push(members[i]._id);
     }
+    if(!req.user.admin) {
+      newGroup.members.push(req.user._id);
+    }
     newGroup.save(function(err, newGroup) {
       if(err) throw err;
       for(var i=0; i<members.length; i++) {
@@ -88,7 +91,7 @@ router.get('/create-a-new-org', function(req, res) {
       for(var i=0; i<users.length; i++) {
         user_info.push({"firstName": users[i].firstName, "lastName": users[i].lastName, "username": users[i].username});
       }
-      res.render('create-a-new-org', {users: user_info});
+      res.render('create-a-new-org', {users: user_info, admin: req.user.admin});
     })
   } else {
     res.redirect('/');
@@ -114,7 +117,7 @@ router.get('/create-a-new-org-invite', function(req, res) {
           user_info.push({"firstName": users[i].firstName, "lastName": users[i].lastName, "username": users[i].username, "major": users[i].major, "classYear": users[i].classYear});
         }
       }
-      res.render('create-a-new-org-invite', {name: req.query.name, description: req.query.description, admin: req.query.admin, users: user_info});
+      res.render('create-a-new-org-invite', {name: req.query.name, description: req.query.description, groupAdmin: req.query.admin, users: user_info, admin: req.user.admin});
     })
   } else {
     res.redirect('/');
@@ -125,7 +128,7 @@ router.get('/organizations', function(req, res) {
   if(req.user) {
     Group.find({'archive': false}, function(err, groups) {
       console.log(groups);
-      res.render('org-list', {groups: groups});
+      res.render('org-list', {groups: groups, admin: req.user.admin});
     })
   } else {
     res.redirect('/');
@@ -213,7 +216,7 @@ router.get('/groupinfo', function(req, res) {
     var info = [];
     for(var i=0; i<groups.length; i++) {
       if(groups[i].archive==false) {
-        info.push({"name": groups[i].name, "_id": groups[i]._id, "active": groups[i].active});
+        info.push({"name": groups[i].name, "_id": groups[i]._id, "active": groups[i].active, admin: req.user.admin});
       }
     }
     res.send(info);
@@ -237,8 +240,9 @@ router.get('/groups/:id', function(req, res) {
           } else if (user) {
             let admin = {id: user._id, username: user.username, firstName: user.firstName, lastName: user.lastName};
             res.render('org-detail', {
-              admin: req.user.username === admin.username,
+              groupAdmin: req.user.username === admin.username,
               member: req.user.joinedGroups.indexOf(group._id) > -1,
+              admin: req.user.admin,
               group: {
                 "id": group._id,
                 "name": group.name,
@@ -250,8 +254,9 @@ router.get('/groups/:id', function(req, res) {
             })
           } else {
             res.render('org-detail', {
-              admin: req.user.username === admin.username,
+              groupAdmin: req.user.username === admin.username,
               member: req.user.joinedGroups.indexOf(group._id) > -1,
+              admin: req.user.admin,
               group: {
                 "id": group._id,
                 "name": group.name,
@@ -281,12 +286,12 @@ router.get('/groups/:id/edit', function(req, res) {
         var group_members=[];
         for(var i=0; i<users.length; i++) {
           if(group.members.indexOf(users[i]._id)>-1) {
-            group_members.push({"firstName": users[i].firstName, "lastName": users[i].lastName, "username": users[i].username});
+            group_members.push({"firstName": users[i].firstName, "lastName": users[i].lastName, "username": users[i].username, "major": users[i].major, "classYear": users[i].classYear});
           } else {
             user_info.push({"firstName": users[i].firstName, "lastName": users[i].lastName, "username": users[i].username, "major": users[i].major, "classYear": users[i].classYear});
           }
         }
-        res.render('edit-org', {id: req.params.id, name: group.name, description: group.description, admin: group.admin, active: group.active, users: user_info, members: group_members, helpers: {
+        res.render('edit-org', {admin: req.user.admin, id: req.params.id, name: group.name, description: group.description, groupAdmin: group.admin, active: group.active, users: user_info, members: group_members, helpers: {
             compare: function(lvalue, rvalue, options) {
               if (arguments.length < 3)
                   throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
@@ -337,6 +342,7 @@ router.post('/groups/:id/edit', function(req, res) {
       for(var j=0; j<addMembers.length; j++) {
         if(removeMembers[i]==addMembers[j]) {
           addMembers.splice(j, 1);
+          removeMembers.splice(i, 1);
         }
       }
     }
@@ -347,30 +353,35 @@ router.post('/groups/:id/edit', function(req, res) {
         for(var i=0; i<members.length; i++) {
           group.members.push(members[i]._id);
         }
-        group.save(function(err, updatedGroup) {
-          if(err) throw err;
-          for(var i=0; i<members.length; i++) {
-            members[i].joinedGroups.push(updatedGroup._id);
-            var newNotification = new Notification({
-              type: 'Added to Organization',
-              message: "You have been added to a new Organization, " + updatedGroup.name + ".",
-              routeID: {
-                kind: 'Group',
-                id: updatedGroup._id
-              }
-            });
-            members[i].save(function(err, updatedUser) {
-              if(err) throw err;
-              newNotification.save(function(err, notification) {
-                if(err) throw err;
-                updatedUser.notifications.push(notification._id);
-                updatedUser.save(function(err, completeUser) {
-                  if(err) throw err;
-                })
-              })
-            });
+        User.find({'username': removeMembers}, function(err, removedMembers) {
+          for(var i=0; i<removedMembers.length; i++) {
+            group.members.splice(group.members.indexOf(removedMembers[i]._id), 1);
           }
-          res.redirect('/groups/' + updatedGroup._id);
+          group.save(function(err, updatedGroup) {
+            if(err) throw err;
+            for(var i=0; i<members.length; i++) {
+              members[i].joinedGroups.push(updatedGroup._id);
+              var newNotification = new Notification({
+                type: 'Added to Organization',
+                message: "You have been added to a new Organization, " + updatedGroup.name + ".",
+                routeID: {
+                  kind: 'Group',
+                  id: updatedGroup._id
+                }
+              });
+              members[i].save(function(err, updatedUser) {
+                if(err) throw err;
+                newNotification.save(function(err, notification) {
+                  if(err) throw err;
+                  updatedUser.notifications.push(notification._id);
+                  updatedUser.save(function(err, completeUser) {
+                    if(err) throw err;
+                  })
+                })
+              });
+            }
+            res.redirect('/groups/' + updatedGroup._id);
+          })
         })
       })
     } else {
@@ -417,7 +428,7 @@ router.post('/groups/:id/edit', function(req, res) {
 })
 
 //Join group
-router.put('/groups/:id/join', function(req, res) {
+router.post('/groups/:id/join', function(req, res) {
   Group.findOneAndUpdate({_id: req.params.id}, {$push: {members: req.user._id}}, function(err, group) {
     if (err) {
       throw err;
@@ -434,7 +445,7 @@ router.put('/groups/:id/join', function(req, res) {
 })
 
 //Leave group
-router.put('/groups/:id/leave', function(req, res) {
+router.post('/groups/:id/leave', function(req, res) {
   Group.findOneAndUpdate({_id: req.params.id}, {$pull: {members: req.user._id}}, function(err, group) {
     if (err) {
       throw err;

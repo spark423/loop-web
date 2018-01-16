@@ -56,7 +56,9 @@
             <div class="uk-clearfix"></div>
         </div>
         <ul class="uk-nav-default uk-nav-parent-icon" uk-nav>
+          {{#if admin}}
             <li class="uk-active"><a href="/home"><span uk-icon="icon: home"></span>Home</a></li>
+            {{/if}}
             <li><a href="/feed"><span uk-icon="icon: rss"></span>Feed</a></li>
             <li><a href="/events"><span uk-icon="icon: calendar"></span>Events</a></li>
             <li><a href="/organizations"><span uk-icon="icon: users"></span>Organizations</a></li>
@@ -110,11 +112,13 @@
                             Event
                         </a>
                     </li>
+                    {{#if admin}}
                     <li>
                         <a href="/create-a-new-board">
                             Board
                         </a>
-                    </li>
+                    </li> 
+                    {{/if}}
                     <li>
                         <a href="/create-a-new-org">
                             Organization

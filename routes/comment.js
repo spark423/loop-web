@@ -6,6 +6,224 @@ var Post = require('../models/post');
 var Event = require('../models/event');
 var Comment = require('../models/comment')
 
+router.post('/comments/:id/flag', function(req, res) {
+  	Comment.findOneAndUpdate({_id: req.params.id}, {$set: {flagged: true}},function(err,comment) {
+			if(comment.source.kind=="Event") {
+				Event.findById(comment.source.item, function(err, event) {
+					let notificationToPoster = new Notification({
+		  			type: 'Flagged Comment',
+		  			message: "Your comment on the event titled \"" + event.title + "\" has been flagged. Please wait for the admin's review.",
+		  			routeID: {
+		  				kind: 'Comment',
+		  				id: comment._id,
+		          boardId: event.board
+		  			}
+		      })
+		      notificationToPoster.save(function(err, notificationToPoster) {
+		      	if (err) {
+		      		throw err;
+		      	} else {
+		      		User.findOneAndUpdate({_id: comment.postedBy}, {$push: {notifications: notificationToPoster}}, function(err,user) {
+		      			if (err) {
+		      				throw err;
+		      			} else {
+		      				let notificationToAdmin = new Notification({
+		      					type: "Flagged Comment",
+		      					message: "The comment on the event titled \"" + event.title + "\" has been flagged.",
+		      					routeID: {
+		      						kind: 'Comment',
+		      						id: comment._id,
+		                  boardId: event.board
+		      					}
+		      				})
+		      				notificationToAdmin.save(function(err, notificationToAdmin) {
+		      					if (err) {
+		      						throw err;
+		      					} else {
+		      						User.updateMany({admin: true}, {$push: {notifications: notificationToAdmin}}, function(err, admin) {
+		      							if (err) {
+		      								throw err;
+		      							} else {
+		                      Board.findOneAndUpdate({_id: event.board}, {$push: {notifications: notificationToAdmin}}, function(err, originBoard) {
+		                        if (err) {
+		                          throw err;
+		                        } else {
+		                          res.json({success: true});
+		                        }
+		                      })
+		      							}
+		      						})
+		      					}
+		      				})
+		      			}
+		      		})
+		      	}
+		      })
+				})
+			} else if (comment.source.kind=="Post") {
+				Post.findById(comment.source.item, function(err, post) {
+					let notificationToPoster = new Notification({
+		  			type: 'Flagged Comment',
+		  			message: "Your comment on the post titled \"" + post.title + "\" has been flagged. Please wait for the admin's review.",
+		  			routeID: {
+		  				kind: 'Comment',
+		  				id: comment._id,
+		          boardId: post.board
+		  			}
+		      })
+		      notificationToPoster.save(function(err, notificationToPoster) {
+		      	if (err) {
+		      		throw err;
+		      	} else {
+		      		User.findOneAndUpdate({_id: comment.postedBy}, {$push: {notifications: notificationToPoster}}, function(err,user) {
+		      			if (err) {
+		      				throw err;
+		      			} else {
+		      				let notificationToAdmin = new Notification({
+		      					type: "Flagged Comment",
+		      					message: "The comment on the post titled \"" + post.title + "\" has been flagged.",
+		      					routeID: {
+		      						kind: 'Comment',
+		      						id: comment._id,
+		                  boardId: post.board
+		      					}
+		      				})
+		      				notificationToAdmin.save(function(err, notificationToAdmin) {
+		      					if (err) {
+		      						throw err;
+		      					} else {
+		      						User.updateMany({admin: true}, {$push: {notifications: notificationToAdmin}}, function(err, admin) {
+		      							if (err) {
+		      								throw err;
+		      							} else {
+		                      Board.findOneAndUpdate({_id: post.board}, {$push: {notifications: notificationToAdmin}}, function(err, originBoard) {
+		                        if (err) {
+		                          throw err;
+		                        } else {
+		                          res.json({success: true});
+		                        }
+		                      })
+		      							}
+		      						})
+		      					}
+		      				})
+		      			}
+		      		})
+		      	}
+		      })
+				})
+			} else {
+				Comment.findById(comment.source.item, function(err, parentComment) {
+					if(parentComment.source.kind=="Event") {
+						Event.findById(parentComment.source.item, function(err, event) {
+							let notificationToPoster = new Notification({
+				  			type: 'Flagged Comment',
+				  			message: "Your comment on the event titled \"" + event.title + "\" has been flagged. Please wait for the admin's review.",
+				  			routeID: {
+				  				kind: 'Comment',
+				  				id: comment._id,
+				          boardId: event.board
+				  			}
+				      })
+				      notificationToPoster.save(function(err, notificationToPoster) {
+				      	if (err) {
+				      		throw err;
+				      	} else {
+				      		User.findOneAndUpdate({_id: comment.postedBy}, {$push: {notifications: notificationToPoster}}, function(err,user) {
+				      			if (err) {
+				      				throw err;
+				      			} else {
+				      				let notificationToAdmin = new Notification({
+				      					type: "Flagged Comment",
+				      					message: "The comment on the event titled \"" + event.title + "\" has been flagged.",
+				      					routeID: {
+				      						kind: 'Comment',
+				      						id: comment._id,
+				                  boardId: event.board
+				      					}
+				      				})
+				      				notificationToAdmin.save(function(err, notificationToAdmin) {
+				      					if (err) {
+				      						throw err;
+				      					} else {
+				      						User.updateMany({admin: true}, {$push: {notifications: notificationToAdmin}}, function(err, admin) {
+				      							if (err) {
+				      								throw err;
+				      							} else {
+				                      Board.findOneAndUpdate({_id: event.board}, {$push: {notifications: notificationToAdmin}}, function(err, originBoard) {
+				                        if (err) {
+				                          throw err;
+				                        } else {
+				                          res.json({success: true});
+				                        }
+				                      })
+				      							}
+				      						})
+				      					}
+				      				})
+				      			}
+				      		})
+				      	}
+				      })
+						})
+					} else {
+						Post.findById(parentComment.source.item, function(err, post) {
+							let notificationToPoster = new Notification({
+				  			type: 'Flagged Comment',
+				  			message: "Your comment on the post titled \"" + post.title + "\" has been flagged. Please wait for the admin's review.",
+				  			routeID: {
+				  				kind: 'Comment',
+				  				id: comment._id,
+				          boardId: post.board
+				  			}
+				      })
+				      notificationToPoster.save(function(err, notificationToPoster) {
+				      	if (err) {
+				      		throw err;
+				      	} else {
+				      		User.findOneAndUpdate({_id: comment.postedBy}, {$push: {notifications: notificationToPoster}}, function(err,user) {
+				      			if (err) {
+				      				throw err;
+				      			} else {
+				      				let notificationToAdmin = new Notification({
+				      					type: "Flagged Comment",
+				      					message: "The comment on the post titled \"" + post.title + "\" has been flagged.",
+				      					routeID: {
+				      						kind: 'Comment',
+				      						id: comment._id,
+				                  boardId: post.board
+				      					}
+				      				})
+				      				notificationToAdmin.save(function(err, notificationToAdmin) {
+				      					if (err) {
+				      						throw err;
+				      					} else {
+				      						User.updateMany({admin: true}, {$push: {notifications: notificationToAdmin}}, function(err, admin) {
+				      							if (err) {
+				      								throw err;
+				      							} else {
+				                      Board.findOneAndUpdate({_id: post.board}, {$push: {notifications: notificationToAdmin}}, function(err, originBoard) {
+				                        if (err) {
+				                          throw err;
+				                        } else {
+				                          res.json({success: true});
+				                        }
+				                      })
+				      							}
+				      						})
+				      					}
+				      				})
+				      			}
+				      		})
+				      	}
+				      })
+						})
+					}
+				})
+			}
+  	})
+  })
+
 router.get('/comments/:id', function(req, res) {
 	Comment.findById(req.params.id, function(err, comment) {
 		if(comment.source.kind=="Event") {

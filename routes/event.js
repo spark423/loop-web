@@ -46,6 +46,61 @@ function quickSort(items, left, right) {
     }
     return items;
 }
+
+router.post('/events/:id/flag', function(req, res) {
+  	Event.findOneAndUpdate({_id: req.params.id}, {$set: {flagged: true}},function(err,post) {
+  		let notificationToPoster = new Notification({
+  			type: 'Flagged Event',
+  			message: "Your event \"" + post.title + "\" has been flagged. Please wait for the admin's review.",
+  			routeID: {
+  				kind: 'Event',
+  				id: post._id,
+          boardId: post.board
+  			}
+      })
+      notificationToPoster.save(function(err, notificationToPoster) {
+      	if (err) {
+      		throw err;
+      	} else {
+      		User.findOneAndUpdate({username: post.contact}, {$push: {notifications: notificationToPoster}}, function(err,user) {
+      			if (err) {
+      				throw err;
+      			} else {
+      				let notificationToAdmin = new Notification({
+      					type: "Flagged Event",
+      					message: "The event titled \"" + post.title + "\" has been flagged.",
+      					routeID: {
+      						kind: 'Event',
+      						id: post._id,
+                  boardId: post.board
+      					}
+      				})
+      				notificationToAdmin.save(function(err, notificationToAdmin) {
+      					if (err) {
+      						throw err;
+      					} else {
+      						User.updateMany({admin: true}, {$push: {notifications: notificationToAdmin}}, function(err, admin) {
+      							if (err) {
+      								throw err;
+      							} else {
+                      Board.findOneAndUpdate({_id: post.board}, {$push: {notifications: notificationToAdmin}}, function(err, originBoard) {
+                        if (err) {
+                          throw err;
+                        } else {
+                          res.redirect('back');
+                        }
+                      })
+      							}
+      						})
+      					}
+      				})
+      			}
+      		})
+      	}
+      })
+  	})
+  })
+
 router.get('/events/calendar', function(req, res) {
   if(req.user) {
     var afterDay = moment(Date.now()).endOf('month').add(6-moment(Date.now()).endOf('month').day(), 'days').format().slice(0,-6) + '.000Z';
@@ -54,7 +109,7 @@ router.get('/events/calendar', function(req, res) {
       if(err) throw err;
       let sortedEvents = quickSort(events, 0, events.length-1);
       var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-      res.render('events-calendar-view', {events: sortedEvents, month: months[moment().month()], year: moment().local().year(), thisMonth: moment().local().daysInMonth(), lastMonth: moment().local().add(-1, 'month').daysInMonth(), lastMonthStart: moment().local().startOf('month').add(0-moment().startOf('month').day(), 'days').date()});
+      res.render('events-calendar-view', {admin: req.user.admin, events: sortedEvents, month: months[moment().month()], year: moment().local().year(), thisMonth: moment().local().daysInMonth(), lastMonth: moment().local().add(-1, 'month').daysInMonth(), lastMonthStart: moment().local().startOf('month').add(0-moment().startOf('month').day(), 'days').date()});
     })
   } else {
     res.redirect('/');
@@ -86,7 +141,7 @@ router.get('/boardinfo', function(req, res) {
           info.push({"name": boards[i].name, "_id": boards[i]._id, "unsubscribable": boards[i].unsubscribable, "active": boards[i].active});
         }
       }
-      res.send({"info": info, "subscribedBoards": req.user.subscribedBoards});
+      res.send({"info": info, "subscribedBoards": req.user.subscribedBoards, admin: req.user.admin});
     });
   } else {
     res.redirect('/');
@@ -169,7 +224,7 @@ router.get('/events/past', function(req, res) {
         }
       })
       Promise.all(eventObjects).then(function(events) {
-        res.render("past-events", {events: events, helpers: {
+        res.render("past-events", {events: events, admin: req.user.admin, helpers: {
             compare: function(lvalue, rvalue, options) {
               if (arguments.length < 3)
                   throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
@@ -216,7 +271,7 @@ router.get('/events/create', function(req, res) {
           info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
         }
       }
-      res.render("create-a-new-event", {boards: info});
+      res.render("create-a-new-event", {boards: info, admin: req.user.admin});
     })
   } else {
     res.redirect('/');
@@ -245,7 +300,7 @@ router.get('/create-a-new-event-invite', function(req, res) {
           user_info.push({"firstName": users[i].firstName, "lastName": users[i].lastName, "username": users[i].username, "major": users[i].major, "classYear": users[i].classYear});
         }
       }
-      res.render('create-a-new-event-invite', {title: req.query.title, description: req.query.description, board: req.query.board, date: req.query.date, startTime: req.query.startTime, endTime: req.query.endTime, location: req.query.location, contact: req.query.contact, users: user_info});
+      res.render('create-a-new-event-invite', {admin: req.user.admin, title: req.query.title, description: req.query.description, board: req.query.board, date: req.query.date, startTime: req.query.startTime, endTime: req.query.endTime, location: req.query.location, contact: req.query.contact, users: user_info});
     })
   } else {
     res.redirect('/');
@@ -299,7 +354,8 @@ router.post('/events/create', function(req, res) {
                 message: "You have been invited to a new Event, " + newEvent.title + ".",
                 routeID: {
                   kind: 'Event',
-                  id: newEvent._id
+                  id: newEvent._id,
+                  boardId: newEvent.board
                 }
               });
               newNotification.save(function(err, notification) {
@@ -336,7 +392,7 @@ router.get('/event/:id', function(req, res) {
             var attending = false;
           }
           let comments = event.comments.map(function(comment) {
-            return {"id": comment._id, "createdAt": moment(comment.createdAt).local().format('MMMM D, YYYY, h:mm a'), "postedBy": {"id": comment.postedBy._id, "firstName": comment.postedBy.firstName, "lastName": comment.postedBy.lastName}, "text": comment.text, "flagged": comment.flagged}
+            return {"own": comment.postedBy._id.toString() === req.user._id.toString(), "id": comment._id, "createdAt": moment(comment.createdAt).local().format('MMMM D, YYYY, h:mm a'), "postedBy": {"id": comment.postedBy._id, "firstName": comment.postedBy.firstName, "lastName": comment.postedBy.lastName}, "text": comment.text, "flagged": comment.flagged}
           })
           if(event.endTime) {
             var endTime = moment(event.endTime).utc().format('h:mm a');
@@ -347,6 +403,7 @@ router.get('/event/:id', function(req, res) {
             if(err) throw err;
             if(user) {
               var eventObject = {
+                "own": user._id.toString() === req.user._id.toString(),
                 "id": event._id,
                 "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
                 "postedBy": {
@@ -391,7 +448,7 @@ router.get('/event/:id', function(req, res) {
               }
             }
             console.log(eventObject);
-            res.render('event-detail', {"event": eventObject, "board": board.name, helpers: {
+            res.render('event-detail', {"event": eventObject, "board": board.name, admin: req.user.admin, helpers: {
   							compare: function(lvalue, rvalue, options) {
   								if (arguments.length < 3)
   										throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
@@ -508,7 +565,7 @@ router.get('/events', function(req, res) {
                   info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
                 }
               }
-              res.render('events-list-view', {events: events, boards: info, helpers: {
+              res.render('events-list-view', {events: events, boards: info, admin: req.user.admin, helpers: {
     							compare: function(lvalue, rvalue, options) {
     								if (arguments.length < 3)
     										throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
@@ -560,7 +617,7 @@ router.get('/event/:id/edit', function(req, res) {
       } else {
         var endTime = "";
       }
-      res.render('edit-event', {event: event, date: date, startTime: startTime, endTime: endTime});
+      res.render('edit-event', {event: event, date: date, startTime: startTime, endTime: endTime, admin: req.user.admin});
     })
   } else {
     res.redirect('/');
@@ -603,7 +660,8 @@ router.put('/events/:id', function(req, res) {
 								message: currentUser.firstName + " " + currentUser.lastName + " is attending your event: " + event.title,
 								routeID: {
 									kind: 'Event',
-									id: event._id
+									id: event._id,
+                  boardId: event.board
 								}
 							})
 							notificationToCreator.save(function(err, notificationToCreator){
@@ -715,7 +773,8 @@ router.post('/events/:id/comment', function(req, res) {
     							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the event \"" + post.title + "\" that you are attending.",
     							routeID: {
     								kind: 'Event',
-    								id: post._id
+    								id: post._id,
+                    boardId: post.board
     							}
     						})
     						notificationToFollowers.save(function(err, notificationToFollowers) {
@@ -749,7 +808,8 @@ router.post('/events/:id/comment', function(req, res) {
     							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on your event titled \"" + post.title + "\".",
     							routeID: {
     								kind: 'Event',
-    								id: post._id
+    								id: post._id,
+                    boardId: post.board
     							}
     						})
     						notificationToPoster.save(function(err, notificationToPoster) {
@@ -762,7 +822,8 @@ router.post('/events/:id/comment', function(req, res) {
     										message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the event \"" + post.title + "\" that you are attending.",
     										routeID: {
     											kind: 'Event',
-    											id: post._id
+    											id: post._id,
+                          boardId: post.board
     										}
     									})
     									notificationToFollowers.save(function(err, notificationToFollowers) {
@@ -799,7 +860,8 @@ router.post('/events/:id/comment', function(req, res) {
                 message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the event \"" + post.title + "\" that you are attending.",
                 routeID: {
                   kind: 'Event',
-                  id: post._id
+                  id: post._id,
+                  boardId: post.board
                 }
               })
               notificationToFollowers.save(function(err, notificationToFollowers) {

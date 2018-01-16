@@ -34,7 +34,10 @@ function unattend() {
 
     <div class="event-detail-header top">
         <h2><a href="javascript:history.back()"><span uk-icon="icon: chevron-left"></span></a>{{event.title}} {{#compare event.archived true opeartor="=="}}<b style="color: red">(DELETED)</b>{{/compare}}</h2>
+        {{#if admin}}<a href="/event/{{event.id}}/edit" class="uk-float-right green"><span class="uk-icon" uk-icon="icon: pencil"></span>Edit event</a>
+        {{else if event.own}}
         <a href="/event/{{event.id}}/edit" class="uk-float-right green"><span class="uk-icon" uk-icon="icon: pencil"></span>Edit event</a>
+        {{/if}}
         <div class="img-wrap"></div>
     </div>
 

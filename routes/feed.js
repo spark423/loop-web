@@ -65,16 +65,44 @@ function quickSort(items, left, right) {
                 contents = contents.concat(boards[i].contents)
               }
               let sortedContents = quickSort(contents, 0, contents.length - 1);
-              let feed = sortedContents.reverse().map(async function(content) {
+              sortedContents.reverse();
+              var numPages = Math.ceil(sortedContents.length/10);
+              var pages = [];
+              if(numPages<20) {
+                for(var i=1; i<=numPages; i++) {
+                  pages.push(i);
+                }
+              } else {
+                if(req.query.page) {
+                  if(req.query.page>10 && req.query.page <= numPages-9) {
+                    for(var i=req.query.page-9;i<req.query.page+10;i++) {
+                      pages.push(i);
+                    }
+                  }
+                } else {
+                  for(var i=1; i<=numPages; i++) {
+                    pages.push(i);
+                  }
+                }
+              }
+              if(req.query.page) {
+                var currentPage = req.query.page;
+                sortedContents = sortedContents.slice(req.query.page*10 - 10, req.query.page*10);
+              } else {
+                var currentPage = 1;
+                sortedContents = sortedContents.slice(0, 10);
+              }
+              let feed = sortedContents.map(async function(content) {
                 let item = content.item;
                 let kind = content.kind;
                 let comments = [];
                   for (let j=0; j<item.comments.length; j++) {
                     let comment = item.comments[j];
                         commentOfComments = comment.comments.map(function(commentOfComment) {
-                          return {"id": commentOfComment._id, "createdAt": commentOfComment.createdAt, "postedBy": {"id": commentOfComment.postedBy._id, "firstName": commentOfComment.postedBy.firstName, "lastName": commentOfComment.postedBy.lastName}}
+                          return {"own": req.user._id.toString() === commentOfComment.postedBy._id.toString(), "id": commentOfComment._id, "createdAt": commentOfComment.createdAt, "postedBy": {"id": commentOfComment.postedBy._id, "firstName": commentOfComment.postedBy.firstName, "lastName": commentOfComment.postedBy.lastName}, "flagged": commentOfComment.flagged}
                         })
                     comments.push({
+                      "own": req.user._id.toString() === comment.postedBy._id.toString(),
                       "id": comment._id,
                       "createdAt": moment(comment.createdAt).local().format('MMMM D, YYYY, h:mm a'),
                       "postedBy": {
@@ -83,6 +111,7 @@ function quickSort(items, left, right) {
                         "lastName": comment.postedBy.lastName
                       },
                       "text": comment.text,
+                      "flagged": comment.flagged,
                       "comments": commentOfComments
                     });
                   }
@@ -103,6 +132,7 @@ function quickSort(items, left, right) {
                     },
                     "title": item.title,
                     "text": item.text,
+                    "flagged": item.flagged,
                     "comments": comments
                   }
                   return Promise.resolve(postObject)
@@ -134,6 +164,7 @@ function quickSort(items, left, right) {
                       "endTime": endTime,
                       "location": item.location,
                       "description": item.description,
+                      "flagged": item.flagged,
                       "comments": comments,
                       "attendees": attendees
                     }
@@ -154,6 +185,7 @@ function quickSort(items, left, right) {
                       "endTime": endTime,
                       "location": item.location,
                       "description": item.description,
+                      "flagged": item.flagged,
                       "comments": comments,
                       "attendees": attendees
                     };
@@ -162,7 +194,7 @@ function quickSort(items, left, right) {
                 }
               })
               Promise.all(feed).then(function(feed) {
-                res.render('feed', {contents: feed, helpers: {
+                res.render('feed', {contents: feed, pages: pages, currentPage: currentPage, admin: req.user.admin, user: req.user._id, helpers: {
                     compare: function(lvalue, rvalue, options) {
                       if (arguments.length < 3)
                           throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
@@ -208,7 +240,7 @@ router.get('/feed-settings', function(req, res) {
       let boards = allBoards.map(function(board) {
         return {"id": board._id, "name": board.name, "description": board.description, "subscribed": req.user.subscribedBoards.indexOf(board._id) > -1};
       })
-      res.render('feed-settings', {boards: boards});
+      res.render('feed-settings', {boards: boards, admin: req.user.admin});
     })
   } else {
     res.redirect('/');

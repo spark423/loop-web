@@ -31,7 +31,7 @@ router.get('/users/:id', function(req, res) {
 					adminGroups: user.adminGroups,
 					joinedGroups: user.joinedGroups,
 					subscribedBoards: user.subscribedBoards
-				}, self: req.user._id==user.id, helpers: {
+				}, self: req.user._id==user.id, admin: req.user.admin, helpers: {
 						compare: function(lvalue, rvalue, options) {
 							if (arguments.length < 3)
 									throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
@@ -71,7 +71,7 @@ router.get('/users/:id', function(req, res) {
 //Render edit profile page
 router.get('/user/edit', function(req, res) {
 	if(req.user) {
-		res.render('edit-profile', {id: req.user._id, description: req.user.description});
+		res.render('edit-profile', {id: req.user._id, description: req.user.description, admin: req.user.admin});
 	} else {
 		res.redirect('/');
 	}

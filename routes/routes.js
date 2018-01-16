@@ -17,9 +17,30 @@ var Event = require('../models/event');
 
 module.exports = function(passport) {
 
+  router.get('/register', function(req, res) {
+    res.render('preregister');
+  });
+
   // Retrieve registration page
   router.get('/signup', function(req, res) {
     res.render('register', {message: req.query.message});
+  });
+
+  router.get('/student-signup', function(req, res) {
+    res.render('student-register');
+  });
+
+  router.post('/student-signup', function(req, res) {
+    User.findOne({'username': req.body.username}, function(err, user) {
+      if (err)
+        return done(err);
+      if (user) {
+        var message = encodeURIComponent('That email is already taken');
+        res.redirect('/student-signup/?message=' + message)
+      } else {
+        res.redirect('/student-signup-password/?username=' + req.body.username + '&firstName=' + req.body.firstName + '&lastName=' + req.body.lastName + '&major=' + req.body.major + '&class=' + req.body.class);
+      }
+    })
   });
 
   router.post('/signup', function(req, res) {
@@ -41,10 +62,29 @@ module.exports = function(passport) {
     })
   });
 
+  router.get('/student-signup-password', function(req, res) {
+    if(Object.keys(req.query).length==5) {
+      res.render('create-password', {student: true, username: req.query.username, firstName: req.query.firstName, lastName: req.query.lastName, major: req.query.major, class: req.query.class, message: req.flash('signupMessage')});
+    } else {
+      console.log(req.query);
+      res.redirect('/');
+    }
+  });
+
+  router.post('/student-signup-password', passport.authenticate('local-student-signup', {
+      successRedirect : '/',
+      failureRedirect : '/student-signup-password',
+      failureFlash : true // allow flash messages
+    })
+  );
 
   // Retrieve create password page
   router.get('/signup-password', function(req, res) {
-    res.render('create-password', {username: req.query.username, firstName: req.query.firstName, lastName: req.query.lastName, message: req.flash('signupMessage')});
+    if(req.query.length==3) {
+      res.render('create-password', {username: req.query.username, firstName: req.query.firstName, lastName: req.query.lastName, message: req.flash('signupMessage')});
+    } else {
+      res.redirect('/');
+    }
   });
 
   router.post('/signup-password', passport.authenticate('local-signup', {

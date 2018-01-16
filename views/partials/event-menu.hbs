@@ -14,11 +14,20 @@
               </a>
             </li>
             {{/compare}}
+            {{#if @root.admin}}
             <li>
               <a href="/event/{{id}}/edit">
                 Edit Event
               </a>
             </li>
+            {{else if this.own}}
+            <li>
+              <a href="/event/{{id}}/edit">
+                Edit Event
+              </a>
+            </li>
+            {{/if}}
+            {{#if @root.admin}}
             {{#if this.flagged}}
             <form method="post" id="unflag-event-{{@index}}" action="/events/{{this.id}}/unflag"></form>
             <li>
@@ -36,6 +45,19 @@
             <li>
               <a href="#" onclick="document.getElementById('delete-event-{{@index}}').submit();">
                 Delete Event
+              </a>
+            </li>
+            {{/if}}
+            {{else if this.own}}
+            <li>
+              <a href="#" onclick="document.getElementById('delete-event-{{@index}}').submit();">
+                Delete Event
+              </a>
+            </li>
+            {{else}}
+            <li>
+              <a href="#" onclick="document.getElementById('flag-event-{{@index}}').submit();">
+                Flag Event
               </a>
             </li>
             {{/if}}

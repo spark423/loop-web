@@ -28,6 +28,7 @@ window.title = false;
     <form id='delete-event-{{@index}}' style="display: none" method="post" action="/events/{{this.id}}"></form>
     <form id='attend-event-{{@index}}' style="display: none" method="post" action="/events/{{this.id}}/attend"></form>
     <form id='unattend-event-{{@index}}' style="display: none" method="post" action="/events/{{this.id}}/unattend"></form>
+    <form id='flag-event-{{@index}}' style="display: none" method="post" action="/events/{{this.id}}/flag"></form>
     <div id="feed-event" class="event">
         <div class="feed-item">
             <div class="uk-card uk-card-default uk-card-body">
@@ -67,8 +68,8 @@ window.title = false;
                 <p style="display: none" id="comment-length-{{@index}}">{{this.comments.length}}</p>
                 {{#if this.comments}}
                 {{#each this.comments}}
-                <form id='delete-comment-{{@index}}' style="display: none" method="post" action="/comments/{{id}}">
-                </form>
+                <form id='delete-comment-{{@../index}}-{{@index}}' style="display: none" method="post" action="/comments/{{id}}"></form>
+                <form id='flag-comment-{{@../index}}-{{@index}}' style="display: none" method="post" action="/comments/{{id}}/flag"></form>
                 {{#compare @index 0 operator="=="}}
                 <div class="divider"></div>
                 <div class="reply">
@@ -99,8 +100,8 @@ window.title = false;
                 <div class="add-comment add-comment-reply" uk-grid>
                   <div class="uk-width-expand@m">
                     {{#each this.comments}}
-                    <form id='delete-comment-{{@../index}}-{{@index}}' style="display: none" method="post" action="/comments/{{id}}">
-                    </form>
+                    <form id='delete-comment-{{@../index}}-{{@index}}' style="display: none" method="post" action="/comments/{{id}}"></form>
+                    <form id='flag-comment-{{@../index}}-{{@index}}' style="display: none" method="post" action="/comments/{{id}}/flag"></form>
                     {{#compare @index 0 operator=">"}}
                     <div class="divider"></div>
                     {{/compare}}
@@ -456,6 +457,7 @@ window.title = false;
     <form id='delete-post-{{@index}}' style="display: none" method="post" action="/posts/{{this.id}}"></form>
     <form id='follow-post-{{@index}}' style="display: none" method="post" action="/posts/{{this.id}}/follow"></form>
     <form id='unfollow-post-{{@index}}' style="display: none" method="post" action="/posts/{{this.id}}/unfollow"></form>
+    <form id='flag-post-{{@index}}' style="display: none" method="post" action="/posts/{{this.id}}/flag"></form>
     <div class="feed-item post" id="{{this.id}}">
         <div class="uk-card uk-card-default uk-card-body">
             <div class="main-post">
@@ -482,8 +484,8 @@ window.title = false;
             <p style="display: none" id="comment-length-{{@index}}">{{this.comments.length}}</p>
             {{#if this.comments}}
             {{#each this.comments}}
-            <form id='delete-comment-{{@index}}' style="display: none" method="post" action="/comments/{{id}}">
-            </form>
+            <form id='delete-comment-{{@../index}}-{{@index}}' style="display: none" method="post" action="/comments/{{id}}"></form>
+            <form id='flag-comment-{{@../index}}-{{@index}}' style="display: none" method="post" action="/comments/{{id}}/flag"></form>
             {{#compare @index 0 operator="=="}}
             <div class="divider"></div>
             <div class="reply">
@@ -867,7 +869,31 @@ window.title = false;
     </div>
     {{/if}}
     {{/each}}
+    <style>
+.pagination a {
+    color: black;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background-color .3s;
+    font-size: 25px;
+}
 
+.pagination a.active {
+    background-color: #00d283;
+    color: white;
+}
+
+.pagination a:hover:not(.active) {background-color: #ddd;}
+</style>
+<div style="text-align:center">
+    <div class="pagination">
+      <a href="#">&laquo;</a>
+      {{#each pages}}
+      <a {{#compare this ../currentPage operator="=="}}class="active" {{/compare}}href="/feed/?page={{this}}">{{this}}</a>
+      {{/each}}
+      <a href="#">&raquo;</a>
+    </div>
+  </div>
 </div>
 
  {{>image-upload-modal}}

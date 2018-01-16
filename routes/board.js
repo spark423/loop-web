@@ -25,7 +25,7 @@ router.get('/boardinfo', function(req, res) {
           info.push({"name": boards[i].name, "_id": boards[i]._id, "unsubscribable": boards[i].unsubscribable, "active": boards[i].active});
         }
       }
-      res.send({"info": info, "subscribedBoards": req.user.subscribedBoards});
+      res.send({"info": info, "subscribedBoards": req.user.subscribedBoards, admin: req.user.admin});
     });
   } else {
     res.redirect('/');
@@ -37,7 +37,7 @@ router.get('/boards/:id/edit', function(req, res) {
   if(req.user) {
     Board.findById(req.params.id, function(err, board) {
       if(err) throw err;
-      res.render('edit-board', {id: req.params.id, name: board.name, description: board.description, active: board.active});
+      res.render('edit-board', {id: req.params.id, name: board.name, description: board.description, active: board.active, admin: req.user.admin});
     })
   } else {
     res.redirect('/');
@@ -177,16 +177,16 @@ router.get('/boards/:id', function(req, res) {
         throw err;
       }
         let contents = board.contents.reverse().map(async function(content) {
-          console.log(content);
           let item = content.item;
           let kind = content.kind;
           let comments = [];
           for (let j=0; j<item.comments.length; j++) {
             let comment = item.comments[j];
             let commentOfComments = comment.comments.map(function(commentOfComment) {
-              return {"id": commentOfComment._id, "createdAt": commentOfComment.createdAt, "postedBy": {"id": commentOfComment.postedBy._id, "firstName": commentOfComment.postedBy.firstName, "lastName": commentOfComment.postedBy.lastName}, "text": commentOfComment.text}
+              return {"own": req.user._id.toString() === commentOfComment.postedBy._id.toString(), "id": commentOfComment._id, "createdAt": commentOfComment.createdAt, "postedBy": {"id": commentOfComment.postedBy._id, "firstName": commentOfComment.postedBy.firstName, "lastName": commentOfComment.postedBy.lastName}, "text": commentOfComment.text}
             })
             comments.push({
+              "own": req.user._id.toString() === comment.postedBy._id.toString(),
               "id": comment._id,
               "createdAt": moment(comment.createdAt).local().format('MMMM D, YYYY, h:mm a'),
               "postedBy": {
@@ -279,6 +279,32 @@ router.get('/boards/:id', function(req, res) {
           let notifications = board.notifications.map(function(notification) {
             return {"id": notification._id, "createdAt": moment(notification.createdAt).local().format('MMM D, YYYY, h:mm a'), "message": notification.message, "routeID": notification.routeID.id, "kind": notification.routeID.kind}
           });
+          var numPages = Math.ceil(contents.length/10);
+          var pages = [];
+          if(numPages<20) {
+            for(var i=1; i<=numPages; i++) {
+              pages.push(i);
+            }
+          } else {
+            if(req.query.page) {
+              if(req.query.page>10 && req.query.page <= numPages-9) {
+                for(var i=req.query.page-9;i<req.query.page+10;i++) {
+                  pages.push(i);
+                }
+              }
+            } else {
+              for(var i=1; i<=numPages; i++) {
+                pages.push(i);
+              }
+            }
+          }
+          if(req.query.page) {
+            var currentPage = req.query.page;
+            contents = contents.slice(req.query.page*10 - 10, req.query.page*10);
+          } else {
+            var currentPage = 1;
+            contents = contents.slice(0, 10);
+          }
           res.render('board-overview', {
             board: {
               id: board._id,
@@ -289,7 +315,7 @@ router.get('/boards/:id', function(req, res) {
               active: board.active,
               description: board.description,
               contents: contents,
-              notifications: notifications}, helpers: {
+              notifications: notifications}, pages: pages, currentPage: currentPage, admin: req.user.admin, helpers: {
               		compare: function(lvalue, rvalue, options) {
               			if (arguments.length < 3)
               					throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
@@ -396,7 +422,13 @@ router.post('/boards/:id/unsubscribe', function(req, res) {
 
 //Render create a new board page
 router.get('/create-a-new-board', function(req, res) {
-  res.render("create-a-new-board");
+  if(req.user) {
+    if(req.user.admin) {
+      res.render("create-a-new-board", {admin: req.user.admin});
+    }
+  } else {
+    res.redirect('/');
+  }
 });
 
 //Create board
