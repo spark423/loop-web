@@ -1,6 +1,8 @@
 <div uk-drop="mode: click">
     <div class="uk-card uk-card-body uk-card-default">
         <ul>
+          {{#if this.own}}
+          {{else}}
           {{#compare this.following false operator="=="}}
           <li>
             <a href="#" onclick="document.getElementById('follow-post-{{@index}}').submit();">
@@ -13,12 +15,23 @@
               Unfollow Post
             </a>
           </li>
+
           {{/compare}}
+          {{/if}}
+          {{#if this.own}}
           <li>
             <a href="/posts/{{this.id}}/edit">
               Edit Post
             </a>
           </li>
+          {{else if @root.admin}}
+          <li>
+            <a href="/posts/{{this.id}}/edit">
+              Edit Post
+            </a>
+          </li>
+          {{/if}}
+          {{#if @root.admin}}
           {{#if this.flagged}}
           <form method="post" id="unflag-post-{{@index}}" action="/posts/{{this.id}}/unflag"></form>
           <li>
@@ -36,6 +49,19 @@
           <li>
             <a href="#" onclick="document.getElementById('delete-post-{{@index}}').submit();">
               Delete Post
+            </a>
+          </li>
+          {{/if}}
+          {{else if this.own}}
+          <li>
+            <a href="#" onclick="document.getElementById('delete-post-{{@index}}').submit();">
+              Delete Post
+            </a>
+          </li>
+          {{else}}
+          <li>
+            <a href="#" onclick="document.getElementById('flag-post-{{@index}}').submit();">
+              Flag Post
             </a>
           </li>
           {{/if}}

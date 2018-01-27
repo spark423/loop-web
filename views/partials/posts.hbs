@@ -28,8 +28,8 @@ function cancel(index) {
           <p style="display: none" id="comment-length-{{@index}}">{{event.comments.length}}</p>
           {{#if event.comments}}
           {{#each event.comments}}
-          <form id='delete-comment-{{@index}}' style="display: none" method="post" action="/comments/{{id}}">
-          </form>
+          <form id='delete-comment-{{@index}}' style="display: none" method="post" action="/comments/{{id}}"></form>
+          <form id='flag-comment-{{@index}}' style="display: none" method="post" action="/comments/{{id}}/flag"></form>
           {{#compare @index 0 operator="=="}}
           <div class="reply">
               <div class="poster-avi uk-float-left">
@@ -37,7 +37,7 @@ function cancel(index) {
               </div>
               <div class="poster-info uk-float-left">
                   <span class="name"><a href='/users/{{postedBy.id}}' style="color: black">{{postedBy.firstName}} {{postedBy.lastName}}</a></span>&nbsp;<span class="timestamp">{{createdAt}}</span><br />
-                  <span id="comment-{{@index}}">{{text}}</span>
+                  <span id="comment-{{@index}}">{{text}} {{#if this.flagged}}<b style="color: red">(FLAGGED)</b>{{/if}}</span>
                   <div class="add-comment" uk-grid id="edit-comment-{{@index}}" style="display: none">
                     <div class="uk-width-expand@m">
                       <input class="uk-input" type="text" name="text" id="editedComment-{{@index}}"value="{{text}}" onkeydown = "if(event.keyCode==13)saveComment({{@index}}, '{{id}}');else if(event.keyCode==27)cancel({{@index}})" autofocus>
@@ -120,7 +120,7 @@ function cancel(index) {
               </div>
               <div class="poster-info uk-float-left">
                 <span class="name"><a href='/users/{{postedBy.id}}' style="color: black">{{postedBy.firstName}} {{postedBy.lastName}}</a></span>&nbsp;<span class="timestamp">{{createdAt}}</span><br />
-                <span id="comment-{{@index}}">{{text}}</span>
+                <span id="comment-{{@index}}">{{text}} {{#if this.flagged}}<b style="color: red">(FLAGGED)</b>{{/if}}</span>
                 <div class="add-comment" uk-grid id="edit-comment-{{@index}}" style="display: none">
                   <div class="uk-width-expand@m">
                     <input class="uk-input" type="text" name="text" id="editedComment-{{@index}}"value="{{text}}" onkeydown = "if(event.keyCode==13)saveComment({{@index}}, '{{id}}');else if(event.keyCode==27)cancel({{@index}})" autofocus>
@@ -217,7 +217,7 @@ function cancel(index) {
                   </div>
                   <div class="poster-info uk-float-left">
                     <span class="name"><a href='/users/{{postedBy.id}}' style="color: black">{{postedBy.firstName}} {{postedBy.lastName}}</a></span>&nbsp;<span class="timestamp">{{createdAt}}</span><br />
-                    <span id="comment-{{@index}}">{{text}}</span>
+                    <span id="comment-{{@index}}">{{text}} {{#if this.flagged}}<b style="color: red">(FLAGGED)</b>{{/if}}</span>
                     <div class="add-comment" uk-grid id="edit-comment-{{@index}}" style="display: none">
                       <div class="uk-width-expand@m">
                         <input class="uk-input" type="text" name="text" id="editedComment-{{@index}}"value="{{text}}" onkeydown = "if(event.keyCode==13)saveComment({{@index}}, '{{id}}');else if(event.keyCode==27)cancel({{@index}})" autofocus>
@@ -301,7 +301,7 @@ function cancel(index) {
                   </div>
                   <div class="poster-info uk-float-left">
                     <span class="name"><a href='/users/{{postedBy.id}}' style="color: black">{{postedBy.firstName}} {{postedBy.lastName}}</a></span>&nbsp;<span class="timestamp">{{createdAt}}</span><br />
-                    <span id="comment-{{@index}}">{{text}}</span>
+                    <span id="comment-{{@index}}">{{text}} {{#if this.flagged}}<b style="color: red">(FLAGGED)</b>{{/if}}</span>
                     <div class="add-comment" uk-grid id="edit-comment-{{@index}}" style="display: none">
                       <div class="uk-width-expand@m">
                         <input class="uk-input" type="text" name="text" id="editedComment-{{@index}}"value="{{text}}" onkeydown = "if(event.keyCode==13)saveComment({{@index}}, '{{id}}');else if(event.keyCode==27)cancel({{@index}})" autofocus>

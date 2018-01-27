@@ -6,7 +6,8 @@ var notificationSchema = new mongoose.Schema({
 	message: {type: String},
 	routeID: {
 		kind: String,
-		id: { type: mongoose.Schema.Types.ObjectId, refPath: 'source.kind' }
+		id: { type: mongoose.Schema.Types.ObjectId, refPath: 'source.kind' },
+		boardId: {type: mongoose.Schema.Types.ObjectId, refPath: 'Board'}
 	}
 });
 

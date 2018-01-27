@@ -30,7 +30,7 @@ function addMember(index) {
 }
 </script>
 <div id="new-org-add-members">
-    <h3>Add Members</h3>
+    <h3>Add/Edit Members</h3>
     <div class="uk-card uk-card-default uk-card-body">
         <div class="add-members-wrap">
             <ul class="add-members-row-wrap">
@@ -44,6 +44,28 @@ function addMember(index) {
                 <li class="add-members-row inner-list-wrap">
                     <div class="inner-list" id="users" style="max-height:400px">
                         <ul>
+                          {{#each members}}
+                            <li>
+                                <div class="member" uk-grid>
+                                    <div class="uk-width-auto@m">
+                                        <div class="img-wrap one"></div>
+                                    </div>
+                                    <div class="uk-width-expand@m">
+                                      <p id="member-username-{{@index}}" style="display: none">{{username}}</p>
+                                        <p class="name">{{firstName}} {{lastName}}</p>
+                                        <p class="major">{{#if major}}{{major}}{{#if classYear}}, {{classYear}}{{/if}}{{else}}{{#if classYear}}{{classYear}}{{/if}}{{/if}}</p>
+                                    </div>
+                                    <div class="uk-width-auto@m" id="icons">
+                                        <div class="invite-icon">
+                                            <span onclick="addMember({{@index}})" id="icon1-{{@index}}" class="uk-icon" uk-icon="icon: plus" style="display:none"></span>
+                                        </div>
+                                        <div class="invite-icon green">
+                                            <span onclick="addMember({{@index}})" id="icon2-{{@index}}" class="uk-icon" uk-icon="icon: check" style="display:"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            {{/each}}
                           {{#each users}}
                             <li>
                                 <div class="member" uk-grid>
@@ -53,7 +75,7 @@ function addMember(index) {
                                     <div class="uk-width-expand@m">
                                       <p id="member-username-{{@index}}" style="display: none">{{username}}</p>
                                         <p class="name">{{firstName}} {{lastName}}</p>
-                                        <p class="major">{{major}}, {{classYear}}</p>
+                                        <p class="major">{{#if major}}{{major}}{{#if classYear}}, {{classYear}}{{/if}}{{else}}{{#if classYear}}{{classYear}}{{/if}}{{/if}}</p>
                                     </div>
                                     <div class="uk-width-auto@m" id="icons">
                                         <div class="invite-icon">

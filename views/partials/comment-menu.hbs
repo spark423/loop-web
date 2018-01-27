@@ -2,27 +2,49 @@
 <div uk-drop="mode: click">
     <div class="uk-card uk-card-body uk-card-default">
         <ul>
+          {{#if @root.admin}}
           <li>
             <a href="#" onclick="edit({{@../index}}, {{@index}})">
               Edit Comment
             </a>
           </li>
-          {{#if this.flagged}}
-          <form method="post" id="unflag-comment-{{@index}}" action="/comments/{{this.id}}/unflag"></form>
+          {{else if this.own}}
           <li>
-            <a href="#" onclick="document.getElementById('unflag-comment-{{@index}}').submit();">
+            <a href="#" onclick="edit({{@../index}}, {{@index}})">
+              Edit Comment
+            </a>
+          </li>
+          {{else}}
+          <li>
+            <a href="#" onclick="document.getElementById('flag-comment-{{@../index}}-{{@index}}').submit();">
+              Flag Comment
+            </a>
+          </li>
+          {{/if}}
+          {{#if @root.admin}}
+          {{#if this.flagged}}
+          <form method="post" id="unflag-comment-{{@../index}}-{{@index}}" action="/comments/{{this.id}}/unflag"></form>
+          <li>
+            <a href="#" onclick="document.getElementById('unflag-comment-{{@../index}}-{{@index}}').submit();">
               Unflag Comment
             </a>
           </li>
-          <form method="post" id="delete-flagged-comment-{{@index}}" action="/comments/{{this.id}}/delete"></form>
+          <form method="post" id="delete-flagged-comment-{{@../index}}-{{@index}}" action="/comments/{{this.id}}/delete"></form>
           <li>
-            <a href="#" onclick="document.getElementById('delete-flagged-comment-{{@index}}').submit();">
+            <a href="#" onclick="document.getElementById('delete-flagged-comment-{{@../index}}-{{@index}}').submit();">
               Delete Comment
             </a>
           </li>
           {{else}}
           <li>
-            <a href="#" onclick="document.getElementById('delete-comment-{{@index}}').submit();">
+            <a href="#" onclick="document.getElementById('delete-comment-{{@../index}}-{{@index}}').submit();">
+              Delete Comment
+            </a>
+          </li>
+          {{/if}}
+          {{else if this.own}}
+          <li>
+            <a href="#" onclick="document.getElementById('delete-comment-{{@../index}}-{{@index}}').submit();">
               Delete Comment
             </a>
           </li>

@@ -1,10 +1,43 @@
 <link rel="stylesheet" href="/css/organization-detail-header/sxn-organization-detail-header.min.css" />
 
+<script>
+function join() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/groups/{{group.id}}/join", true);
+  xhttp.send();
+  document.getElementById("join").innerHTML = '<span class="green uk-icon" uk-icon="icon: check"></span><a onclick="leave1()" class="green">Joined</a>';
+  document.getElementById("numMembers").innerHTML = {{group.members.length}} + 1;
+}
+function leave1() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/groups/{{group.id}}/leave", true);
+  xhttp.send();
+  document.getElementById("join").innerHTML = '<span class="green uk-icon" uk-icon="icon: plus"></span><a onclick="join()" class="green">Join Organization</a>';
+  document.getElementById("numMembers").innerHTML = {{group.members.length}};
+}
+function join1() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/groups/{{group.id}}/join ", true);
+  xhttp.send();
+  document.getElementById("join").innerHTML = '<span class="green uk-icon" uk-icon="icon: check"></span><a onclick="leave()" class="green">Joined</a>';
+  document.getElementById("numMembers").innerHTML = {{group.members.length}};
+}
+function leave1() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/groups/{{group.id}}/leave", true);
+  xhttp.send();
+  document.getElementById("join").innerHTML = '<span class="green uk-icon" uk-icon="icon: plus"></span><a onclick="join1()" class="green">Join Organization</a>';
+  document.getElementById("numMembers").innerHTML = {{group.members.length}} - 1;
+}
+</script>
 <div id="organization-detail-header">
 
     <div class="organization-detail-header top">
         <h2><a href="javascript:history.back()"><span uk-icon="icon: chevron-left"></span></a>{{group.name}}{{#if group.active}}{{else}} <b style="color: red">(Deactivated)</b>{{/if}}</h2>
-        <a href="/groups/{{group.id}}/edit" class="uk-float-right green"><span class="uk-icon" uk-icon="icon: pencil"></span>Edit Organization</a>
+        {{#if admin}}<a href="/groups/{{group.id}}/edit" class="uk-float-right green"><span class="uk-icon" uk-icon="icon: pencil"></span>Edit Organization</a>
+        {{else if groupAdmin}}
+<a href="/groups/{{group.id}}/edit" class="uk-float-right green"><span class="uk-icon" uk-icon="icon: pencil"></span>Edit Organization</a>
+        {{/if}}
         <div class="img-wrap"></div>
     </div>
 
@@ -13,10 +46,17 @@
 
         </div>
         <div>
-
+          {{#if admin}}
+          {{else}}
+          <div class="uk-float-right" id="join">
+              {{#if member}}<span class="green uk-icon" uk-icon="icon: check"></span><a onclick="leave()" class="green">Joined</a>
+              {{else}}<span class="green uk-icon" uk-icon="icon: plus"></span><a onclick="join()" class="green">Join Organization</a>
+              {{/if}}
+          </div>
+          {{/if}}
             <div class="uk-clearfix"></div>
             <div class="attending uk-float-right">
-                <span uk-icon="icon: users"></span><span>{{group.members.length}} members</span>
+                <span uk-icon="icon: users"></span><span><span id="numMembers">{{group.members.length}}</span> members</span>
             </div>
             <div class="uk-clearfix"></div>
         </div>

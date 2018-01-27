@@ -17,7 +17,7 @@ function unsubscribe() {
 
     <div class="board-header" class="uk-child-width-1-2@m" uk-grid>
         <div>
-            <h2>{{board.name}}{{#if board.active}}{{else}} <b style="color: red">(Deactivated)</b>{{/if}}<a href="/boards/{{board.id}}/edit" class="green" uk-icon="icon: pencil"></a></h2>
+            <h2>{{board.name}}{{#if board.active}}{{else}} <b style="color: red">(Deactivated)</b>{{/if}}{{#if admin}}<a href="/boards/{{board.id}}/edit" class="green" uk-icon="icon: pencil"></a>{{/if}}</h2>
             <span class="text-light">{{board.description}}</span>
         </div>
         {{#compare board.unsubscribable false operator="=="}}

@@ -57,6 +57,7 @@ function delete_group(id) {
                     <span class="name"><a href="/groups/{{_id}}">{{name}}</a></span><span class="timestamp" {{#if active}}>(Members: {{members.length}}){{else}}style="color: red"> (DEACTIVATED){{/if}}</span><br />
                     <span>{{description}}</span>
                 </div>
+                {{#if @root.admin}}
                 <div style="float:right">
                    <a style="padding-top: 23px;margin-right: 50px" class="uk-icon" uk-icon="icon: file-edit" href="/groups/{{_id}}/edit">Edit </a>
                    {{#if active}}<a href="#deactivate" onclick='deactivate_check_group("{{name}}", "{{_id}}")' class="uk-icon" uk-icon="icon: ban" uk-toggle>Deactivate </a>
@@ -65,6 +66,7 @@ function delete_group(id) {
                    <a href="#delete" onclick='delete_check_group("{{name}}", "{{_id}}")' class="uk-icon" uk-icon="icon: close" uk-toggle>Delete </a>
                    {{/if}}
                  </div>
+                 {{/if}}
             </div>
 
         </div>

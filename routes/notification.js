@@ -58,7 +58,7 @@ router.get('/notifications', function(req, res) {
 				let notifications = user.notifications.map(function(notification) {
 					return {"type": notification.type, "createdAt": moment(notification.createdAt), "message": notification.message, "routeID": notification.routeID}
 				})
-				res.send({length: notifications.length, notifications: notifications});
+				res.send({length: notifications.length, notifications: notifications, admin: req.user.admin});
 			}
 		})
 	} else {
@@ -77,7 +77,7 @@ router.get('/all-notifications', function(req, res) {
 					return {"type": notification.type, "createdAt": moment(notification.createdAt).utc().local().format('MMMM D, YYYY, h:mm a'), "message": notification.message, "routeID": notification.routeID}
 				})
 				let sortedNotifications = quickSort(notifications, 0, notifications.length - 1).reverse();
-				res.render('notifications', {notifications: sortedNotifications, helpers: {
+				res.render('notifications', {notifications: sortedNotifications, admin: req.user.admin, helpers: {
 						compare: function(lvalue, rvalue, options) {
 							if (arguments.length < 3)
 									throw new Error("Handlerbars Helper 'compare' needs 2 parameters");

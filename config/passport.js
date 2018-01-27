@@ -69,17 +69,6 @@ passport.use('local-signup', new LocalStrategy({
         if (req.body.password !== req.body.confirmPassword) {
       	  return done(null, false, req.flash('signupMessage', 'Passwords do not match.'));
         } else {
-          //If there is no user with the credential, create the user and set the credential
-          /*User.findById(req.user._id, function (err, user) {
-            if (err)
-              return done(err);
-            user.password = user.hashPassword(password);
-            user.save(function (err, updatedUser) {
-              if (err)
-                return done(err);
-              return done(null, updatedUser);
-            });
-          });*/
           var newUser = new User()
             newUser.username = req.body.username,
             newUser.password = newUser.hashPassword(req.body.password),
@@ -98,6 +87,36 @@ passport.use('local-signup', new LocalStrategy({
       });
 }));
 
+passport.use('local-student-signup', new LocalStrategy({
+    usernameField : 'confirmPassword',
+    passwordField : 'password',
+    passReqToCallback : true // allows us to pass back the entire request to the callback
+  },
+	function(req, username, password, done) {
+    // Asynchronous
+    // User.findOne wont fire unless data is sent back
+    process.nextTick(function() {
+      // Find a user whose email is the same as the forms email and check to see if the user trying to login has made an account
+        if (req.body.password !== req.body.confirmPassword) {
+      	  return done(null, false, req.flash('signupMessage', 'Passwords do not match.'));
+        } else {
+          var newUser = new User()
+            newUser.username = req.body.username,
+            newUser.password = newUser.hashPassword(req.body.password),
+            newUser.firstName = req.body.firstName,
+            newUser.lastName = req.body.lastName,
+            newUser.admin = false,
+            newUser.classYear = req.body.class,
+            newUser.major= req.body.major,
+            newUser.blocked = false
+            newUser.save(function(err) {
+              if (err)
+                throw err;
+              return done(null, newUser);
+          });
+        }
+      });
+}));
 //Login =============================================================================================================================================================================
 passport.use('local-login', new LocalStrategy({
     passReqToCallback : true // allows us to pass back the entire request to the callback
@@ -115,8 +134,6 @@ passport.use('local-login', new LocalStrategy({
           return done(null, false, req.flash('loginMessage', 'There is no user with that email.'));
         } else if (!user.validatePassword(password)) {
           return done(null, false, req.flash('loginMessage', 'Password is incorrect.'));
-        } else if(user.admin!=true) {
-          return done(null, false, req.flash('loginMessage', 'You are not a registered admin.'));
         } else {
           //Found the user and logs the user in
           return done(null, user);
