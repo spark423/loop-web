@@ -17,3 +17,35 @@
 #overview .double{
     margin-top: 0;
 }
+
+#Reports {
+  padding: 0 30px;
+  margin: 0 0 30px;
+}
+
+#ReportLevel2, #ReportLevel3, #ReportLevelSubmit, #ReportGraph {
+  /* display: none; */
+}
+
+#ReportGraph {
+  width: 20px;
+}
+
+.report-select {
+  width: 20%;
+}
+
+
+.chartjs-tooltip {
+	opacity: 1;
+	position: absolute;
+	background: rgba(0, 0, 0, .7);
+	color: white;
+	border-radius: 3px;
+	-webkit-transition: all .1s ease;
+	transition: all .1s ease;
+	pointer-events: none;
+	-webkit-transform: translate(-50%, 0);
+	transform: translate(-50%, 0);
+	padding: 4px;
+}
