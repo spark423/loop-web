@@ -94,6 +94,23 @@ module.exports = function(passport) {
     })
   );
 
+  router.get('/add-tags', function(req, res) {
+    res.render('tags');
+  })
+
+  router.get('/add-office', function(req, res) {
+    res.render('offices');
+  })
+
+  router.get('/invite-users', function(req, res) {
+    res.render('invite-users');
+  })
+
+  router.post('/add-office', function(req, res) {
+    console.log(req.body);
+    res.redirect('back');
+  })
+
   // Retrieve login page
   router.get('/', function(req, res) {
     if(req.user) {

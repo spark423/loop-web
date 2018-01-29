@@ -33,7 +33,11 @@ $( document ).ready(function() {
         var newCell  = newRow.insertCell(j);
         newCell.innerHTML = days;
         newCell.className = "next-month";
-        newCell.id = currentMonth-1 + '-' + lastMonthStart;
+        if(currentMonth==0) {
+          newCell.id = 11 + '-' + lastMonthStart;
+        } else {
+          newCell.id = currentMonth-1 + '-' + lastMonthStart;
+        }
         lastMonthStart++;
         days = "";
       } else if (start <= thisMonth){
@@ -50,7 +54,11 @@ $( document ).ready(function() {
         var newCell  = newRow.insertCell(j);
         newCell.innerHTML = days;
         newCell.className = "next-month";
-        newCell.id = currentMonth+1 + '-' + nextMonth;
+        if(currentMonth==11) {
+          newCell.id = 0 + '-' + nextMonth;
+        } else {
+          newCell.id = currentMonth+1 + '-' + nextMonth;
+        }
         nextMonth++;
         days = "";
       }

@@ -1,0 +1,66 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.3/semantic.min.css">
+<link rel="stylesheet" href="/css/login.v5.min.css"/>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.3/semantic.min.js"></script>
+<script>
+$(function(){
+  $('.ui.dropdown')
+    .dropdown({
+      allowAdditions: true
+    })
+
+});
+</script>
+<style>
+#login input, #login select {
+  border-radius: 0px;
+}
+</style>
+<section id="login">
+    <div class="login-header">
+        <img class="uk-float-left" src="/img/loop_logo_white.png" alt="Loop" />
+    </div>
+
+
+    <h1>Customize your Loop</h1>
+    <p>Add tags based on your likes and interests for a uniquely curated experience:</p>
+
+    <div class="inputs">
+      <form action="/signup" method="post" id="register">
+      <div class="ui fluid multiple search selection dropdown">
+        <input name="tags" type="hidden">
+        <i class="dropdown icon"></i>
+        <div class="default text">Add tags</div>
+        <div class="menu">
+          <div class="item" data-value="angular">Angular</div>
+          <div class="item" data-value="css">CSS</div>
+          <div class="item" data-value="design">Graphic Design</div>
+          <div class="item" data-value="ember">Ember</div>
+          <div class="item" data-value="html">HTML</div>
+          <div class="item" data-value="ia">Information Architecture</div>
+          <div class="item" data-value="javascript">Javascript</div>
+          <div class="item" data-value="mech">Mechanical Engineering</div>
+          <div class="item" data-value="meteor">Meteor</div>
+          <div class="item" data-value="node">NodeJS</div>
+          <div class="item" data-value="plumbing">Plumbing</div>
+          <div class="item" data-value="python">Python</div>
+          <div class="item" data-value="rails">Rails</div>
+          <div class="item" data-value="react">React</div>
+          <div class="item" data-value="repair">Kitchen Repair</div>
+          <div class="item" data-value="ruby">Ruby</div>
+          <div class="item" data-value="ui">UI Design</div>
+          <div class="item" data-value="ux">User Experience</div>
+        </div>
+      </div>
+            <div class="uk-margin"></div>
+            <a type="button" class="uk-button uk-button-default" onclick="document.getElementById('submitbutton').click();">
+                Add
+            </a>
+            <input type="submit" style="display: none" id="submitbutton"></input>
+            <a href="/" class="uk-button uk-button-secondary">
+                Skip
+            </a>
+        </form>
+    </div>
+
+</div>

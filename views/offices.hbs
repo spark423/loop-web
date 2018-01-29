@@ -1,0 +1,98 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.3/semantic.min.css">
+<link rel="stylesheet" href="/css/login.v5.min.css"/>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.3/semantic.min.js"></script>
+<script>
+$(function(){
+  $('.ui.dropdown')
+    .dropdown({
+      allowAdditions: true
+    })
+
+    $('#office')
+  .dropdown({
+    action: 'activate',
+    onChange: function(value, text) {
+      console.log(text);
+      console.log(value);
+    /*  each
+      if(value==value) {
+        $('#tags').dropdown('set selected',['angular','css']);
+      }
+      each*/
+    }
+  })
+;
+});
+</script>
+
+<section id="login">
+    <div class="login-header">
+        <img class="uk-float-left" src="/img/loop_logo_white.png" alt="Loop" />
+    </div>
+
+
+    <h1>Add an Office</h1>
+    <p>Choose the office you belong to and add tags relating to your office:</p>
+
+    <div class="inputs">
+      <form action="/add-office" method="post" id="register">
+        <div class="uk-margin">
+
+        <div id="office" class="ui fluid search selection dropdown">
+     <input type="hidden" name="office">
+     <i class="dropdown icon"></i>
+     <div class="default text">Select your office or add one</div>
+     <div class="menu">
+        <div class="item" data-value="af">Afghanistan</div>
+        <div class="item" data-value="ax">Aland Islands</div>
+        <div class="item" data-value="al">Albania</div>
+        <div class="item" data-value="dz">Algeria</div>
+      </div>
+     </div>
+     </div>
+     <div class="uk-margin">
+
+        <div id="tags" class="ui fluid multiple search selection dropdown">
+          <input name="tags" type="hidden">
+          <i class="dropdown icon"></i>
+          <div class="default text">Add tags</div>
+          <div class="menu">
+            <div class="item" data-value="angular">Angular</div>
+            <div class="item" data-value="css">CSS</div>
+            <div class="item" data-value="design">Graphic Design</div>
+            <div class="item" data-value="ember">Ember</div>
+            <div class="item" data-value="html">HTML</div>
+            <div class="item" data-value="ia">Information Architecture</div>
+            <div class="item" data-value="javascript">Javascript</div>
+            <div class="item" data-value="mech">Mechanical Engineering</div>
+            <div class="item" data-value="meteor">Meteor</div>
+            <div class="item" data-value="node">NodeJS</div>
+            <div class="item" data-value="plumbing">Plumbing</div>
+            <div class="item" data-value="python">Python</div>
+            <div class="item" data-value="rails">Rails</div>
+            <div class="item" data-value="react">React</div>
+            <div class="item" data-value="repair">Kitchen Repair</div>
+            <div class="item" data-value="ruby">Ruby</div>
+            <div class="item" data-value="ui">UI Design</div>
+            <div class="item" data-value="ux">User Experience</div>
+          </div>
+        </div>
+      </div>
+   <div class="uk-margin">
+       <input style="padding: 0 15px;" class="uk-input uk-form-width-medium" type="" name="title" placeholder="Title/Role" required>
+   </div>
+   <div class="uk-margin">
+       <input style="padding: 0 15px;" class="uk-input uk-form-width-medium" type="" name="division" placeholder="Division" required>
+   </div>
+            <a type="button" class="uk-button uk-button-default" onclick="document.getElementById('submitbutton').click();">
+                Add
+            </a>
+            <input type="submit" style="display: none" id="submitbutton"></input>
+            <a href="/" class="uk-button uk-button-secondary">
+                Skip
+            </a>
+        </form>
+    </div>
+
+</div>

@@ -105,6 +105,8 @@ router.get('/events/calendar', function(req, res) {
   if(req.user) {
     var afterDay = moment(Date.now()).endOf('month').add(6-moment(Date.now()).endOf('month').day(), 'days').format().slice(0,-6) + '.000Z';
     var beforeDay = moment(Date.now()).startOf('month').add(0-moment(Date.now()).startOf('month').day(),'days').format().slice(0,-6) + '.000Z';
+    console.log(afterDay);
+    console.log(beforeDay);
     Event.find({$and: [{date: {$lte: afterDay}}, {date: {$gte: beforeDay}}, {"archive": false}]}, function(err, events) {
       if(err) throw err;
       let sortedEvents = quickSort(events, 0, events.length-1);
