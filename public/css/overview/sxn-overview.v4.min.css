@@ -1,1 +1,32 @@
 #overview{padding:0 30px;margin:0 0 30px}#overview svg:not(:root){width:100%;height:100%;color:#00d283}#overview p{margin:0}#overview .count{margin:0;font-weight:600}#overview .double{margin-top:0}
+
+#ReportLevel2, #ReportLevel3, #ReportLevelSubmit, #ReportGraph {
+  /* display: none; */
+}
+
+#ReportGraph {
+  margin-top: 20px;
+}
+
+#Reports {
+  padding: 0 30px;
+  margin: 0 0 30px;
+}
+
+.report-select {
+  width: 20%;
+}
+
+.chartjs-tooltip {
+	opacity: 1;
+	position: absolute;
+	background: rgba(0, 0, 0, .7);
+	color: white;
+	border-radius: 3px;
+	-webkit-transition: all .1s ease;
+	transition: all .1s ease;
+	pointer-events: none;
+	-webkit-transform: translate(-50%, 0);
+	transform: translate(-50%, 0);
+	padding: 4px;
+}

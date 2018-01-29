@@ -26,6 +26,129 @@ module.exports = function(passport) {
     res.render('register', {message: req.query.message});
   });
 
+	router.get('/reports/step2', function(req, res) {
+		res.json({
+			items: [
+        {
+          text: 'All',
+          selected: true
+        },
+				{
+					text: 'People',
+					items: [{
+							text: 'Student',
+							value: 'student'
+						},
+						{
+							text: 'Alumni',
+							value: 'alumni'
+						},
+						{
+							text: 'Faculty',
+							value: 'faculty'
+						},
+						{
+							text: 'Friends',
+							value: 'friends'
+						},
+						{
+							text: 'Parents',
+							value: 'parents'
+						}
+					]
+				},
+				{
+					text: 'Jobs',
+					items: [{
+							text: 'Student',
+							value: 'student'
+						},
+						{
+							text: 'Alumni',
+							value: 'alumni'
+						},
+						{
+							text: 'Faculty',
+							value: 'faculty'
+						},
+						{
+							text: 'Friends',
+							value: 'friends'
+						},
+						{
+							text: 'Parents',
+							value: 'parents'
+						}
+					]
+				},
+				{
+					text: 'Companies',
+					items: [{
+							text: 'Student',
+							value: 'student'
+						},
+						{
+							text: 'Alumni',
+							value: 'alumni'
+						},
+						{
+							text: 'Faculty',
+							value: 'faculty'
+						},
+						{
+							text: 'Friends',
+							value: 'friends'
+						},
+						{
+							text: 'Parents',
+							value: 'parents'
+						}
+					]
+				},
+      ]
+		});
+	});
+
+
+  router.get('/reports/step3', function(req, res) {
+    res.json({
+      items: [
+        {
+          text: 'Major',
+          value: 'major'
+        },
+        {
+          text: 'Minor',
+          value: 'minor'
+        },
+        {
+          text: 'Grad Year',
+          value: 'grad-year'
+        },
+        {
+          text: 'School ID',
+          value: 'school-id'
+        },
+        {
+          text: 'City',
+          value: 'city'
+        },
+        {
+          text: 'State',
+          value: 'state'
+        },
+        {
+          text: 'Logins',
+          value: 'logins'
+        },
+        {
+          text: 'Title',
+          value: 'title'
+        }
+      ]
+    });
+  });
+
   router.get('/student-signup', function(req, res) {
     res.render('student-register');
   });
