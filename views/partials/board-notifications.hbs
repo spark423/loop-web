@@ -1,5 +1,6 @@
 <link rel="stylesheet" href="/css/board-notifications/sxn-board-notifications.v7.min.css" />
-
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.3/semantic.min.js"></script>
 <script>
 var currentSlide = 0;
 var numSlides = 0;
@@ -71,8 +72,15 @@ $( document ).ready(function() {
   body.append('</div>');
   {{/if}}
   {{/if}}
-  body.append('<div class="new-post-toggle" hidden><div class="create-wrap"><h4 class="inner">New Post</h4><div class="divider"></div><div class="create-grid" uk-grid><div class="poll-wrap uk-width-3-5@m"><div class="form-wrap"><form id="postform" method="post" action="/boards/{{board.id}}/post"><input class="uk-input uk-form-large uk-form-blank uk-form-width-large" type="text" name="title" placeholder="Add a title"></input><textarea class="uk-textarea uk-form-blank uk-form-width-large" type="text" name="text" placeholder="Add a description" style="overflow: hidden; resize: vertical"></textarea><a class="uk-button uk-button-primary" type="button" onclick="document.getElementById('+ "'postform'" + ').submit();">Create</a><a class="uk-button uk-button-cancel" uk-toggle="target: .new-post-toggle" type="button">Back</a></form></div></div></div></div></div>');
-  body.append('<div class="new-post-toggle add-comment" uk-grid><div class="uk-width-expand@m"><form id="postform" method="post" action="boards/{{board.id}}/post"><div><a uk-toggle="target: .new-post-toggle"><input class="uk-input" type="text" placeholder="+ Create a new post"></a></div></form></div></div>');
+  body.append('<div class="new-post-toggle" hidden><div class="create-wrap"><h4 class="inner">New Post</h4><div class="divider"></div><div class="create-grid" uk-grid><div class="poll-wrap uk-width-3-5@m"><div class="form-wrap"><form id="postform" method="post" action="/boards/{{board.id}}/post"><input class="uk-input uk-form-large uk-form-blank uk-form-width-large" type="text" name="title" placeholder="Add a title"></input><textarea class="uk-textarea uk-form-blank uk-form-width-large" type="text" name="text" placeholder="Add a description" style="overflow: hidden; resize: vertical"></textarea><div class="ui fluid multiple search selection dropdown"><input name="tags" type="hidden"><i class="dropdown icon"></i><div class="default text">Add tags</div><div class="menu">{{#each tags}}<div class="item" data-value="{{_id}}">{{name}}{{#if numberContent}} ({{numberContent}} Posts){{/if}}</div>{{/each}}</div></div><br><a class="uk-button uk-button-primary" type="button" onclick="document.getElementById('+ "'postform'" + ').submit();">Create</a><a class="uk-button uk-button-cancel" uk-toggle="target: .new-post-toggle" type="button">Back</a></div></div><div class="uk-width-2-5@m"><div class="list-wrap"><ul><li><a><span uk-icon="icon: users"></span><span>Post as</span></a><select name="postAs" form="postform"><option value="self">Yourself</option>{{#if office}}{{#each office}}<option value="{{_id}}">{{name}}</option>{{/each}}{{/if}}{{#each groups}}<option value="{{_id}}">{{name}}{{#if active}}{{else}} (Deactivated){{/if}}</option>{{/each}}</select></li></ul></div></div></div></div></div></form>');
+  body.append('{{#if blocked}}<b style="color: red">You are currently blocked from posting, please contact your institution\'s Administrator.</b>{{else if postBlocked}}<b>You do not have permission to post to this board</b>{{else}}<div class="new-post-toggle add-comment" uk-grid><div class="uk-width-expand@m"><div><a uk-toggle="target: .new-post-toggle"><input class="uk-input" type="text" placeholder="+ Create a new post"></a></div></div></div>{{/if}}');
+  $(function(){
+    $('.ui.dropdown')
+      .dropdown({
+        allowAdditions: true
+      })
+
+  });
 })
 </script>
 <div id="board-notifications">

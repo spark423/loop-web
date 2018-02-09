@@ -17,6 +17,7 @@ var board = require('./routes/board');
 var post = require('./routes/post');
 var event = require('./routes/event');
 var comment = require('./routes/comment');
+var tag = require('./routes/tag');
 var notification = require('./routes/notification')
 var feed = require('./routes/feed')
 var fileUpload = require('express-fileupload');
@@ -72,7 +73,7 @@ app.use(event)
 app.use(comment)
 app.use(notification)
 app.use(feed)
-
+app.use(tag)
 
 app.get('/board', function(req, res) {
 	res.render('board-overview');

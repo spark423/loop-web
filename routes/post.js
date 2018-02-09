@@ -6,6 +6,8 @@ var Post = require('../models/post');
 var Comment = require('../models/comment');
 var Notification = require('../models/notification')
 var Time = require('../models/time')
+var Tag = require('../models/tag');
+var Office = require('../models/office')
 
 router.post('/posts/:id/flag', function(req, res) {
   	Post.findOneAndUpdate({_id: req.params.id}, {$set: {flagged: true}},function(err,post) {
@@ -141,42 +143,119 @@ router.post('/posts/:id/delete-flagged/:notification', function(req, res) {
 
 //Render create a post page
 router.get('/posts/create', function(req, res) {
-	Board.find({}, function(err, boards) {
-		if(err) throw err;
-		var info = [];
-		for(var i=0; i<boards.length; i++) {
-			if(boards[i].archive==false) {
-				info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
-			}
-		}
-		res.render("create-a-new-post", {boards: info, admin: req.user.admin});
-	})
+  if(req.user) {
+    if(req.user.blocked) {
+      res.redirect('/');
+    } else {
+      Board.find({}, function(err, boards) {
+    		if(err) throw err;
+    		var info = [];
+    		for(var i=0; i<boards.length; i++) {
+    			if(boards[i].archive==false && req.user.viewBlockedBoards.indexOf(boards[i]._id)==-1 && req.user.postBlockedBoards.indexOf(boards[i]._id)==-1) {
+    				info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
+    			}
+    		}
+        User.findById(req.user._id).populate('adminGroups').populate('office').exec(function(err, user) {
+          if(err) throw err;
+          console.log(user);
+          Tag.find({}, function(err, tags) {
+            if(err) throw err;
+            res.render("create-a-new-post", {tags: tags, boards: info, groups: user.adminGroups, office: user.office, admin: req.user.admin});
+          })
+        })
+    	})
+    }
+  } else {
+    res.redirect('/');
+  }
 })
 
 //Create post
 router.post('/posts/create', function(req, res) {
-  let newPost = new Post({
-    postedBy: req.user._id,
-    board: req.body.board,
-    title: req.body.title,
-    text: req.body.text
-  })
-  newPost.save(function(err, newPost) {
-    if (err) {
-      throw err;
-    }
-    Board.findOneAndUpdate({_id: req.body.board}, {$push: {contents: {"kind": "Post", "item": newPost._id}}}, function(err) {
-      if (err) {
-        throw err;
+  var tagsList = req.body.tags.split(',');
+  console.log(req.body);
+  let tags = tagsList.map(async function(tag) {
+    if (tag.match(/^[0-9a-fA-F]{24}$/)) {
+      let foundTag = await Tag.findById(tag);
+      if(foundTag) {
+        if(foundTag.numberContent) {
+          foundTag.numberContent++;
+          return foundTag.save();
+        } else {
+          foundTag.numberContent = 1;
+          return foundTag.save();
+        }
       }
-      User.findOneAndUpdate({_id: req.user._id}, {$push: {posts: newPost._id}}, function(err) {
+    } else {
+      let newTag = new Tag({
+        name: tag,
+        followers: [req.user._id],
+        numberContent: 1
+      })
+      return newTag.save();
+    }
+  })
+  Promise.all(tags).then(function(tags) {
+    var promisePost = new Promise(function(resolve, reject) {
+      if(req.body.postAs=="self") {
+        let newPost = new Post({
+          postedBy: req.user._id,
+          board: req.body.board,
+          title: req.body.title,
+          text: req.body.text,
+          tags: tags
+        })
+        console.log("self");
+        resolve(newPost);
+      } else {
+        Office.findById(req.body.postAs, function(err, office) {
+          if(office) {
+            let newPost = new Post({
+              postedBy: req.user._id,
+              board: req.body.board,
+              title: req.body.title,
+              text: req.body.text,
+              tags: tags,
+              postingOffice: req.body.postAs,
+              onOfficePage: true
+            })
+            console.log("office");
+            resolve(newPost);
+          } else {
+            let newPost = new Post({
+              postedBy: req.user._id,
+              board: req.body.board,
+              title: req.body.title,
+              text: req.body.text,
+              tags: tags,
+              postingGroup: req.body.postAs,
+              onGroupPage: true
+            })
+            console.log("group");
+            resolve(newPost);
+          }
+        })
+      }
+    })
+    promisePost.then(function(newPost) {
+      newPost.save(function(err, newPost) {
         if (err) {
           throw err;
         }
-        res.redirect('/boards/' + req.body.board);
-      })
-    });
-  });
+        Board.findOneAndUpdate({_id: newPost.board}, {$push: {contents: {"kind": "Post", "item": newPost._id}}}, function(err) {
+          if (err) {
+            throw err;
+          }
+          User.findOneAndUpdate({_id: req.user._id}, {$push: {posts: newPost._id}}, function(err) {
+            if (err) {
+              throw err;
+            }
+            res.redirect('/boards/' + newPost.board);
+          })
+        });
+      });
+    })
+  })
 })
 
 //Redirect to board with post

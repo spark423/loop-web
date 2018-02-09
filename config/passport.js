@@ -3,7 +3,23 @@ var LocalStrategy   = require('passport-local').Strategy;
 var User = require('../models/user');
 var Group = require('../models/group');
 //Passport session setup ============================================================================================================================================================
+var crypto = require('crypto'),
+    algorithm = 'aes192',
+    pass = 'd6F3Efeq';
 
+function encrypt(text){
+  var cipher = crypto.createCipher(algorithm,pass)
+  var crypted = cipher.update(text,'utf8','hex')
+  crypted += cipher.final('hex');
+  return crypted;
+}
+
+function decrypt(text){
+  var decipher = crypto.createDecipher(algorithm,pass)
+  var dec = decipher.update(text,'hex','utf8')
+  dec += decipher.final('utf8');
+  return dec;
+}
 //Serialization
 passport.serializeUser(function(user, done) {
   done(null, user.id);
@@ -75,7 +91,6 @@ passport.use('local-signup', new LocalStrategy({
             newUser.firstName = req.body.firstName,
             newUser.lastName = req.body.lastName,
             newUser.admin = true,
-            newUser.classYear = "",
             newUser.major= "",
             newUser.blocked = false
             newUser.save(function(err) {
@@ -109,6 +124,56 @@ passport.use('local-student-signup', new LocalStrategy({
             newUser.classYear = req.body.class,
             newUser.major= req.body.major,
             newUser.blocked = false
+            newUser.save(function(err) {
+              if (err)
+                throw err;
+              return done(null, newUser);
+          });
+        }
+      });
+}));
+
+passport.use('local-outside-signup', new LocalStrategy({
+    usernameField : 'confirmPassword',
+    passwordField : 'password',
+    passReqToCallback : true // allows us to pass back the entire request to the callback
+  },
+	function(req, username, password, done) {
+    // Asynchronous
+    // User.findOne wont fire unless data is sent back
+    process.nextTick(function() {
+      // Find a user whose email is the same as the forms email and check to see if the user trying to login has made an account
+        if (req.body.password !== req.body.confirmPassword) {
+      	  return done(null, false, req.flash('signupMessage', 'Passwords do not match.'));
+        } else {
+          var newUser = new User();
+            newUser.username = req.body.username;
+            newUser.password = newUser.hashPassword(req.body.password);
+            newUser.firstName = req.body.firstName;
+            newUser.lastName = req.body.lastName;
+            newUser.admin = false;
+            newUser.classYear = "";
+            newUser.major= "";
+            newUser.blocked = false;
+            if(decrypt(req.body.token.toString())!="outside") {
+              var permissions = decrypt(req.body.token.toString());
+              permissions = permissions.split("?");
+              for(var i=0; i<4; i++) {
+                permissions[i] = permissions[i].split(',');
+              }
+              if(permissions[0]!='') {
+                newUser.postBlockedBoards = permissions[0];
+              }
+              if(permissions[1]!='') {
+                newUser.viewBlockedBoards = permissions[1];
+              }
+              if(permissions[2]!='') {
+                newUser.postBlockedGroups = permissions[2];
+              }
+              if(permissions[3]!='') {
+                newUser.viewBlockedGroups = permissions[3];
+              }
+            }
             newUser.save(function(err) {
               if (err)
                 throw err;

@@ -1,0 +1,48 @@
+<link rel="stylesheet" href="/css/login.v5.min.css" />
+<section id="login">
+    <div class="login-header">
+        <img class="uk-float-left" src="/img/loop_logo_white.png" alt="Loop" />
+        <ul class="uk-list uk-link-text">
+            <li><a href="theuniversityloop.com">Help</a></li>
+            <li><a href="theuniversityloop.com">FAQ</a></li>
+            <li><a href="theuniversityloop.com">About</a></li>
+        </ul>
+    </div>
+
+    <h1>Welcome to Loop</h1>
+    <p>Create your account by completing the fields below:</p>
+    {{#if message}}
+      <script> alert("{{message}}"); </script>
+    {{/if}}
+    <div class="inputs">
+
+            <div class="uk-margin">
+                <select style="padding: 0 15px;" class="uk-select" name="university">
+                    <option value="">Select your university</option>
+                    <option value="haverford">Haverford College</option>
+                    <option value="swarthmore">Swarthmore College</option>
+                    <option value="brynmawr">Bryn Mawr College</option>
+                </select>
+            </div>
+            <form action="/signup" method="post" id="register">
+              <input type="" value="{{token}}" name="token" style="display:none"></input>
+            <div class="uk-margin">
+                <input style="padding: 0 15px;" class="uk-input uk-form-width-medium" type="" name="firstName" placeholder="First Name" required>
+            </div>
+            <div class="uk-margin">
+                <input style="padding: 0 15px;" class="uk-input uk-form-width-medium" type="" name="lastName" placeholder="Last Name" required>
+            </div>
+            <div class="uk-margin">
+                <input style="padding: 0 15px;" class="uk-input uk-form-width-medium" type="" name="username" placeholder="Email" required>
+            </div>
+            <a type="button" class="uk-button uk-button-default" onclick="document.getElementById('submitbutton').click();">
+                Next
+            </a>
+            <input type="submit" style="display: none" id="submitbutton"></input>
+            <a href="/" class="uk-button uk-button-secondary">
+                Back
+            </a>
+        </form>
+    </div>
+
+</div><br><br><br>

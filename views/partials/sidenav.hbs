@@ -99,7 +99,14 @@
                 </ul>
             </li>
         </ul>
-        <div class="uk-position-bottom-center">
+        <script>
+        $.getJSON('/blocked', function(data) {
+          if(data==true) {
+            document.getElementById('createNew').style.display = "none"
+          }
+        })
+        </script>
+        <div class="uk-position-bottom-center" id="createNew">
             <div class="create-list" hidden>
                 <ul>
                     <li>
@@ -117,7 +124,7 @@
                         <a href="/create-a-new-board">
                             Board
                         </a>
-                    </li> 
+                    </li>
                     {{/if}}
                     <li>
                         <a href="/create-a-new-org">

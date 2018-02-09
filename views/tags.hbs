@@ -8,14 +8,15 @@ $(function(){
     .dropdown({
       allowAdditions: true
     })
-
+    var list = []
+    {{#each userTags}}
+    list.push('{{name}} ({{followers.length}} Followers)');
+    {{/each}}
+    console.log(list)
+    $('#tags').dropdown('set selected', list);
 });
 </script>
-<style>
-#login input, #login select {
-  border-radius: 0px;
-}
-</style>
+
 <section id="login">
     <div class="login-header">
         <img class="uk-float-left" src="/img/loop_logo_white.png" alt="Loop" />
@@ -26,30 +27,15 @@ $(function(){
     <p>Add tags based on your likes and interests for a uniquely curated experience:</p>
 
     <div class="inputs">
-      <form action="/signup" method="post" id="register">
-      <div class="ui fluid multiple search selection dropdown">
+      <form action="/add-tags" method="post" id="register">
+      <div class="ui fluid multiple search selection dropdown" id="tags">
         <input name="tags" type="hidden">
         <i class="dropdown icon"></i>
         <div class="default text">Add tags</div>
         <div class="menu">
-          <div class="item" data-value="angular">Angular</div>
-          <div class="item" data-value="css">CSS</div>
-          <div class="item" data-value="design">Graphic Design</div>
-          <div class="item" data-value="ember">Ember</div>
-          <div class="item" data-value="html">HTML</div>
-          <div class="item" data-value="ia">Information Architecture</div>
-          <div class="item" data-value="javascript">Javascript</div>
-          <div class="item" data-value="mech">Mechanical Engineering</div>
-          <div class="item" data-value="meteor">Meteor</div>
-          <div class="item" data-value="node">NodeJS</div>
-          <div class="item" data-value="plumbing">Plumbing</div>
-          <div class="item" data-value="python">Python</div>
-          <div class="item" data-value="rails">Rails</div>
-          <div class="item" data-value="react">React</div>
-          <div class="item" data-value="repair">Kitchen Repair</div>
-          <div class="item" data-value="ruby">Ruby</div>
-          <div class="item" data-value="ui">UI Design</div>
-          <div class="item" data-value="ux">User Experience</div>
+          {{#each tags}}
+          <div class="item" data-value="{{_id}}">{{name}} ({{followers.length}} Followers)</div>
+          {{/each}}
         </div>
       </div>
             <div class="uk-margin"></div>

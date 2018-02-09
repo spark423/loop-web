@@ -8,9 +8,9 @@
     <div class="edit-organization-header top">
         <h2><a href="javascript:history.back();"><span uk-icon="icon: chevron-left"></span></a>Edit Organization</h2>
         <a onclick="document.getElementById('orgform').submit();" class="uk-float-right green"><span class="uk-icon" uk-icon="icon: check"></span>Save Changes</a>
-        <br>{{#if active}}<a onclick="document.getElementById('deactivate').submit();" class="uk-float-right" style="color: red"><span class="uk-icon" uk-icon="icon: close" style="color:red"></span>Deactivate</a>
-            {{else}}<a onclick="document.getElementById('reactivate').submit();" class="uk-float-right"><span class="uk-icon" uk-icon="icon: plus"></span>Reactivate</a>
-            {{/if}}
+<br>       <br> {{#if active}}<a onclick="document.getElementById('deactivate').submit();" class="uk-float-right" style="color: red"><span class="uk-icon" uk-icon="icon: close" style="color:red"></span>Deactivate</a>
+        {{else}}<a onclick="document.getElementById('reactivate').submit();" class="uk-float-right"><span class="uk-icon" uk-icon="icon: plus"></span>Reactivate</a>
+        {{/if}}
     </div>
 
 </div>

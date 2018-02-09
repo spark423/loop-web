@@ -1,7 +1,11 @@
 <script>
 var notifications = $('#notifications')
 $.getJSON('/notifications', function(data) {
+  if(data.length - localStorage.notifications>=0) {
     document.getElementById('notifications-number').innerHTML = data.length - localStorage.notifications;
+  } else {
+    document.getElementById('notifications-number').innerHTML = 0;
+  }
     if(data.length > localStorage.notifications) {
       localStorage.seen = 'false';
       localStorage.past = localStorage.time;
@@ -18,8 +22,8 @@ function clearNotifications() {
   })
 }
 </script>
-<div id="topbar">
-  
+<div id="topbar" style="box-sizing: content-box;">
+
     <div class="uk-float-right">
         <span class="text-light uk-margin-small-right" style="visibility:hidden"></span>
         <a href="#" class="uk-icon-link app-link" uk-icon="icon: more-vertical" uk-toggle="target: .col-tog, .app-link" style="visibility:hidden"></a>

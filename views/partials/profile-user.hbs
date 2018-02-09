@@ -12,16 +12,18 @@
                     <p class="name">
                         {{user.firstName}} {{user.lastName}}<br/>
                         <span class="major">
+                          {{#if admin}}
+                          {{user.title}}, {{user.division}}
+
+                          {{else}}
                           {{#if user.major}}
-                          {{user.major}},
-                          {{else}}
-                          N/A
-                          {{/if}}
                           {{#if user.classYear}}
-                          {{user.classYear}}
-                          {{else}}
-                          , N/A
+                          {{user.major}}, {{user.classYear}}
                           {{/if}}
+                          {{/if}}
+
+                          {{/if}}
+
                         </span>
                         <br>
                         <span class="major">

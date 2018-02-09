@@ -1,0 +1,31 @@
+<link rel="stylesheet" href="/css/feed-header/sxn-feed-header.min.css" />
+<script>
+function follow() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/tag/{{id}}/follow", true);
+  xhttp.send();
+  document.getElementById("subscribe").innerHTML = '<a onclick="unfollow()" class="uk-float-right uk-link">Following ✔</a>';
+}
+function unfollow() {
+  var xhttp = new XMLHttpRequest();
+  xhttp.open("POST", "/tag/{{id}}/unfollow", true);
+  xhttp.send();
+  document.getElementById("subscribe").innerHTML = '<a onclick="follow()" class="uk-float-right uk-link">Follow</a>';
+}
+</script>
+<div id="feed-top">
+
+    <div class="feed-header" class="uk-child-width-1-2@m" uk-grid>
+        <div>
+          <h2><span class="uk-icon" style="display: inline" uk-icon="icon: tag"></span> {{name}}</h2>
+        </div>
+        <div id="subscribe">
+          {{#compare following false operator="=="}}
+            <a onclick="follow()" class="uk-float-right uk-link">Follow</a>
+            {{else}}
+            <a onclick="unfollow()" class="uk-float-right uk-link">Following ✔</a>
+            {{/compare}}
+    </div>
+    </div>
+
+</div>

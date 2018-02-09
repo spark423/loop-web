@@ -1,0 +1,30 @@
+<link rel="stylesheet" href="/css/add-org-description/sxn-add-org-description.v2.min.css" />
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.3/semantic.min.js"></script>
+
+<script>
+$(function(){
+  $('.ui.dropdown')
+    .dropdown({
+      allowAdditions: true
+    })
+
+});
+</script>
+<div id="add-org-description">
+
+    <h2>Add Tags</h2>
+    <div class="uk-card uk-card-default uk-card-body">
+      <div class="ui fluid multiple search selection dropdown">
+        <input name="tags" type="hidden">
+        <i class="dropdown icon"></i>
+        <div class="default text">Add tags</div>
+        <div class="menu">
+          {{#each tags}}
+          <div class="item" data-value="{{_id}}">{{name}}{{#if followers}} ({{followers.length}} Followers){{/if}}</div>
+          {{/each}}
+        </div>
+      </div>
+  </div>
+</div>

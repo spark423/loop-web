@@ -38,7 +38,7 @@ function cancel(index, index2) {
                         <img src="/img/user.png" alt="Alex Reekie" />
                     </div>
                     <div class="poster-info uk-float-left">
-                      <span class="name">{{#if this.postedBy.isLoopUser}}<a href='/users/{{this.postedBy.id}}'>{{this.postedBy.firstName}} {{this.postedBy.lastName}}</a>{{else}}{{this.postedBy.username}}{{/if}}</span><br />
+                      <span class="name">{{#if this.postingGroup}}<a href='/groups/{{this.postingGroup.id}}'>{{this.postingGroup.name}}</a>{{/if}}{{#if this.postingOffice}}<b>{{this.postingOffice.name}}</b>{{/if}}{{#if this.postedBy.isLoopUser}}<a href='/users/{{this.postedBy.id}}'>{{this.postedBy.firstName}} {{this.postedBy.lastName}}</a>{{else}}{{this.postedBy.username}}{{/if}}</span><br />
                         <span>Created a new event at {{this.createdAt}}</span>
                     </div>
                     <div class="more">
@@ -61,6 +61,11 @@ function cancel(index, index2) {
                                 <span class="description">
                                     {{this.description}}
                                 </span>
+                                {{#if this.tags}}
+                                <div class="tags">
+                                    <span class="uk-icon" uk-icon="icon: tag"></span><span>{{#each tags}}{{#compare @index 1 operator=">="}}, {{/compare}}<a href="/tag/{{_id}}" style="color:grey">{{name}}</a>{{/each}}</span>
+                                </div>
+                                {{/if}}
                             </div>
                         </div>
                     </div>
@@ -465,7 +470,7 @@ function cancel(index, index2) {
                     <img src="/img/user.png" alt="Alex Reekie" />
                 </div>
                 <div class="poster-info uk-float-left">
-                  <span class="name"><a href='/users/{{this.postedBy.id}}'>{{this.postedBy.firstName}} {{this.postedBy.lastName}}</a></span><br />
+                  <span class="name">{{#if this.postingGroup}}<a href='/groups/{{this.postingGroup.id}}'>{{this.postingGroup.name}}</a>{{/if}}{{#if this.postingOffice}}<b>{{this.postingOffice.name}}</b>{{/if}}{{#if this.postedBy}}<a href='/users/{{this.postedBy.id}}'>{{this.postedBy.firstName}} {{this.postedBy.lastName}}</a>{{/if}}</span><br />
                     <span>Posted at {{this.createdAt}} in <a href="/boards/{{this.board}}" id="board-name-{{@index}}">{{this.boardName}}</a></span>
                 </div>
                 <div class="more">
@@ -479,6 +484,12 @@ function cancel(index, index2) {
                   <h2>{{this.title}} {{#if this.flagged}}<b style="color: red">(FLAGGED)</b>{{/if}}</h2>
                     <p>{{this.text}}</p>
                 </div>
+                <br>
+                {{#if this.tags}}
+                <div class="tags">
+                    <span class="uk-icon" uk-icon="icon: tag"></span><span>{{#each tags}}{{#compare @index 1 operator=">="}}, {{/compare}}<a href="/tag/{{_id}}" style="color:grey">{{name}}</a>{{/each}}</span>
+                </div>
+                {{/if}}
             </div>
             <p style="display: none" id="comment-length-{{@index}}">{{this.comments.length}}</p>
             {{#if this.comments}}
@@ -869,31 +880,6 @@ function cancel(index, index2) {
     </div>
     {{/if}}
     {{/each}}
-    <style>
-.pagination a {
-    color: black;
-    padding: 8px 16px;
-    text-decoration: none;
-    transition: background-color .3s;
-    font-size: 25px;
-}
 
-.pagination a.active {
-    background-color: #00d283;
-    color: white;
-}
-
-.pagination a:hover:not(.active) {background-color: #ddd;}
-</style>
-<div style="text-align:center">
-    <div class="pagination">
-      <a href="#">&laquo;</a>
-      {{#each pages}}
-      <a {{#compare this ../currentPage operator="=="}}class="active" {{/compare}}href="/feed/?page={{this}}">{{this}}</a>
-      {{/each}}
-      <a href="#">&raquo;</a>
-    </div>
-  </div>
 </div>
-
  {{>image-upload-modal}}

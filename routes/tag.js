@@ -11,6 +11,7 @@ var moment = require('moment')
 var Office = require('../models/office');
 var Tag = require('../models/tag')
 
+
 function swap(items, firstIndex, secondIndex){
   var temp = items[firstIndex];
   items[firstIndex] = items[secondIndex];
@@ -22,10 +23,10 @@ function partition(items, left, right) {
       i       = left,
       j       = right;
     while (i <= j) {
-        while (items[i].item.createdAt < pivot.item.createdAt) {
+        while (items[i].createdAt < pivot.createdAt) {
             i++;
         }
-        while (items[j].item.createdAt > pivot.item.createdAt) {
+        while (items[j].createdAt > pivot.createdAt) {
             j--;
         }
         if (i <= j) {
@@ -51,29 +52,45 @@ function quickSort(items, left, right) {
     return items;
 }
 
-//Render feed page
-  router.get('/feed', function(req, res) {
-    if(req.user) {
-      User.findById(req.user._id, function(err, user) {
-        if (err) {
-          throw err;
-        } else {
-          Board.find({$and: [{$or: [{unsubscribable: true},{_id: {$in: user.subscribedBoards}}]}, {active: true}]}).populate([{path: 'contents.item', populate: [{path: 'tags'}, {path: 'attendees'}, {path: 'comments', populate: [{path: 'postedBy'},{path: 'comments', populate: [{path: 'postedBy'}]}]}]}]).exec(function(err, boards) {
-            if (err) {
-              throw err;
-            } else {
+router.get('/tag/:id', function(req, res) {
+  if(req.user) {
+          Post.find({tags: req.params.id}).populate([{path: 'attendees'}, {path: 'comments', populate: [{path: 'postedBy'},{path: 'comments', populate: [{path: 'postedBy'}]}]}]).populate('tags').exec(function(err, posts) {
+            if(err) throw err;
+            Event.find({tags: req.params.id}).populate([{path: 'attendees'}, {path: 'comments', populate: [{path: 'postedBy'},{path: 'comments', populate: [{path: 'postedBy'}]}]}]).populate('tags').exec(function(err, events) {
+              if(err) throw err;
               let contents = [];
-              for (let i=0; i<boards.length; i++) {
-                contents = contents.concat(boards[i].contents)
-              }
-              let sortedContents = quickSort(contents, 0, contents.length - 1);
+              contents = contents.concat(events);
+              contents = contents.concat(posts);
+              console.log(contents);
+              let sortedContents = quickSort(contents, 0, contents.length-1);
               sortedContents.reverse();
-              pages = [];
-              numPages = 0;
-              currentPage = 0;
-              let feed = sortedContents.map(async function(content) {
-                let item = content.item;
-                let kind = content.kind;
+              var numPages = Math.ceil(sortedContents.length/10);
+              var pages = [];
+              if(numPages<20) {
+                for(var i=1; i<=numPages; i++) {
+                  pages.push(i);
+                }
+              } else {
+                if(req.query.page) {
+                  if(req.query.page>10 && req.query.page <= numPages-9) {
+                    for(var i=req.query.page-9;i<req.query.page+10;i++) {
+                      pages.push(i);
+                    }
+                  }
+                } else {
+                  for(var i=1; i<=numPages; i++) {
+                    pages.push(i);
+                  }
+                }
+              }
+              if(req.query.page) {
+                var currentPage = req.query.page;
+                sortedContents = sortedContents.slice(req.query.page*10 - 10, req.query.page*10);
+              } else {
+                var currentPage = 1;
+                sortedContents = sortedContents.slice(0, 10);
+              }
+              let feed = sortedContents.map(async function(item) {
                 let comments = [];
                   for (let j=0; j<item.comments.length; j++) {
                     let comment = item.comments[j];
@@ -94,7 +111,7 @@ function quickSort(items, left, right) {
                       "comments": commentOfComments
                     });
                   }
-                if (kind == 'Post') {
+                if (!item.date) {
                   if(item.postingGroup) {
                     let postCreator = await Group.findById(item.postingGroup);
                     let boardName = await Board.findById(item.board);
@@ -270,53 +287,88 @@ function quickSort(items, left, right) {
                 }
               })
               Promise.all(feed).then(function(feed) {
-                res.render('feed', {contents: feed, pages: pages, currentPage: currentPage, admin: req.user.admin, user: req.user._id, helpers: {
-                    compare: function(lvalue, rvalue, options) {
-                      if (arguments.length < 3)
-                          throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
+                console.log(feed);
+                Tag.findById(req.params.id, function(err, tag) {
+                  if (err)
+                    throw err;
+                    res.render('tag-feed', {
+                      name: tag.name,
+                      followers: tag.followers.length,
+                      numberContent: tag.numberContent,
+                      id: tag._id,
+                      following: req.user.tags.indexOf(req.params.id) != -1,
+                      contents: feed, pages: pages, currentPage: currentPage, user: req.user._id, helpers: {
+                          compare: function(lvalue, rvalue, options) {
+                            if (arguments.length < 3)
+                                throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
 
-                      var operator = options.hash.operator || "==";
+                            var operator = options.hash.operator || "==";
 
-                      var operators = {
-                          '==':       function(l,r) { return l == r; },
-                          '===':      function(l,r) { return l === r; },
-                          '!=':       function(l,r) { return l != r; },
-                          '<':        function(l,r) { return l < r; },
-                          '>':        function(l,r) { return l > r; },
-                          '<=':       function(l,r) { return l <= r; },
-                          '>=':       function(l,r) { return l >= r; },
-                          'typeof':   function(l,r) { return typeof l == r; }
-                      }
+                            var operators = {
+                                '==':       function(l,r) { return l == r; },
+                                '===':      function(l,r) { return l === r; },
+                                '!=':       function(l,r) { return l != r; },
+                                '<':        function(l,r) { return l < r; },
+                                '>':        function(l,r) { return l > r; },
+                                '<=':       function(l,r) { return l <= r; },
+                                '>=':       function(l,r) { return l >= r; },
+                                'typeof':   function(l,r) { return typeof l == r; }
+                            }
 
-                      if (!operators[operator])
-                          throw new Error("Handlerbars Helper 'compare' doesn't know the operator "+operator);
+                            if (!operators[operator])
+                                throw new Error("Handlerbars Helper 'compare' doesn't know the operator "+operator);
 
-                      var result = operators[operator](lvalue,rvalue);
+                            var result = operators[operator](lvalue,rvalue);
 
-                      if( result ) {
-                          return options.fn(this);
-                      } else {
-                          return options.inverse(this);
-                      }
-                    }
-                  }});
-              });
-            }
+                            if( result ) {
+                                return options.fn(this);
+                            } else {
+                                return options.inverse(this);
+                            }
+                          }
+                        }
+              })
+            })
           })
-        }
+        })
       })
-    } else {
-      res.redirect('/');
-    }
-  });
+  } else {
+    res.redirect('/');
+  }
+})
 
-router.get('/feed-settings', function(req, res) {
+router.post('/tag/:id/follow', function(req, res) {
   if(req.user) {
-    Board.find({"active": true}, function(err, allBoards) {
-      let boards = allBoards.map(function(board) {
-        return {"id": board._id, "name": board.name, "description": board.description, "subscribed": req.user.subscribedBoards.indexOf(board._id) > -1};
+    Tag.findById(req.params.id, function(err, tag) {
+      if(err) throw err;
+      tag.followers.push(req.user._id);
+      tag.save(function(err, savedTag) {
+        if(err) throw err;
+        req.user.tags.push(savedTag._id);
+        req.user.save(function(err, savedUser) {
+          if(err) throw err;
+          res.send();
+        })
       })
-      res.render('feed-settings', {boards: boards, admin: req.user.admin});
+    })
+  } else {
+    res.redirect('/');
+  }
+})
+
+router.post('/tag/:id/unfollow', function(req, res) {
+  if(req.user) {
+    Tag.findById(req.params.id, function(err, tag) {
+      if(err) throw err;
+      tag.followers.splice(tag.followers.indexOf(req.user._id), 1);
+      tag.save(function(err, savedTag) {
+        if(err) throw err;
+        req.user.tags.splice(req.user.tags.indexOf(savedTag._id), 1);
+        req.user.save(function(err, savedUser) {
+          if(err) throw err;
+          res.send();
+        })
+      })
     })
   } else {
     res.redirect('/');

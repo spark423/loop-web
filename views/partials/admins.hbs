@@ -24,8 +24,8 @@
 
 </div>
 {{/if}}
-{{#if group.members}}
 <div id="admins">
+  {{#if group.members}}
 
     <h2>Members</h2>
 
@@ -48,6 +48,10 @@
         </div>
 
     </div>
+    {{/if}}
 
+    {{#if contents}}
+    <br>
+    <h2>Feed</h2>
+    {{/if}}
 </div>
-{{/if}}

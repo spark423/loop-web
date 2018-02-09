@@ -5,6 +5,9 @@ var Board = require('../models/board');
 var Event = require('../models/event');
 var Comment = require('../models/comment');
 var Notification = require('../models/notification')
+var Tag = require('../models/tag');
+var Office = require('../models/office');
+var Group = require('../models/group')
 var moment = require('moment');
 
 function swap(items, firstIndex, secondIndex){
@@ -111,7 +114,23 @@ router.get('/events/calendar', function(req, res) {
       if(err) throw err;
       let sortedEvents = quickSort(events, 0, events.length-1);
       var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-      res.render('events-calendar-view', {admin: req.user.admin, events: sortedEvents, month: months[moment().month()], year: moment().local().year(), thisMonth: moment().local().daysInMonth(), lastMonth: moment().local().add(-1, 'month').daysInMonth(), lastMonthStart: moment().local().startOf('month').add(0-moment().startOf('month').day(), 'days').date()});
+      Board.find({}, function(err, boards) {
+        if(err) throw err;
+        var info = [];
+        for(var i=0; i<boards.length; i++) {
+          if(boards[i].archive==false && req.user.viewBlockedBoards.indexOf(boards[i]._id)==-1 && req.user.postBlockedBoards.indexOf(boards[i]._id)==-1) {
+            info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
+          }
+        }
+        User.findById(req.user._id).populate('adminGroups').populate('office').exec(function(err, user) {
+          if(err) throw err;
+          console.log(user);
+          Tag.find({}, function(err, tags) {
+            if(err) throw err;
+            res.render('events-calendar-view', {blocked: req.user.blocked, tags: tags, boards: info, groups: user.adminGroups, office: user.office, admin: req.user.admin, events: sortedEvents, month: months[moment().month()], year: moment().local().year(), thisMonth: moment().local().daysInMonth(), lastMonth: moment().local().add(-1, 'month').daysInMonth(), lastMonthStart: moment().local().startOf('month').add(0-moment().startOf('month').day(), 'days').date()});
+          })
+        })
+      })
     })
   } else {
     res.redirect('/');
@@ -166,63 +185,115 @@ router.get('/events/past', function(req, res) {
         }
         return true;
       }).map(async function(event) {
-        var user = await User.findOne({username: event.contact});
         if(event.endTime) {
           var endTime = moment(event.endTime).utc().format('h:mm a');
         } else {
           var endTime = "";
         }
-        if(user) {
-            let eventObject= {
-                "id": event._id,
-                "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
-                "title": event.title,
-                "postedBy": {
-                  "id": user._id,
-                  "firstName": user.firstName,
-                  "lastName": user.lastName,
-                  "isLoopUser": true
-                },
-                "board": {
-                  "id": event.board._id,
-                  "name": event.board.name
-                },
-                "archive": event.archive,
-                "description": event.description,
-                "date": moment(event.date).utc().format('MMMM D, YYYY'),
-                "startTime": moment(event.startTime).utc().format('h:mm a'),
-                "endTime": endTime,
-                "location": event.location,
-                "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
-                "currentTime": moment(Date.now()).local().format('h:mm a')
-              }
-              return Promise.resolve(eventObject);
+        if(event.postingGroup) {
+          var user = await Group.findById(event.postingGroup);
+              let eventObject= {
+                  "id": event._id,
+                  "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                  "title": event.title,
+                  "postingGroup": {
+                    "id": user._id,
+                    "name": user.name,
+                    "isLoopUser": true
+                  },
+                  "board": {
+                    "id": event.board._id,
+                    "name": event.board.name
+                  },
+                  "archive": event.archive,
+                  "description": event.description,
+                  "date": moment(event.date).utc().format('MMMM D, YYYY'),
+                  "startTime": moment(event.startTime).utc().format('h:mm a'),
+                  "endTime": endTime,
+                  "location": event.location,
+                  "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
+                  "currentTime": moment(Date.now()).local().format('h:mm a')
+                }
+                return Promise.resolve(eventObject);
+        } else if(event.postingOffice) {
+          var user = await Office.findById(event.postingOffice);
+              let eventObject= {
+                  "id": event._id,
+                  "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                  "title": event.title,
+                  "postingOffice": {
+                    "id": user._id,
+                    "name": user.name,
+                    "isLoopUser": true
+                  },
+                  "board": {
+                    "id": event.board._id,
+                    "name": event.board.name
+                  },
+                  "archive": event.archive,
+                  "description": event.description,
+                  "date": moment(event.date).utc().format('MMMM D, YYYY'),
+                  "startTime": moment(event.startTime).utc().format('h:mm a'),
+                  "endTime": endTime,
+                  "location": event.location,
+                  "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
+                  "currentTime": moment(Date.now()).local().format('h:mm a')
+                }
+                return Promise.resolve(eventObject);
         } else {
-          let eventObject= {
-            "id": event._id,
-            "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
-            "title": event.title,
-            "postedBy": {
-              "id": "",
-              "firstName": "",
-              "lastName": "",
-              "username": event.contact,
-              "isLoopUser": false
-            },
-            "board": {
-              "id": event.board._id,
-              "name": event.board.name
-            },
-            "archive": event.archive,
-            "description": event.description,
-            "date": moment(event.date).utc().format('MMMM D, YYYY'),
-            "startTime": moment(event.startTime).utc().format('h:mm a'),
-            "endTime": endTime,
-            "location": event.location,
-            "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
-            "currentTime": moment(Date.now()).local().format('h:mm a')
+          var user = await User.findOne({username: event.contact});
+          if(user) {
+              let eventObject= {
+                  "id": event._id,
+                  "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                  "title": event.title,
+                  "postedBy": {
+                    "id": user._id,
+                    "firstName": user.firstName,
+                    "lastName": user.lastName,
+                    "isLoopUser": true
+                  },
+                  "board": {
+                    "id": event.board._id,
+                    "name": event.board.name
+                  },
+                  "archive": event.archive,
+                  "description": event.description,
+                  "date": moment(event.date).utc().format('MMMM D, YYYY'),
+                  "startTime": moment(event.startTime).utc().format('h:mm a'),
+                  "endTime": endTime,
+                  "location": event.location,
+                  "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
+                  "currentTime": moment(Date.now()).local().format('h:mm a')
+                }
+                return Promise.resolve(eventObject);
+          } else {
+            let eventObject= {
+              "id": event._id,
+              "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+              "title": event.title,
+              "postedBy": {
+                "id": "",
+                "firstName": "",
+                "lastName": "",
+                "username": event.contact,
+                "isLoopUser": false
+              },
+              "board": {
+                "id": event.board._id,
+                "name": event.board.name
+              },
+              "archive": event.archive,
+              "description": event.description,
+              "date": moment(event.date).utc().format('MMMM D, YYYY'),
+              "startTime": moment(event.startTime).utc().format('h:mm a'),
+              "endTime": endTime,
+              "location": event.location,
+              "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
+              "currentTime": moment(Date.now()).local().format('h:mm a')
+            }
+            return Promise.resolve(eventObject);
           }
-          return Promise.resolve(eventObject);
         }
       })
       Promise.all(eventObjects).then(function(events) {
@@ -265,16 +336,27 @@ router.get('/events/past', function(req, res) {
 //Render event creation page
 router.get('/events/create', function(req, res) {
   if(req.user) {
-    Board.find({}, function(err, boards) {
-      if(err) throw err;
-      var info = [];
-      for(var i=0; i<boards.length; i++) {
-        if(boards[i].archive==false) {
-          info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
+    if(req.user.blocked) {
+      res.redirect('/');
+    } else {
+      Board.find({}, function(err, boards) {
+        if(err) throw err;
+        var info = [];
+        for(var i=0; i<boards.length; i++) {
+          if(boards[i].archive==false && req.user.viewBlockedBoards.indexOf(boards[i]._id)==-1 && req.user.postBlockedBoards.indexOf(boards[i]._id)==-1) {
+            info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
+          }
         }
-      }
-      res.render("create-a-new-event", {boards: info, admin: req.user.admin});
-    })
+        User.findById(req.user._id).populate('adminGroups').populate('office').exec(function(err, user) {
+          if(err) throw err;
+          console.log(user);
+          Tag.find({}, function(err, tags) {
+            if(err) throw err;
+            res.render("create-a-new-event", {tags: tags, boards: info, admin: req.user.admin, groups: user.adminGroups, office: user.office});
+          })
+        })
+      })
+    }
   } else {
     res.redirect('/');
   }
@@ -289,7 +371,9 @@ router.post('/event-invite', function(req, res) {
   var location = encodeURIComponent(req.body.location);
   var date = encodeURIComponent(req.body.date);
   var contact = encodeURIComponent(req.user.username);
-  res.redirect('/create-a-new-event-invite/?title=' + title + '&description=' + description + '&board=' + board + '&startTime=' + startTime + '&endTime=' + endTime + '&location=' + location + '&date=' + date + '&contact=' + contact);
+  var postAs = encodeURIComponent(req.body.postAs);
+  var tags = encodeURIComponent(req.body.tags)
+  res.redirect('/create-a-new-event-invite/?title=' + title + '&description=' + description + '&board=' + board + '&startTime=' + startTime + '&endTime=' + endTime + '&location=' + location + '&date=' + date + '&contact=' + contact + '&postAs=' + postAs + '&tags=' + tags);
 })
 
 router.get('/create-a-new-event-invite', function(req, res) {
@@ -302,7 +386,7 @@ router.get('/create-a-new-event-invite', function(req, res) {
           user_info.push({"firstName": users[i].firstName, "lastName": users[i].lastName, "username": users[i].username, "major": users[i].major, "classYear": users[i].classYear});
         }
       }
-      res.render('create-a-new-event-invite', {admin: req.user.admin, title: req.query.title, description: req.query.description, board: req.query.board, date: req.query.date, startTime: req.query.startTime, endTime: req.query.endTime, location: req.query.location, contact: req.query.contact, users: user_info});
+      res.render('create-a-new-event-invite', {tags: req.query.tags, admin: req.user.admin, title: req.query.title, description: req.query.description, board: req.query.board, date: req.query.date, startTime: req.query.startTime, endTime: req.query.endTime, location: req.query.location, contact: req.query.contact, postAs: req.query.postAs, users: user_info});
     })
   } else {
     res.redirect('/');
@@ -317,16 +401,6 @@ router.post('/events/create', function(req, res) {
   var difference = moment(req.body.date).utc().get('hour') - moment(req.body.date).local().get('hour');
   startTime.add(-difference, 'hour');
   endTime.add(-difference, 'hour');
-  var newEvent = new Event({
-    title: req.body.title,
-		description: req.body.description,
-    board: req.body.board,
-    startTime: startTime,
-    endTime: endTime,
-    location: req.body.location,
-    date: req.body.date,
-		contact: req.user.username
-  });
   var addMembers = req.body.addMembers.split(',');
   var removeMembers = req.body.removeMembers.split(',');
   for(var i=0; i<removeMembers.length; i++) {
@@ -336,43 +410,122 @@ router.post('/events/create', function(req, res) {
       }
     }
   }
-	newEvent.attendees.push(req.user._id);
-  newEvent.save(function(error, newEvent) {
-    if (error) throw error;
-    User.findById(req.user._id, function(error, user) {
-      if (error) throw error;
-			user.attendedEvents.push(newEvent._id);
-      user.save(function(error, updatedUser) {
+  var tagsList = req.body.tags.split(',');
+  let tags = tagsList.map(async function(tag) {
+    if (tag.match(/^[0-9a-fA-F]{24}$/)) {
+      let foundTag = await Tag.findById(tag);
+      if(foundTag) {
+        if(foundTag.numberContent) {
+          foundTag.numberContent++;
+          return foundTag.save();
+        } else {
+          foundTag.numberContent = 1;
+          return foundTag.save();
+        }
+      }
+    } else {
+      let newTag = new Tag({
+        name: tag,
+        followers: [req.user._id],
+        numberContent: 1
+      })
+      return newTag.save();
+    }
+  })
+  Promise.all(tags).then(function(tags) {
+    var promiseEvent = new Promise(function(resolve, reject) {
+      if(req.body.postAs=="self") {
+        var newEvent = new Event({
+          title: req.body.title,
+      		description: req.body.description,
+          board: req.body.board,
+          startTime: startTime,
+          endTime: endTime,
+          location: req.body.location,
+          date: req.body.date,
+      		contact: req.user.username,
+          tags: tags,
+          attendees: [req.user._id]
+        });
+        resolve(newEvent);
+      } else {
+        Office.findById(req.body.postAs, function(err, office) {
+          if(office) {
+            var newEvent = new Event({
+              title: req.body.title,
+          		description: req.body.description,
+              board: req.body.board,
+              startTime: startTime,
+              endTime: endTime,
+              location: req.body.location,
+              date: req.body.date,
+          		contact: req.user.username,
+              tags: tags,
+              attendees: [req.user._id],
+              postingOffice: req.body.postAs,
+              onOfficePage: true
+            });
+            resolve(newEvent);
+          } else {
+            var newEvent = new Event({
+              title: req.body.title,
+          		description: req.body.description,
+              board: req.body.board,
+              startTime: startTime,
+              endTime: endTime,
+              location: req.body.location,
+              date: req.body.date,
+          		contact: req.user.username,
+              tags: tags,
+              attendees: [req.user._id],
+              postingGroup: req.body.postAs,
+              onGroupPage: true
+            });
+            resolve(newEvent);
+          }
+        })
+      }
+    })
+    promiseEvent.then(function(newEvent) {
+      newEvent.save(function(error, newEvent) {
         if (error) throw error;
-				Board.findById(newEvent.board, function(err, board) {
-					if (err) throw err;
-					board.contents.push({"kind": "Event", "item": newEvent._id});
-					board.save(function(err, updatedBoard) {
-						if(err) throw err;
-            User.find({'username': addMembers}, function(err, members) {
-              if(err) throw err;
-              var newNotification = new Notification({
-                type: 'Invited to Event',
-                message: "You have been invited to a new Event, " + newEvent.title + ".",
-                routeID: {
-                  kind: 'Event',
-                  id: newEvent._id,
-                  boardId: newEvent.board
-                }
-              });
-              newNotification.save(function(err, notification) {
-                if(err) throw err;
-                for(var i=0; i<members.length; i++) {
-                  members[i].notifications.push(notification._id);
-                  members[i].save(function(err, completeUser) {
+        User.findById(req.user._id, function(error, user) {
+          if (error) throw error;
+    			user.attendedEvents.push(newEvent._id);
+          user.validateSync();
+          user.save(function(error, updatedUser) {
+            if (error) throw error;
+    				Board.findById(newEvent.board, function(err, board) {
+    					if (err) throw err;
+    					board.contents.push({"kind": "Event", "item": newEvent._id});
+    					board.save(function(err, updatedBoard) {
+    						if(err) throw err;
+                User.find({'username': addMembers}, function(err, members) {
+                  if(err) throw err;
+                  var newNotification = new Notification({
+                    type: 'Invited to Event',
+                    message: "You have been invited to a new Event, " + newEvent.title + ".",
+                    routeID: {
+                      kind: 'Event',
+                      id: newEvent._id,
+                      boardId: newEvent.board
+                    }
+                  });
+                  newNotification.save(function(err, notification) {
                     if(err) throw err;
-                  })
-                }
-                res.redirect('/boards/' + updatedBoard._id);
-              });
-            })
-					})
-				})
+                    for(var i=0; i<members.length; i++) {
+                      members[i].notifications.push(notification._id);
+                      members[i].save(function(err, completeUser) {
+                        if(err) throw err;
+                      })
+                    }
+                    res.redirect('/boards/' + updatedBoard._id);
+                  });
+                })
+    					})
+    				})
+          })
+        })
       })
     })
   })
@@ -401,173 +554,34 @@ router.get('/event/:id', function(req, res) {
           } else {
             var endTime = "";
           }
-          User.findOne({"username": event.contact}, function(err, user) {
-            if(err) throw err;
-            if(user) {
-              var eventObject = {
-                "own": user._id.toString() === req.user._id.toString(),
-                "id": event._id,
-                "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
-                "postedBy": {
-                  "id": user._id,
-                  "firstName": user.firstName,
-                  "lastName": user.lastName,
-                  "isLoopUser": true
-                },
-                "title": event.title,
-                "board": event.board,
-                "archive": event.archive,
-                "date": moment(event.date).utc().format('MMMM D, YYYY'),
-                "startTime": moment(event.startTime).utc().format('h:mm a'),
-                "endTime": endTime,
-                "location": event.location,
-                "description": event.description,
-                "flagged": event.flagged,
-                "comments": comments,
-                "attendees": attendees,
-                "attending": attending
-              }
-            } else {
-              var eventObject = {
-                "id": event._id,
-                "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
-                "postedBy": {
-                  "username": event.contact,
-                  "isLoopUser": false
-                },
-                "title": event.title,
-                "board": event.board,
-                "archive": event.archive,
-                "date": moment(event.date).utc().format('MMMM D, YYYY'),
-                "startTime": moment(event.startTime).utc().format('h:mm a'),
-                "endTime": endTime,
-                "location": event.location,
-                "description": event.description,
-                "flagged": event.flagged,
-                "comments": comments,
-                "attendees": attendees,
-                "attending": attending
-              }
-            }
-            console.log(eventObject);
-            res.render('event-detail', {"event": eventObject, "board": board.name, admin: req.user.admin, helpers: {
-  							compare: function(lvalue, rvalue, options) {
-  								if (arguments.length < 3)
-  										throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
-
-  								var operator = options.hash.operator || "==";
-
-  								var operators = {
-  										'==':       function(l,r) { return l == r; },
-  										'===':      function(l,r) { return l === r; },
-  										'!=':       function(l,r) { return l != r; },
-  										'<':        function(l,r) { return l < r; },
-  										'>':        function(l,r) { return l > r; },
-  										'<=':       function(l,r) { return l <= r; },
-  										'>=':       function(l,r) { return l >= r; },
-  										'typeof':   function(l,r) { return typeof l == r; }
-  								}
-
-  								if (!operators[operator])
-  										throw new Error("Handlerbars Helper 'compare' doesn't know the operator "+operator);
-
-  								var result = operators[operator](lvalue,rvalue);
-
-  								if( result ) {
-  										return options.fn(this);
-  								} else {
-  										return options.inverse(this);
-  								}
-  							}
-  						}});
-          })
-        })
-      })
-    })
-  } else {
-    res.redirect('/');
-  }
-})
-
-//Render all events
-router.get('/events', function(req, res) {
-	if(req.user) {
-    Event.find({$and: [{date: {$gte: moment(Date.now()).local().startOf('day').format().slice(0,-6) + '.000Z'}, archive: false}]}).populate('board').exec(function(err, events) {
-      if(err) throw err;
-  			let sortedEvents = quickSort(events, 0, events.length-1);
-  			let eventObjects = sortedEvents.map(async function(event) {
-          var user = await User.findOne({username: event.contact});
-          if(event.endTime) {
-            var endTime = moment(event.endTime).utc().format('h:mm a');
-          } else {
-            var endTime = "";
-          }
-          if(user) {
-              let eventObject= {
+          if(event.postingGroup) {
+            Group.findById(event.postingGroup, function(err, user) {
+              if(err) throw err;
+              if(user) {
+                var eventObject = {
+                  "own": event.contact.toString() === req.user.username.toString(),
                   "id": event._id,
                   "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
-                  "title": event.title,
-                  "postedBy": {
+                  "postingGroup": {
                     "id": user._id,
-                    "firstName": user.firstName,
-                    "lastName": user.lastName,
+                    "name": user.name,
                     "isLoopUser": true
                   },
-                  "board": {
-                    "id": event.board._id,
-                    "name": event.board.name
-                  },
+                  "title": event.title,
+                  "board": event.board,
                   "archive": event.archive,
-                  "description": event.description,
                   "date": moment(event.date).utc().format('MMMM D, YYYY'),
                   "startTime": moment(event.startTime).utc().format('h:mm a'),
                   "endTime": endTime,
                   "location": event.location,
+                  "description": event.description,
                   "flagged": event.flagged,
-                  "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
-                  "currentTime": moment(Date.now()).local().format('h:mm a')
-                }
-                return Promise.resolve(eventObject);
-          } else {
-            let eventObject= {
-              "id": event._id,
-              "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
-              "title": event.title,
-              "postedBy": {
-                "id": "",
-                "firstName": "",
-                "lastName": "",
-                "username": event.contact,
-                "isLoopUser": false
-              },
-              "board": {
-                "id": event.board._id,
-                "name": event.board.name
-              },
-              "archive": event.archive,
-              "description": event.description,
-              "flagged": event.flagged,
-              "date": moment(event.date).utc().format('MMMM D, YYYY'),
-              "startTime": moment(event.startTime).utc().format('h:mm a'),
-              "endTime": endTime,
-              "location": event.location,
-              "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
-              "currentTime": moment(Date.now()).local().format('h:mm a')
-            }
-            return Promise.resolve(eventObject);
-          }
-        })
-        Promise.all(eventObjects).then(function(events) {
-          console.log(events);
-            Board.find({}, function(err, boards) {
-              if(err) throw err;
-              var info = [];
-              for(var i=0; i<boards.length; i++) {
-                if(boards[i].archive==false) {
-                  info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
+                  "comments": comments,
+                  "attendees": attendees,
+                  "attending": attending
                 }
               }
-              res.render('events-list-view', {events: events, boards: info, admin: req.user.admin, helpers: {
+              res.render('event-detail', {"event": eventObject, "board": board.name, admin: req.user.admin, helpers: {
     							compare: function(lvalue, rvalue, options) {
     								if (arguments.length < 3)
     										throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
@@ -597,6 +611,320 @@ router.get('/events', function(req, res) {
     								}
     							}
     						}});
+            })
+          } else if(event.postingOffice) {
+            Office.findById(event.postingOffice, function(err, user) {
+              if(err) throw err;
+              if(user) {
+                var eventObject = {
+                  "own": event.contact.toString() === req.user.username.toString(),
+                  "id": event._id,
+                  "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                  "postingOffice": {
+                    "id": user._id,
+                    "name": user.name,
+                    "isLoopUser": true
+                  },
+                  "title": event.title,
+                  "board": event.board,
+                  "archive": event.archive,
+                  "date": moment(event.date).utc().format('MMMM D, YYYY'),
+                  "startTime": moment(event.startTime).utc().format('h:mm a'),
+                  "endTime": endTime,
+                  "location": event.location,
+                  "description": event.description,
+                  "flagged": event.flagged,
+                  "comments": comments,
+                  "attendees": attendees,
+                  "attending": attending
+                }
+              }
+              res.render('event-detail', {"event": eventObject, "board": board.name, admin: req.user.admin, helpers: {
+    							compare: function(lvalue, rvalue, options) {
+    								if (arguments.length < 3)
+    										throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
+
+    								var operator = options.hash.operator || "==";
+
+    								var operators = {
+    										'==':       function(l,r) { return l == r; },
+    										'===':      function(l,r) { return l === r; },
+    										'!=':       function(l,r) { return l != r; },
+    										'<':        function(l,r) { return l < r; },
+    										'>':        function(l,r) { return l > r; },
+    										'<=':       function(l,r) { return l <= r; },
+    										'>=':       function(l,r) { return l >= r; },
+    										'typeof':   function(l,r) { return typeof l == r; }
+    								}
+
+    								if (!operators[operator])
+    										throw new Error("Handlerbars Helper 'compare' doesn't know the operator "+operator);
+
+    								var result = operators[operator](lvalue,rvalue);
+
+    								if( result ) {
+    										return options.fn(this);
+    								} else {
+    										return options.inverse(this);
+    								}
+    							}
+    						}});
+            })
+          } else {
+            User.findOne({"username": event.contact}, function(err, user) {
+              if(err) throw err;
+              if(user) {
+                var eventObject = {
+                  "own": user._id.toString() === req.user._id.toString(),
+                  "id": event._id,
+                  "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                  "postedBy": {
+                    "id": user._id,
+                    "firstName": user.firstName,
+                    "lastName": user.lastName,
+                    "isLoopUser": true
+                  },
+                  "title": event.title,
+                  "board": event.board,
+                  "archive": event.archive,
+                  "date": moment(event.date).utc().format('MMMM D, YYYY'),
+                  "startTime": moment(event.startTime).utc().format('h:mm a'),
+                  "endTime": endTime,
+                  "location": event.location,
+                  "description": event.description,
+                  "flagged": event.flagged,
+                  "comments": comments,
+                  "attendees": attendees,
+                  "attending": attending
+                }
+              } else {
+                var eventObject = {
+                  "id": event._id,
+                  "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                  "postedBy": {
+                    "username": event.contact,
+                    "isLoopUser": false
+                  },
+                  "title": event.title,
+                  "board": event.board,
+                  "archive": event.archive,
+                  "date": moment(event.date).utc().format('MMMM D, YYYY'),
+                  "startTime": moment(event.startTime).utc().format('h:mm a'),
+                  "endTime": endTime,
+                  "location": event.location,
+                  "description": event.description,
+                  "flagged": event.flagged,
+                  "comments": comments,
+                  "attendees": attendees,
+                  "attending": attending
+                }
+              }
+              res.render('event-detail', {"event": eventObject, "board": board.name, admin: req.user.admin, helpers: {
+    							compare: function(lvalue, rvalue, options) {
+    								if (arguments.length < 3)
+    										throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
+
+    								var operator = options.hash.operator || "==";
+
+    								var operators = {
+    										'==':       function(l,r) { return l == r; },
+    										'===':      function(l,r) { return l === r; },
+    										'!=':       function(l,r) { return l != r; },
+    										'<':        function(l,r) { return l < r; },
+    										'>':        function(l,r) { return l > r; },
+    										'<=':       function(l,r) { return l <= r; },
+    										'>=':       function(l,r) { return l >= r; },
+    										'typeof':   function(l,r) { return typeof l == r; }
+    								}
+
+    								if (!operators[operator])
+    										throw new Error("Handlerbars Helper 'compare' doesn't know the operator "+operator);
+
+    								var result = operators[operator](lvalue,rvalue);
+
+    								if( result ) {
+    										return options.fn(this);
+    								} else {
+    										return options.inverse(this);
+    								}
+    							}
+    						}});
+            })
+          }
+        })
+      })
+    })
+  } else {
+    res.redirect('/');
+  }
+})
+
+//Render all events
+router.get('/events', function(req, res) {
+	if(req.user) {
+    Event.find({$and: [{date: {$gte: moment(Date.now()).local().startOf('day').format().slice(0,-6) + '.000Z'}, archive: false}]}).populate('board').exec(function(err, events) {
+      if(err) throw err;
+  			let sortedEvents = quickSort(events, 0, events.length-1);
+  			let eventObjects = sortedEvents.map(async function(event) {
+          var user = await User.findOne({username: event.contact});
+          if(event.endTime) {
+            var endTime = moment(event.endTime).utc().format('h:mm a');
+          } else {
+            var endTime = "";
+          }
+          if(event.postingGroup) {
+            var user = await Group.findById(event.postingGroup);
+                let eventObject= {
+                    "id": event._id,
+                    "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                    "title": event.title,
+                    "postingGroup": {
+                      "id": user._id,
+                      "name": user.name,
+                      "isLoopUser": true
+                    },
+                    "board": {
+                      "id": event.board._id,
+                      "name": event.board.name
+                    },
+                    "archive": event.archive,
+                    "description": event.description,
+                    "date": moment(event.date).utc().format('MMMM D, YYYY'),
+                    "startTime": moment(event.startTime).utc().format('h:mm a'),
+                    "endTime": endTime,
+                    "location": event.location,
+                    "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
+                    "currentTime": moment(Date.now()).local().format('h:mm a')
+                  }
+                  return Promise.resolve(eventObject);
+          } else if(event.postingOffice) {
+            var user = await Office.findById(event.postingOffice);
+                let eventObject= {
+                    "id": event._id,
+                    "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                    "title": event.title,
+                    "postingOffice": {
+                      "id": user._id,
+                      "name": user.name,
+                      "isLoopUser": true
+                    },
+                    "board": {
+                      "id": event.board._id,
+                      "name": event.board.name
+                    },
+                    "archive": event.archive,
+                    "description": event.description,
+                    "date": moment(event.date).utc().format('MMMM D, YYYY'),
+                    "startTime": moment(event.startTime).utc().format('h:mm a'),
+                    "endTime": endTime,
+                    "location": event.location,
+                    "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
+                    "currentTime": moment(Date.now()).local().format('h:mm a')
+                  }
+                  return Promise.resolve(eventObject);
+          } else {
+            var user = await User.findOne({username: event.contact});
+            if(user) {
+                let eventObject= {
+                    "id": event._id,
+                    "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                    "title": event.title,
+                    "postedBy": {
+                      "id": user._id,
+                      "firstName": user.firstName,
+                      "lastName": user.lastName,
+                      "isLoopUser": true
+                    },
+                    "board": {
+                      "id": event.board._id,
+                      "name": event.board.name
+                    },
+                    "archive": event.archive,
+                    "description": event.description,
+                    "date": moment(event.date).utc().format('MMMM D, YYYY'),
+                    "startTime": moment(event.startTime).utc().format('h:mm a'),
+                    "endTime": endTime,
+                    "location": event.location,
+                    "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
+                    "currentTime": moment(Date.now()).local().format('h:mm a')
+                  }
+                  return Promise.resolve(eventObject);
+            } else {
+              let eventObject= {
+                "id": event._id,
+                "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                "title": event.title,
+                "postedBy": {
+                  "id": "",
+                  "firstName": "",
+                  "lastName": "",
+                  "username": event.contact,
+                  "isLoopUser": false
+                },
+                "board": {
+                  "id": event.board._id,
+                  "name": event.board.name
+                },
+                "archive": event.archive,
+                "description": event.description,
+                "date": moment(event.date).utc().format('MMMM D, YYYY'),
+                "startTime": moment(event.startTime).utc().format('h:mm a'),
+                "endTime": endTime,
+                "location": event.location,
+                "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
+                "currentTime": moment(Date.now()).local().format('h:mm a')
+              }
+              return Promise.resolve(eventObject);
+            }
+          }
+        })
+        Promise.all(eventObjects).then(function(events) {
+          console.log(events);
+            Board.find({}, function(err, boards) {
+              if(err) throw err;
+              var info = [];
+              for(var i=0; i<boards.length; i++) {
+                if(boards[i].archive==false && req.user.viewBlockedBoards.indexOf(boards[i]._id)==-1 && req.user.postBlockedBoards.indexOf(boards[i]._id)==-1) {
+                  info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
+                }
+              }
+              User.findById(req.user._id).populate('adminGroups').populate('office').exec(function(err, user) {
+                if(err) throw err;
+                console.log(user);
+                Tag.find({}, function(err, tags) {
+                  if(err) throw err;
+                  res.render('events-list-view', {blocked: req.user.blocked, tags: tags, groups: user.adminGroups, office: user.office, events: events, boards: info, admin: req.user.admin, helpers: {
+        							compare: function(lvalue, rvalue, options) {
+        								if (arguments.length < 3)
+        										throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
+
+        								var operator = options.hash.operator || "==";
+
+        								var operators = {
+        										'==':       function(l,r) { return l == r; },
+        										'===':      function(l,r) { return l === r; },
+        										'!=':       function(l,r) { return l != r; },
+        										'<':        function(l,r) { return l < r; },
+        										'>':        function(l,r) { return l > r; },
+        										'<=':       function(l,r) { return l <= r; },
+        										'>=':       function(l,r) { return l >= r; },
+        										'typeof':   function(l,r) { return typeof l == r; }
+        								}
+
+        								if (!operators[operator])
+        										throw new Error("Handlerbars Helper 'compare' doesn't know the operator "+operator);
+
+        								var result = operators[operator](lvalue,rvalue);
+
+        								if( result ) {
+        										return options.fn(this);
+        								} else {
+        										return options.inverse(this);
+        								}
+        							}
+        						}});
+                })
+              })
             })
 
       })
@@ -904,6 +1232,7 @@ router.post('/events/:id/attend', function(req, res) {
 		if (error)
 			throw error;
 		user.attendedEvents.push(req.params.id)
+    user.validateSync();
 		user.save(function(error, updatedUser) {
 			if (error)
 				throw error;
@@ -929,6 +1258,7 @@ router.post('/events/:id/unattend', function(req, res) {
 		var attendedEvents = user.attendedEvents
 		var index1 = attendedEvents.indexOf(req.params.id)
 		user.attendedEvents = attendedEvents.slice(0, index1).concat(attendedEvents.slice(index1+1, attendedEvents.length))
+    user.validateSync();
 		user.save(function(error, updatedUser) {
 			if (error)
 				throw error;
