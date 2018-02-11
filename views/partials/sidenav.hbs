@@ -38,9 +38,16 @@
                                   });
                                   </script>
                                 </li>
+                                {{#if admin}}
                                 <li>
                                     <a href="/settings">
                                         <span uk-icon="icon: cog"></span>Settings
+                                    </a>
+                                </li>
+                                {{/if}}
+                                <li>
+                                    <a href="/invite-more-users">
+                                        <span uk-icon="icon: plus-circle"></span>Invite other users
                                     </a>
                                 </li>
                                 <li>

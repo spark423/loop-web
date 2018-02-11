@@ -74,7 +74,7 @@ router.get('/all-notifications', function(req, res) {
 				throw err;
 			} else {
 				let notifications = user.notifications.map(function(notification) {
-					return {"type": notification.type, "createdAt": moment(notification.createdAt).utc().local().format('MMMM D, YYYY, h:mm a'), "message": notification.message, "routeID": notification.routeID}
+					return {"type": notification.type, "createdAt": moment(notification.createdAt).utc().local().format('MMMM D, YYYY, h:mm a'), "formatCreated": moment(notification.createdAt).utc().local().format('MMMM D, YYYY'), "message": notification.message, "routeID": notification.routeID}
 				})
 				let sortedNotifications = quickSort(notifications, 0, notifications.length - 1).reverse();
 				res.render('notifications', {notifications: sortedNotifications, admin: req.user.admin, helpers: {

@@ -17,6 +17,20 @@ function search1() {
 }
 function addMember(index) {
   var username_tag = "member-username-" + index;
+  if(document.getElementById("icon1-member-" + index).style.display=="") {
+    document.getElementById("icon1-member-" + index).style.display="none";
+    document.getElementById("icon2-member-" + index).style.display="";
+    document.getElementById("addMembers").value += document.getElementById(username_tag).innerHTML + ",";
+  }
+  else {
+    document.getElementById("icon1-member-" + index).style.display="";
+    document.getElementById("icon2-member-" + index).style.display="none";
+    document.getElementById("removeMembers").value += document.getElementById(username_tag).innerHTML + ",";
+  }
+}
+
+function add(index) {
+  var username_tag = "username-" + index;
   if(document.getElementById("icon1-" + index).style.display=="") {
     document.getElementById("icon1-" + index).style.display="none";
     document.getElementById("icon2-" + index).style.display="";
@@ -57,10 +71,10 @@ function addMember(index) {
                                     </div>
                                     <div class="uk-width-auto@m" id="icons">
                                         <div class="invite-icon">
-                                            <span onclick="addMember({{@index}})" id="icon1-{{@index}}" class="uk-icon" uk-icon="icon: plus" style="display:none"></span>
+                                            <span onclick="addMember({{@index}})" id="icon1-member-{{@index}}" class="uk-icon" uk-icon="icon: plus" style="display:none"></span>
                                         </div>
                                         <div class="invite-icon green">
-                                            <span onclick="addMember({{@index}})" id="icon2-{{@index}}" class="uk-icon" uk-icon="icon: check" style="display:"></span>
+                                            <span onclick="addMember({{@index}})" id="icon2-member-{{@index}}" class="uk-icon" uk-icon="icon: check" style="display:"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -73,16 +87,16 @@ function addMember(index) {
                                         <div class="img-wrap one"></div>
                                     </div>
                                     <div class="uk-width-expand@m">
-                                      <p id="member-username-{{@index}}" style="display: none">{{username}}</p>
+                                      <p id="username-{{@index}}" style="display: none">{{username}}</p>
                                         <p class="name">{{firstName}} {{lastName}}</p>
                                         <p class="major">{{#if major}}{{major}}{{#if classYear}}, {{classYear}}{{/if}}{{else}}{{#if classYear}}{{classYear}}{{/if}}{{/if}}</p>
                                     </div>
                                     <div class="uk-width-auto@m" id="icons">
                                         <div class="invite-icon">
-                                            <span onclick="addMember({{@index}})" id="icon1-{{@index}}" class="uk-icon" uk-icon="icon: plus" style="display:"></span>
+                                            <span onclick="add({{@index}})" id="icon1-{{@index}}" class="uk-icon" uk-icon="icon: plus" style="display:"></span>
                                         </div>
                                         <div class="invite-icon green">
-                                            <span onclick="addMember({{@index}})" id="icon2-{{@index}}" class="uk-icon" uk-icon="icon: check" style="display:none"></span>
+                                            <span onclick="add({{@index}})" id="icon2-{{@index}}" class="uk-icon" uk-icon="icon: check" style="display:none"></span>
                                         </div>
                                     </div>
                                 </div>

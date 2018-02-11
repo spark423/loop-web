@@ -19,14 +19,15 @@ $( document ).ready(function() {
   var addedHeader = false;
   {{#each notifications}}
   if({{@index}}==0) {
-    previousDate = '{{createdAt}}';
-    var date = '{{createdAt}}';
+    previousDate = '{{formatCreated}}';
+    var date = '{{formatCreated}}';
     var previousArray = date.split(/[ ,]+/);
   }
-  var date = '{{createdAt}}';
+  var date = '{{formatCreated}}';
   var dateArray = date.split(/[ ,]+/);
   date = dateArray[0] + ' ' + dateArray[1] + ', ' + dateArray[2];
   if(date==currentDate && addedHeader==false) {
+    console.log("addedHeader");
     header = '<h4 class="today">TODAY</h4>';
     notifications += header;
     addedHeader = true;
@@ -39,9 +40,11 @@ $( document ).ready(function() {
     notifications += header;
     addedHeader = true;
   }
-  if(previousDate=='{{createdAt}}') {
-    notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Comment' operator="=="}}href="/comment/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Board' operator="=="}}href="/boards/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>';
+  if(previousDate=='{{formatCreated}}') {
+    console.log("here");
+    notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Comment' operator="=="}}href="/comment/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Board' operator="=="}}href="/boards/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.formatCreated}}</span><br /><span>{{this.message}}</span></div></div></div>';
     if({{../notifications.length}}=={{@index}}+1) {
+      console.log("not here");
       notifications+= '</div>';
       if(dateArray[0]==currentMonth && dateArray[1]==currentDay && dateArray[2] == currentYear) {
         today.append(notifications);
@@ -55,11 +58,12 @@ $( document ).ready(function() {
     }
   } else {
     if(previousArray[0] == currentMonth && previousArray[1]==currentDay && previousArray[2]==currentYear) {
+      console.log("here1");
       notifications += '</div>';
       today.append(notifications);
       notifications = "";
-      previousDate = '{{createdAt}}';
-      date = '{{createdAt}}';
+      previousDate = '{{formatCreated}}';
+      date = '{{formatCreated}}';
       dateArray = date.split(/[ ,]+/);
       previousArray = date.split(/[ ,]+/);
       addedHeader=false;
@@ -72,7 +76,7 @@ $( document ).ready(function() {
         notifications += header;
         addedHeader = true;
       }
-      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Comment' operator="=="}}href="/comment/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Board' operator="=="}}href="/boards/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
+      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Comment' operator="=="}}href="/comment/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Board' operator="=="}}href="/boards/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.formatCreated}}</span><br /><span>{{this.message}}</span></div></div></div>'
       if({{../notifications.length}}=={{@index}}+1) {
         notifications+= '</div>';
         if(dateArray[0]==currentMonth && dateArray[1]==currentDay && dateArray[2] == currentYear) {
@@ -86,11 +90,12 @@ $( document ).ready(function() {
         }
       }
     } else if (previousArray[0] == currentMonth && previousArray[1] < currentDay && previousArray[1] >= begofWeek && previousArray[2]==currentYear) {
+      console.log("here2");
       notifications += '</div><br>';
       week.append(notifications);
       notifications = "";
-      previousDate = '{{createdAt}}';
-      date = '{{createdAt}}';
+      previousDate = '{{formatCreated}}';
+      date = '{{formatCreated}}';
       dateArray = date.split(/[ ,]+/);
       previousArray = date.split(/[ ,]+/);
       addedHeader=false;
@@ -104,7 +109,7 @@ $( document ).ready(function() {
         notifications += header;
         addedHeader = true;
       }
-      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Comment' operator="=="}}href="/comment/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Board' operator="=="}}href="/boards/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
+      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Comment' operator="=="}}href="/comment/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Board' operator="=="}}href="/boards/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.formatCreated}}</span><br /><span>{{this.message}}</span></div></div></div>'
       if({{../notifications.length}}=={{@index}}+1) {
         notifications+= '</div><br>';
         if(dateArray[0]==currentMonth && dateArray[1]==currentDay && dateArray[2] == currentYear) {
@@ -118,11 +123,12 @@ $( document ).ready(function() {
         }
       }
     } else if (previousArray[0] == currentMonth && previousArray[2]==currentYear) {
+      console.log("here3");
       notifications += '</div><br>';
       month.append(notifications);
       notifications = "";
-      previousDate = '{{createdAt}}';
-      date = '{{createdAt}}';
+      previousDate = '{{formatCreated}}';
+      date = '{{formatCreated}}';
       dateArray = date.split(/[ ,]+/);
       previousArray = date.split(/[ ,]+/);
       addedHeader=false;
@@ -131,7 +137,7 @@ $( document ).ready(function() {
         notifications += header;
         addedHeader = true;
       }
-      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Comment' operator="=="}}href="/comment/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Board' operator="=="}}href="/boards/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
+      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Comment' operator="=="}}href="/comment/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Board' operator="=="}}href="/boards/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.formatCreated}}</span><br /><span>{{this.message}}</span></div></div></div>'
       if({{../notifications.length}}=={{@index}}+1) {
         notifications+= '</div><br>';
         if(dateArray[0]==currentMonth && dateArray[1]==currentDay && dateArray[2] == currentYear) {
@@ -145,11 +151,12 @@ $( document ).ready(function() {
         }
       }
     } else {
+      console.log("here4");
       notifications += '</div><br>';
       past.append(notifications);
       notifications = "";
-      previousDate = '{{createdAt}}';
-      date = '{{createdAt}}';
+      previousDate = '{{formatCreated}}';
+      date = '{{formatCreated}}';
       dateArray = date.split(/[ ,]+/);
       previousArray = date.split(/[ ,]+/);
       addedHeader=false;
@@ -158,7 +165,7 @@ $( document ).ready(function() {
         notifications += header;
         addedHeader = true;
       }
-      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Comment' operator="=="}}href="/comment/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Board' operator="=="}}href="/boards/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.createdAt}}</span><br /><span>{{this.message}}</span></div></div></div>'
+      notifications += '<div class="uk-card uk-card-default uk-card-body"><div class="main-post"><div class="poster-avi uk-float-left"><img src="img/user.png" alt="Alex Reekie" /></div><div class="poster-info uk-float-left"><span class="name"><a {{#compare this.routeID.kind 'Comment' operator="=="}}href="/comment/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Board' operator="=="}}href="/boards/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Group' operator="=="}}href="/groups/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Post' operator="=="}}href="/post/{{this.routeID.id}}"{{/compare}}{{#compare this.routeID.kind 'Event' operator="=="}}href="/event/{{this.routeID.id}}"{{/compare}}>{{this.type}}</a></span><span class="timestamp">{{this.formatCreated}}</span><br /><span>{{this.message}}</span></div></div></div>'
       if({{../notifications.length}}=={{@index}}+1) {
         notifications+= '</div><br>';
         if(dateArray[0]==currentMonth && dateArray[1]==currentDay && dateArray[2] == currentYear) {

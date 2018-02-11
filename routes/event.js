@@ -383,10 +383,12 @@ router.get('/create-a-new-event-invite', function(req, res) {
       var user_info = [];
       for(var i=0; i<users.length; i++) {
         if(req.user.username!=users[i].username) {
-          user_info.push({"firstName": users[i].firstName, "lastName": users[i].lastName, "username": users[i].username, "major": users[i].major, "classYear": users[i].classYear});
+          user_info.push({"firstName": users[i].firstName, "lastName": users[i].lastName, "username": users[i].username, "major": users[i].major, "classYear": users[i].classYear, "title": users[i].title, "division": users[i].division});
         }
       }
-      res.render('create-a-new-event-invite', {tags: req.query.tags, admin: req.user.admin, title: req.query.title, description: req.query.description, board: req.query.board, date: req.query.date, startTime: req.query.startTime, endTime: req.query.endTime, location: req.query.location, contact: req.query.contact, postAs: req.query.postAs, users: user_info});
+      Group.find({}, function(err, groups) {
+        res.render('create-a-new-event-invite', {tags: req.query.tags, admin: req.user.admin, title: req.query.title, description: req.query.description, board: req.query.board, date: req.query.date, startTime: req.query.startTime, endTime: req.query.endTime, location: req.query.location, contact: req.query.contact, postAs: req.query.postAs, users: user_info, groups: groups});
+      })
     })
   } else {
     res.redirect('/');
@@ -403,10 +405,19 @@ router.post('/events/create', function(req, res) {
   endTime.add(-difference, 'hour');
   var addMembers = req.body.addMembers.split(',');
   var removeMembers = req.body.removeMembers.split(',');
+  var addGroups = req.body.addGroups.split(',');
+  var removeGroups = req.body.removeGroups.split(',');
   for(var i=0; i<removeMembers.length; i++) {
     for(var j=0; j<addMembers.length; j++) {
       if(removeMembers[i]==addMembers[j]) {
         addMembers.splice(j, 1);
+      }
+    }
+  }
+  for(var i=0; i<removeGroups.length; i++) {
+    for(var j=0; j<addGroups.length; j++) {
+      if(removeGroups[i]==addGroups[j]) {
+        addGroups.splice(j, 1);
       }
     }
   }
@@ -423,7 +434,7 @@ router.post('/events/create', function(req, res) {
           return foundTag.save();
         }
       }
-    } else {
+    } else if(tag!=""){
       let newTag = new Tag({
         name: tag,
         followers: [req.user._id],
@@ -500,27 +511,56 @@ router.post('/events/create', function(req, res) {
     					board.contents.push({"kind": "Event", "item": newEvent._id});
     					board.save(function(err, updatedBoard) {
     						if(err) throw err;
-                User.find({'username': addMembers}, function(err, members) {
-                  if(err) throw err;
-                  var newNotification = new Notification({
-                    type: 'Invited to Event',
-                    message: "You have been invited to a new Event, " + newEvent.title + ".",
-                    routeID: {
-                      kind: 'Event',
-                      id: newEvent._id,
-                      boardId: newEvent.board
-                    }
-                  });
-                  newNotification.save(function(err, notification) {
-                    if(err) throw err;
-                    for(var i=0; i<members.length; i++) {
-                      members[i].notifications.push(notification._id);
-                      members[i].save(function(err, completeUser) {
+                Group.find({'_id': addGroups}, function(err, groups) {
+                  let foundGroups = groups.map(async function(group) {
+                    var newNotification = new Notification({
+                      type: 'Invited to Event',
+                      message: "The Organization, " + group.name + ", that you are part of has been invited to a new Event, " + newEvent.title + ".",
+                      routeID: {
+                        kind: 'Event',
+                        id: newEvent._id,
+                        boardId: newEvent.board
+                      }
+                    })
+                    newNotification.save(function(err, groupNotification) {
+                      if(err) throw err;
+                      User.find({'_id': group.members}, function(err, groupMembers) {
                         if(err) throw err;
+                        for(var i=0; i<groupMembers.length; i++) {
+                          groupMembers[i].notifications.push(groupNotification._id);
+                          groupMembers[i].save(function(err, savedMember) {
+                            if(err) throw err;
+                            console.log("saved notification");
+                          })
+                        }
+                        return groupMembers;
                       })
-                    }
-                    res.redirect('/boards/' + updatedBoard._id);
-                  });
+                    })
+                  })
+                  Promise.all(foundGroups).then(function(groupMembers) {
+                    User.find({$and: [{'username': addMembers}, {'_id': {$nin: groupMembers}}]}, function(err, members) {
+                      if(err) throw err;
+                      var newNotification = new Notification({
+                        type: 'Invited to Event',
+                        message: "You have been invited to a new Event, " + newEvent.title + ".",
+                        routeID: {
+                          kind: 'Event',
+                          id: newEvent._id,
+                          boardId: newEvent.board
+                        }
+                      });
+                      newNotification.save(function(err, notification) {
+                        if(err) throw err;
+                        for(var i=0; i<members.length; i++) {
+                          members[i].notifications.push(notification._id);
+                          members[i].save(function(err, completeUser) {
+                            if(err) throw err;
+                          })
+                        }
+                        res.redirect('/boards/' + updatedBoard._id);
+                      });
+                    })
+                  })
                 })
     					})
     				})

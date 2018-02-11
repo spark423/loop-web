@@ -5,6 +5,7 @@ var Board = require('../models/board');
 var Post = require('../models/post');
 var Event = require('../models/event');
 var Comment = require('../models/comment')
+var Notification = require('../models/notification')
 
 router.post('/comments/:id/flag', function(req, res) {
   	Comment.findOneAndUpdate({_id: req.params.id}, {$set: {flagged: true}},function(err,comment) {
@@ -48,7 +49,7 @@ router.post('/comments/:id/flag', function(req, res) {
 		                        if (err) {
 		                          throw err;
 		                        } else {
-		                          res.json({success: true});
+		                          res.redirect('back');
 		                        }
 		                      })
 		      							}
@@ -100,7 +101,7 @@ router.post('/comments/:id/flag', function(req, res) {
 		                        if (err) {
 		                          throw err;
 		                        } else {
-		                          res.json({success: true});
+		                          res.redirect('back');
 		                        }
 		                      })
 		      							}
@@ -154,7 +155,7 @@ router.post('/comments/:id/flag', function(req, res) {
 				                        if (err) {
 				                          throw err;
 				                        } else {
-				                          res.json({success: true});
+				                          res.redirect('back');
 				                        }
 				                      })
 				      							}
@@ -206,7 +207,7 @@ router.post('/comments/:id/flag', function(req, res) {
 				                        if (err) {
 				                          throw err;
 				                        } else {
-				                          res.json({success: true});
+				                          res.redirect('back');
 				                        }
 				                      })
 				      							}

@@ -416,7 +416,6 @@ router.get('/boards/:id', function(req, res) {
             }
           });
           Promise.all(contents).then(function(contents) {
-            console.log(contents);
             let notifications = board.notifications.map(function(notification) {
               return {"id": notification._id, "createdAt": moment(notification.createdAt).local().format('MMM D, YYYY, h:mm a'), "message": notification.message, "routeID": notification.routeID.id, "kind": notification.routeID.kind}
             });
@@ -494,7 +493,7 @@ router.post('/boards/:id/post', function(req, res) {
           return foundTag.save();
         }
       }
-    } else {
+    } else if(tag!=""){
       let newTag = new Tag({
         name: tag,
         followers: [req.user._id],

@@ -146,12 +146,12 @@ module.exports = function(passport) {
           }
         }
       } else {
-        let newTag = new Tag({
-          name: tag,
-          followers: [req.user._id]
-        })
-        return newTag.save();
-      }
+          let newTag = new Tag({
+            name: tag,
+            followers: [req.user._id]
+          })
+          return newTag.save();
+        }
     })
     Promise.all(tags).then(function(tags) {
       User.findOneAndUpdate({_id: req.user._id}, {$set: {'tags': tags}}, function(err, user) {
@@ -294,6 +294,11 @@ module.exports = function(passport) {
                 'Please click on the link to sign up to connect your community organization with students and administrators.\n\n' +
                 'Link: http://localhost:3000/invited/' + token
                };
+               client.sendMail(email, function(err){
+                 console.log("here5");
+                 if(err) throw err;
+                 res.redirect('/add-tags');
+               })
             } else if(req.body.permission=="admin") {
               console.log("admin");
               var token = encrypt("admin");
@@ -305,6 +310,11 @@ module.exports = function(passport) {
                 'Please click on the link to sign up as an administrator.\n\n' +
                 'Link: http://localhost:3000/invited/' + token
                };
+               client.sendMail(email, function(err){
+                 console.log("here5");
+                 if(err) throw err;
+                 res.redirect('/add-tags');
+               })
             } else if(req.body.permission=="student"){
               console.log("student");
               var token = encrypt("student");
@@ -316,6 +326,11 @@ module.exports = function(passport) {
                 'Please click on the link to sign up and join your school\'s network.\n\n' +
                 'Link: http://localhost:3000/invited/' + token
                };
+               client.sendMail(email, function(err){
+                 console.log("here5");
+                 if(err) throw err;
+                 res.redirect('/add-tags');
+               })
             } else if(req.body.permission=="outside"){
               console.log("outside");
               var token = encrypt("outside");
@@ -327,12 +342,12 @@ module.exports = function(passport) {
                 'Please click on the link to sign up to connect your community organization with students and administrators.\n\n' +
                 'Link: http://localhost:3000/invited/' + token
                };
+               client.sendMail(email, function(err){
+                 console.log("here5");
+                 if(err) throw err;
+                 res.redirect('/add-tags');
+               })
             }
-            client.sendMail(email, function(err){
-              console.log("here5");
-              if(err) throw err;
-              res.redirect('/add-tags');
-            })
           }
         })
       }
@@ -392,7 +407,9 @@ module.exports = function(passport) {
       if(req.user.admin) {
         Office.find({private: 'false'}).populate('tags').exec(function(err, offices) {
           Tag.find({}, function(err, tags) {
-            if(offices) {
+            console.log(offices);
+            console.log(offices.length);
+            if(offices.length==0) {
               res.render('offices', {offices: offices, tags: tags, check: true});
             } else {
               res.render('offices', {offices: offices, tags: tags, check: false});
@@ -409,14 +426,17 @@ module.exports = function(passport) {
 
   router.post('/add-office', function(req, res) {
     console.log(req.body);
+    console.log(req.body.check=='true');
     if(req.user.admin) {
-      if(req.body.check==true) {
+      if(req.body.check=='true') {
+        console.log("here");
         let college = new Office({
           name: "Haverford College",
           private: true,
           members: [req.user._id]
         })
         college.save(function(err, savedCollege) {
+          console.log("saved");
           User.findOneAndUpdate({_id: req.user._id}, {$push: {office: savedCollege._id}}, function(err, user) {
             if(err) throw err;
           })
@@ -429,7 +449,7 @@ module.exports = function(passport) {
                 let foundTag = await Tag.findOne({name: tag});
                 if(foundTag) {
                   return Promise.resolve(tag);
-                } else {
+                } else if(tag!=""){
                   let newTag = new Tag({
                     name: tag
                   })

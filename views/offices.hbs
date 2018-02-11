@@ -14,14 +14,14 @@ $( document ).ready(function() {
     allowAdditions: true,
     action: 'activate',
     onChange: function(value, text) {
-      $('#tags').dropdown('remove selected', list);
+      var list = []
+      $('#tags').dropdown('set selected', list);
       console.log(text);
       console.log(value);
       {{#each offices}}
       if(value=="{{_id}}") {
-        var list = [];
         {{#each tags}}
-        list.push('{{name}} ({{followers.length}} Followers)');
+        list.push('{{name}}');
         {{/each}}
         $('#tags').dropdown('set selected', list);
       }
@@ -64,7 +64,7 @@ $( document ).ready(function() {
           <div class="default text">Add tags</div>
           <div class="menu">
             {{#each tags}}
-            <div class="item" data-value="{{_id}}">{{name}} ({{followers.length}} Followers)</div>
+            <div class="item" data-value="{{_id}}">{{name}}</div>
             {{/each}}
           </div>
         </div>

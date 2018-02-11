@@ -106,7 +106,7 @@ router.post('/groups/create', function(req, res) {
             return foundTag.save();
           }
         }
-      } else {
+      } else if(tag!=""){
         let newTag = new Tag({
           name: tag,
           followers: [req.user._id],

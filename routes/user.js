@@ -65,7 +65,7 @@ router.get('/users/:id', function(req, res) {
 	if(req.user) {
 		User.findById(req.params.id).populate([{path: 'posts', populate: [{path: 'attendees'}, {path: 'comments', populate: [{path: 'postedBy'},{path: 'comments', populate: [{path: 'postedBy'}]}]}]}, {path: 'tags'}, {path: 'adminGroups'}, {path: 'joinedGroups'}, {path: 'subscribedBoards'}]).exec(function(err, user) {
 			if (err) throw err;
-			Event.find({contact: req.user.username}).populate([{path: 'attendees'}, {path: 'comments', populate: [{path: 'postedBy'},{path: 'comments', populate: [{path: 'postedBy'}]}]}]).populate('tags').exec(function(err, events) {
+			Event.find({contact: user.username}).populate([{path: 'attendees'}, {path: 'comments', populate: [{path: 'postedBy'},{path: 'comments', populate: [{path: 'postedBy'}]}]}]).populate('tags').exec(function(err, events) {
 				if(err) throw err;
 				let contents = [];
 				contents = contents.concat(events);

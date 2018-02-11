@@ -8,6 +8,8 @@
 
         <div uk-grid>
           {{#each user.joinedGroups}}
+          {{#if archive}}
+          {{else}}
             <div class="uk-width-1-3@m" style="margin-top:0px">
                 <p>
                     <b>
@@ -18,9 +20,10 @@
                     {{/each}}
                     Member
                     </b><br/>
-                    <span>{{name}}</span>
+                    <span><a href="/groups/{{_id}}" style="color: black">{{name}}</a></span>
                 </p>
             </div>
+            {{/if}}
             {{/each}}
 
         </div>

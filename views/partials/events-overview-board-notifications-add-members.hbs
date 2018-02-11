@@ -28,6 +28,31 @@ function addMember(index) {
     document.getElementById("removeMembers").value += document.getElementById(username_tag).innerHTML + ",";
   }
 }
+function addGroup(index) {
+  var group_tag = "group-" + index;
+  if(document.getElementById("icon1-group-" + index).style.display=="") {
+    document.getElementById("icon1-group-" + index).style.display="none";
+    document.getElementById("icon2-group-" + index).style.display="";
+    document.getElementById("addGroups").value += document.getElementById(group_tag).innerHTML + ",";
+  }
+  else {
+    document.getElementById("icon1-group-" + index).style.display="";
+    document.getElementById("icon2-group-" + index).style.display="none";
+    document.getElementById("removeGroups").value += document.getElementById(group_tag).innerHTML + ",";
+  }
+}
+function showAll() {
+  $('#user').show();
+  $('#group').show();
+}
+function showUsers() {
+  $('#user').show();
+  $('#group').hide();
+}
+function showGroups() {
+  $('#user').hide();
+  $('#group').show();
+}
 </script>
 <div id="new-org-add-members">
   <form method="post" action="/events/create" id="eventform">
@@ -48,12 +73,25 @@ function addMember(index) {
                     <div>
                       <input id="input" class="uk-input" type="text" placeholder="Search for users" onkeyup="search()">
                     </div>
+
+                </li>
+                <li class="add-members-row">
+                    <div>
+                        <ul class="uk-subnav uk-subnav-pill" uk-switcher style="top:0px">
+                            <li><a onclick="showAll()">All</a></li>
+                            <li><a onclick="showUsers()">People</a></li>
+                            <li><a onclick="showGroups()">Organizations</a></li>
+                        </ul>
+                    </div>
                 </li>
                 <input type="text" id="addMembers" name="addMembers" style="display: none">
                 <input type="text" id="removeMembers" name="removeMembers" style="display: none">
+                <input type="text" id="addGroups" name="addGroups" style="display: none">
+                <input type="text" id="removeGroups" name="removeGroups" style="display: none">
                 <li class="add-members-row inner-list-wrap">
                     <div class="inner-list" id="users" style="max-height:400px">
                         <ul>
+                          <div style="border-bottom: 1px solid #d1d2d3" id="user">
                           {{#each users}}
                             <li>
                                 <div class="member" uk-grid>
@@ -63,7 +101,7 @@ function addMember(index) {
                                     <div class="uk-width-expand@m">
                                       <p id="username-{{@index}}" style="display: none">{{username}}</p>
                                         <p class="name">{{firstName}} {{lastName}}</p>
-                                        <p class="major">{{major}}, {{classYear}}</p>
+                                        <p class="major">{{#if classYear}}{{major}}, {{classYear}}{{else}}{{title}}, {{division}}{{/if}}</p>
                                     </div>
                                     <div class="uk-width-auto@m" id="icons">
                                         <div class="invite-icon">
@@ -76,7 +114,33 @@ function addMember(index) {
                                 </div>
                             </li>
                             {{/each}}
+                            </div>
+                            <div id="group">
+                              {{#each groups}}
+                                <li>
+                                    <div class="member" uk-grid>
+                                        <div class="uk-width-auto@m">
+                                            <div class="img-wrap one"></div>
+                                        </div>
+                                        <div class="uk-width-expand@m">
+                                          <p id="group-{{@index}}" style="display: none">{{_id}}</p>
+                                            <p class="name">{{name}}</p>
+                                            <p class="major">{{description}}</p>
+                                        </div>
+                                        <div class="uk-width-auto@m" id="icons">
+                                            <div class="invite-icon">
+                                                <span onclick="addGroup({{@index}})" id="icon1-group-{{@index}}" class="uk-icon" uk-icon="icon: plus" style="display:"></span>
+                                            </div>
+                                            <div class="invite-icon green">
+                                                <span onclick="addGroup({{@index}})" id="icon2-group-{{@index}}" class="uk-icon" uk-icon="icon: check" style="display:none;"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                {{/each}}
+                            </div>
                         </ul>
+
                     </div>
                 </li>
                 <li class="add-members-row">
