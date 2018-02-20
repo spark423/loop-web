@@ -164,10 +164,10 @@ module.exports = function(passport) {
   router.get('/invite-users', function(req, res) {
     if(req.user) {
       if(req.user.admin) {
-        let boardsPromise = Board.find({}, function(err, boards) {
+        let boardsPromise = Board.find({'archive': false}, function(err, boards) {
           if(err) throw err;
         });
-        let groupsPromise = Group.find({}, function(err, groups) {
+        let groupsPromise = Group.find({'archive': false}, function(err, groups) {
           if(err) throw err;
         })
         Promise.all([boardsPromise, groupsPromise]).then(function([boards, groups]) {
@@ -184,10 +184,10 @@ module.exports = function(passport) {
   router.get('/invite-more-users', function(req, res) {
     if(req.user) {
       if(req.user.admin) {
-        let boardsPromise = Board.find({}, function(err, boards) {
+        let boardsPromise = Board.find({'archive': false}, function(err, boards) {
           if(err) throw err;
         });
-        let groupsPromise = Group.find({}, function(err, groups) {
+        let groupsPromise = Group.find({'archive': false}, function(err, groups) {
           if(err) throw err;
         })
         Promise.all([boardsPromise, groupsPromise]).then(function([boards, groups]) {
@@ -268,7 +268,7 @@ module.exports = function(passport) {
           ], function(err) {
             if(err) throw err;
           })
-        } res.redirect('/');
+        } res.redirect('/add-tags');
       } else {
         User.findOne({username: req.body.email}, function(err, user) {
           if(user) {
@@ -292,7 +292,7 @@ module.exports = function(passport) {
                 subject: 'Join Loop!',
                 text: 'You are invited to join Haverford College\'s Community Loop!\n\n' +
                 'Please click on the link to sign up to connect your community organization with students and administrators.\n\n' +
-                'Link: http://localhost:3000/invited/' + token
+                'Link: http://loop-web-env.us-east-2.elasticbeanstalk.com/invited/' + token
                };
                client.sendMail(email, function(err){
                  console.log("here5");
@@ -308,7 +308,7 @@ module.exports = function(passport) {
                 subject: 'Join Loop!',
                 text: 'You are invited to join your institution\'s Community Loop on behalf of ' + req.user.firstName + ' ' + req.user.lastName + ' (' + req.user.username + ')' + '!\n\n' +
                 'Please click on the link to sign up as an administrator.\n\n' +
-                'Link: http://localhost:3000/invited/' + token
+                'Link: http://loop-web-env.us-east-2.elasticbeanstalk.com/invited/' + token
                };
                client.sendMail(email, function(err){
                  console.log("here5");
@@ -324,7 +324,7 @@ module.exports = function(passport) {
                 subject: 'Join Loop!',
                 text: 'You are invited to join Haverford College\'s Community Loop!\n\n' +
                 'Please click on the link to sign up and join your school\'s network.\n\n' +
-                'Link: http://localhost:3000/invited/' + token
+                'Link: http://loop-web-env.us-east-2.elasticbeanstalk.com/invited/' + token
                };
                client.sendMail(email, function(err){
                  console.log("here5");
@@ -340,7 +340,7 @@ module.exports = function(passport) {
                 subject: 'Join Loop!',
                 text: 'You are invited to join Haverford College\'s Community Loop!\n\n' +
                 'Please click on the link to sign up to connect your community organization with students and administrators.\n\n' +
-                'Link: http://localhost:3000/invited/' + token
+                'Link: http://loop-web-env.us-east-2.elasticbeanstalk.com/invited/' + token
                };
                client.sendMail(email, function(err){
                  console.log("here5");

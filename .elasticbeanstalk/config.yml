@@ -1,6 +1,6 @@
 branch-defaults:
   develop1:
-    environment: null
+    environment: loop-web-env
     group_suffix: null
 global:
   application_name: loop-web-app

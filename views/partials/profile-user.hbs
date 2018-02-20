@@ -12,6 +12,15 @@
                     <p class="name">
                         {{user.firstName}} {{user.lastName}}<br/>
                         <span class="major">
+                        {{#if admin}}
+                        Administrator
+                        {{else if user.classYear}}
+                        Student
+                        {{else}}
+                        Outside Organization
+                        {{/if}}
+                        </span>
+                        <span class="major">
                           {{#if admin}}
                           {{user.title}}, {{user.division}}
 

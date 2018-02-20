@@ -9,8 +9,8 @@ $(function(){
 });
 
 function addAnother(i) {
-  $("#addUsers").append('<div style="padding: 10px 0px"><div class="uk-margin" style="display:inline; padding: 10px 10px"><input style="padding: 0 15px;" class="uk-input uk-form-width-medium" type="" name="email" placeholder="Email" required></div><div class="uk-margin" style="display: inline"><select style="padding: 0 15px;" class="uk-select" name="permission" onchange="getval(this, ' + i + ');"><option value="">Select the permission level</option><option value="student">Student</option><option value="admin">Administrator</option><option value="outside">Community Organization</option><option value="custom">Custom</option></select></div></div>');
-  $("#addUsers").append('<table style="margin-left:auto; margin-right:auto;border-spacing: 15px; border-collapse: separate; display:none" id="permission-' + i + '"><tr style="padding: 10px"><th>Block from Posting to Board</th><th>Block from Viewing a Board</th><th>Block from Posting to an Organization</th><th>Block from Viewing to an Organization</th></tr><tr style="padding: 10px"><th><div class="ui fluid multiple search selection dropdown" style="width:20vw"><input name="postBlockedBoards" type="hidden"><i class="dropdown icon"></i><div class="default text">Add Restricted Boards</div><div class="menu">{{#each boards}}<div class="item" data-value="{{_id}}">{{name}}</div>{{/each}}</div></div></th><th><div class="ui fluid multiple search selection dropdown" style="width:20vw"><input name="viewBlockedBoards" type="hidden"><i class="dropdown icon"></i><div class="default text">Add Restricted Boards</div><div class="menu">{{#each boards}}<div class="item" data-value="{{_id}}">{{name}}</div>{{/each}}</div></div></th><th><div class="ui fluid multiple search selection dropdown" style="width:20vw"><input name="postBlockedGroups" type="hidden"><i class="dropdown icon"></i><div class="default text">Add Restricted Organizations</div><div class="menu">{{#each groups}}<div class="item" data-value="{{_id}}">{{name}}</div>{{/each}}</div></div></th><th><div class="ui fluid multiple search selection dropdown" style="width:20vw"><input name="viewBlockedGroupus" type="hidden"><i class="dropdown icon"></i><div class="default text">Add Restricted Organizations</div><div class="menu">{{#each groups}}<div class="item" data-value="{{_id}}">{{name}}</div>{{/each}}</div></div></th></tr></table>');
+  $("#addUsers").append('<div id="newUser-' + i + '"><div style="padding: 10px 0px"><span uk-icon="icon: close" onclick="removeUser(' + i + ')"></span><div class="uk-margin" style="display:inline; padding: 10px 10px"><input style="padding: 0 15px;" class="uk-input uk-form-width-medium" type="" name="email" placeholder="Email" required></div><div class="uk-margin" style="display: inline"><select style="padding: 0 15px;" class="uk-select" name="permission" onchange="getval(this, ' + i + ');"><option value="">Select the permission level</option><option value="student">Student</option><option value="admin">Administrator</option><option value="outside">Community Organization</option><option value="custom">Custom</option></select></div></div>');
+  $("#addUsers").append('<table style="margin-left:auto; margin-right:auto;border-spacing: 15px; border-collapse: separate; display:none" id="permission-' + i + '"><tr style="padding: 10px"><th>Block from Posting to Board</th><th>Block from Viewing a Board</th><th>Block from Posting to an Organization</th><th>Block from Viewing to an Organization</th></tr><tr style="padding: 10px"><th><div class="ui fluid multiple search selection dropdown" style="width:20vw"><input name="postBlockedBoards" type="hidden"><i class="dropdown icon"></i><div class="default text">Add Restricted Boards</div><div class="menu">{{#each boards}}<div class="item" data-value="{{_id}}">{{name}}</div>{{/each}}</div></div></th><th><div class="ui fluid multiple search selection dropdown" style="width:20vw"><input name="viewBlockedBoards" type="hidden"><i class="dropdown icon"></i><div class="default text">Add Restricted Boards</div><div class="menu">{{#each boards}}<div class="item" data-value="{{_id}}">{{name}}</div>{{/each}}</div></div></th><th><div class="ui fluid multiple search selection dropdown" style="width:20vw"><input name="postBlockedGroups" type="hidden"><i class="dropdown icon"></i><div class="default text">Add Restricted Organizations</div><div class="menu">{{#each groups}}<div class="item" data-value="{{_id}}">{{name}}</div>{{/each}}</div></div></th><th><div class="ui fluid multiple search selection dropdown" style="width:20vw"><input name="viewBlockedGroupus" type="hidden"><i class="dropdown icon"></i><div class="default text">Add Restricted Organizations</div><div class="menu">{{#each groups}}<div class="item" data-value="{{_id}}">{{name}}</div>{{/each}}</div></div></th></tr></table></div>');
   $('.ui.dropdown').dropdown();
   document.getElementById("addAnother").setAttribute( "onClick", "javascript: addAnother(" + (i+1) + ");");
 }
@@ -21,6 +21,11 @@ function getval(sel, i) {
   } else {
     document.getElementById('permission-' + i).style.display = "none";
   }
+}
+
+function removeUser(i) {
+  var user = document.getElementById('newUser-' + i);
+  user.parentNode.removeChild(user);
 }
 </script>
 
@@ -35,7 +40,9 @@ function getval(sel, i) {
     <form action="/invite-users" method="post" id="register">
 
     <div id="addUsers">
+    <div id="newUser-0">
     <div style="padding: 10px 0px">
+      <span uk-icon="icon: close" onclick="removeUser(0)"></span>
     <div class="uk-margin" style="display:inline; padding: 10px 10px">
         <input style="padding: 0 15px;" class="uk-input uk-form-width-medium" type="" name="email" placeholder="Email" required>
     </div>
@@ -108,7 +115,7 @@ function getval(sel, i) {
         </th>
       </tr>
     </table>
-
+  </div>
 </div>
 <br>
   <a onclick="addAnother(1)" style="font-size:20px; color: white" id="addAnother">+ Add another user</a>

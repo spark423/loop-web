@@ -1,5 +1,4 @@
 <link rel="stylesheet" href="/css/boards-following/sxn-boards-following.min.css" />
-{{#if user.tags}}
 <div id="boards-following">
 
     <h4>Followed Tags {{#if self}}<a id="pencil" href="/add-tags"><span class="uk-icon" uk-icon="icon: pencil"></a>{{/if}}</h4>
@@ -7,6 +6,7 @@
     <div class="uk-card uk-card-default uk-card-body">
 
         <div uk-grid>
+          {{#if user.tags}}
           {{#each user.tags}}
             <div class="uk-width-1-4@m" style="margin-top: 0px">
                 <p>
@@ -14,10 +14,16 @@
                 </p>
             </div>
           {{/each}}
+          {{else}}
+          <div class="uk-width-1-4@m" style="margin-top: 0px">
+              <p>
+                  No tags
+              </p>
+          </div>
+          {{/if}}
 
         </div>
 
     </div>
 
 </div>
-{{/if}}
