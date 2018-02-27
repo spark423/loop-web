@@ -124,10 +124,15 @@ router.get('/events/calendar', function(req, res) {
         }
         User.findById(req.user._id).populate('adminGroups').populate('office').exec(function(err, user) {
           if(err) throw err;
-          console.log(user);
+          var adminGroups = []
+          for(var i=0; i<user.adminGroups.length; i++) {
+            if(user.adminGroups[i].archive==false && user.adminGroups[i].active==true) {
+              adminGroups.push(user.adminGroups[i]);
+            }
+      		}
           Tag.find({}, function(err, tags) {
             if(err) throw err;
-            res.render('events-calendar-view', {blocked: req.user.blocked, tags: tags, boards: info, groups: user.adminGroups, office: user.office, admin: req.user.admin, events: sortedEvents, month: months[moment().month()], year: moment().local().year(), thisMonth: moment().local().daysInMonth(), lastMonth: moment().local().add(-1, 'month').daysInMonth(), lastMonthStart: moment().local().startOf('month').add(0-moment().startOf('month').day(), 'days').date()});
+            res.render('events-calendar-view', {blocked: req.user.blocked, tags: tags, boards: info, groups: adminGroups, office: user.office, admin: req.user.admin, events: sortedEvents, month: months[moment().month()], year: moment().local().year(), thisMonth: moment().local().daysInMonth(), lastMonth: moment().local().add(-1, 'month').daysInMonth(), lastMonthStart: moment().local().startOf('month').add(0-moment().startOf('month').day(), 'days').date()});
           })
         })
       })
@@ -349,10 +354,15 @@ router.get('/events/create', function(req, res) {
         }
         User.findById(req.user._id).populate('adminGroups').populate('office').exec(function(err, user) {
           if(err) throw err;
-          console.log(user);
+          var adminGroups = []
+          for(var i=0; i<user.adminGroups.length; i++) {
+            if(user.adminGroups[i].archive==false && user.adminGroups[i].active==true) {
+              adminGroups.push(user.adminGroups[i]);
+            }
+          }
           Tag.find({}, function(err, tags) {
             if(err) throw err;
-            res.render("create-a-new-event", {tags: tags, boards: info, admin: req.user.admin, groups: user.adminGroups, office: user.office});
+            res.render("create-a-new-event", {tags: tags, boards: info, admin: req.user.admin, groups: adminGroups, office: user.office});
           })
         })
       })
@@ -930,10 +940,15 @@ router.get('/events', function(req, res) {
               }
               User.findById(req.user._id).populate('adminGroups').populate('office').exec(function(err, user) {
                 if(err) throw err;
-                console.log(user);
+                var adminGroups = []
+                for(var i=0; i<user.adminGroups.length; i++) {
+                  if(user.adminGroups[i].archive==false && user.adminGroups[i].active==true) {
+                    adminGroups.push(user.adminGroups[i]);
+                  }
+            		}
                 Tag.find({}, function(err, tags) {
                   if(err) throw err;
-                  res.render('events-list-view', {blocked: req.user.blocked, tags: tags, groups: user.adminGroups, office: user.office, events: events, boards: info, admin: req.user.admin, helpers: {
+                  res.render('events-list-view', {blocked: req.user.blocked, tags: tags, groups: adminGroups, office: user.office, events: events, boards: info, admin: req.user.admin, helpers: {
         							compare: function(lvalue, rvalue, options) {
         								if (arguments.length < 3)
         										throw new Error("Handlerbars Helper 'compare' needs 2 parameters");

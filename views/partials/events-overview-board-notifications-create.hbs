@@ -1,5 +1,10 @@
 <link rel="stylesheet" href="/css/post-board-notifications-create/sxn-post-board-notifications-create.v3.min.css" />
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.10.0/jquery.timepicker.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timepicker/1.10.0/jquery.timepicker.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.3/semantic.min.js"></script>
 <script>
 $(function(){
@@ -9,6 +14,13 @@ $(function(){
     })
 
 });
+$(document).ready(function() {
+  if($('#setDate')[0].type != 'date' ) {
+      $('#setDate').datepicker();
+      $('#startTime').timepicker();
+      $('#endTime').timepicker();
+  }
+})
 </script>
 <div id="post-board-notifications-create">
     <div class="uk-card uk-card-default uk-card-body">
@@ -42,17 +54,17 @@ $(function(){
                         <ul>
                             <li>
                                 <a>
-                                    <span uk-icon="icon: calendar"></span><span>Set date </span><input type="date" name="date" style="width: 130px" required>
+                                    <span uk-icon="icon: calendar"></span><span>Set date </span><input id="setDate" type="date" name="date" style="width: 130px" required>
                                 </a>
                             </li>
                             <li>
                                 <a>
-                                    <span uk-icon="icon: clock"></span><span>Start time </span><input type="time" name="startTime" style="width: 120px" required>
+                                    <span uk-icon="icon: clock"></span><span>Start time </span><input type="time" name="startTime" style="width: 120px" id="startTime" required>
                                 </a>
                             </li>
                             <li>
                                 <a>
-                                    <span uk-icon="icon: clock"></span><span>End time </span><input type="time" name="endTime" style="width: 120px" required>
+                                    <span uk-icon="icon: clock"></span><span>End time </span><input type="time" name="endTime" style="width: 120px" id="endTime" required>
                                 </a>
                             </li>
                             <li>

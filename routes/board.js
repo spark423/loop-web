@@ -424,6 +424,12 @@ router.get('/boards/:id', function(req, res) {
             currentPage = 0;
             User.findById(req.user._id).populate('adminGroups').populate('office').exec(function(err, user) {
               if(err) throw err;
+              var adminGroups = []
+              for(var i=0; i<user.adminGroups.length; i++) {
+                if(user.adminGroups[i].archive==false && user.adminGroups[i].active==true) {
+                  adminGroups.push(user.adminGroups[i]);
+                }
+          		}
               Tag.find({}, function(err, tags) {
                 if(err) throw err;
                 res.render('board-overview', {
@@ -436,7 +442,7 @@ router.get('/boards/:id', function(req, res) {
                     active: board.active,
                     description: board.description,
                     contents: contents,
-                    notifications: notifications}, pages: pages, currentPage: currentPage, admin: req.user.admin, blocked: req.user.blocked, postBlocked: req.user.postBlockedBoards.indexOf(req.params.id) >= 0, tags: tags, groups: user.adminGroups, office: user.office, helpers: {
+                    notifications: notifications}, pages: pages, currentPage: currentPage, admin: req.user.admin, blocked: req.user.blocked, postBlocked: req.user.postBlockedBoards.indexOf(req.params.id) >= 0, tags: tags, groups: adminGroups, office: user.office, helpers: {
                         compare: function(lvalue, rvalue, options) {
                           if (arguments.length < 3)
                               throw new Error("Handlerbars Helper 'compare' needs 2 parameters");

@@ -157,10 +157,15 @@ router.get('/posts/create', function(req, res) {
     		}
         User.findById(req.user._id).populate('adminGroups').populate('office').exec(function(err, user) {
           if(err) throw err;
-          console.log(user);
+          var adminGroups = []
+          for(var i=0; i<user.adminGroups.length; i++) {
+            if(user.adminGroups[i].archive==false && user.adminGroups[i].active==true) {
+              adminGroups.push(user.adminGroups[i]);
+            }
+      		}
           Tag.find({}, function(err, tags) {
             if(err) throw err;
-            res.render("create-a-new-post", {tags: tags, boards: info, groups: user.adminGroups, office: user.office, admin: req.user.admin});
+            res.render("create-a-new-post", {tags: tags, boards: info, groups: adminGroups, office: user.office, admin: req.user.admin});
           })
         })
     	})

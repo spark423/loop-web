@@ -164,10 +164,10 @@ module.exports = function(passport) {
   router.get('/invite-users', function(req, res) {
     if(req.user) {
       if(req.user.admin) {
-        let boardsPromise = Board.find({'archive': false}, function(err, boards) {
+        let boardsPromise = Board.find({'archive': false, 'active': true}, function(err, boards) {
           if(err) throw err;
         });
-        let groupsPromise = Group.find({'archive': false}, function(err, groups) {
+        let groupsPromise = Group.find({'archive': false, 'active': true}, function(err, groups) {
           if(err) throw err;
         })
         Promise.all([boardsPromise, groupsPromise]).then(function([boards, groups]) {
@@ -184,10 +184,10 @@ module.exports = function(passport) {
   router.get('/invite-more-users', function(req, res) {
     if(req.user) {
       if(req.user.admin) {
-        let boardsPromise = Board.find({'archive': false}, function(err, boards) {
+        let boardsPromise = Board.find({'archive': false, 'active': true}, function(err, boards) {
           if(err) throw err;
         });
-        let groupsPromise = Group.find({'archive': false}, function(err, groups) {
+        let groupsPromise = Group.find({'archive': false, 'active': true}, function(err, groups) {
           if(err) throw err;
         })
         Promise.all([boardsPromise, groupsPromise]).then(function([boards, groups]) {
