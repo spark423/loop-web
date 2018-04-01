@@ -48,7 +48,7 @@ function makeAdmin(index) {
                         <div class="img-wrap"></div>
                     </div>
                     <div class="uk-width-expand@m">
-                        <p class="name" id="name-{{@index}}">{{firstName}} {{lastName}}{{#compare ../admin username}} ✔{{/compare}}</p>
+                        <p class="name" id="name-{{@index}}">{{firstName}} {{lastName}}{{#compare ../admin username}} ✔{{/compare}}<br>{{username}}</p>
                         <p id="username-{{@index}}" style="display:none">{{username}}</p>
                         <a onclick="makeAdmin({{@index}})">Make Admin</a>
                     </div>

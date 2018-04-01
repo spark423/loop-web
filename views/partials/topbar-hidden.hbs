@@ -63,6 +63,7 @@ $.getJSON('/notifications', function(data) {
       deletedBoardCount++;
     }
   }
+  console.log(flaggedPostCount);
   if(createdPostCount!=0) {
     var notification="<li><a href='/all-notifications'><span uk-icon='icon: comment'></span>" + "<b>" + createdPostCount + "</b> people commented on a post you created</a></li>";
     notifications.append(notification);

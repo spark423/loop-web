@@ -13,7 +13,7 @@ router.post('/posts/:id/flag', function(req, res) {
   	Post.findOneAndUpdate({_id: req.params.id}, {$set: {flagged: true}},function(err,post) {
   		let notificationToPoster = new Notification({
   			type: 'Flagged Post',
-  			message: "Your post \"" + post.title + "\" has been flagged. Please wait for the admin's review.",
+  			message: "Your post \"" + post.text + "\" has been flagged. Please wait for the admin's review.",
   			routeID: {
   				kind: 'Post',
   				id: post._id,
@@ -30,7 +30,7 @@ router.post('/posts/:id/flag', function(req, res) {
       			} else {
       				let notificationToAdmin = new Notification({
       					type: "Flagged Post",
-      					message: "The post titled \"" + post.title + "\" has been flagged.",
+      					message: "The post titled \"" + post.text + "\" has been flagged.",
       					routeID: {
       						kind: 'Post',
       						id: post._id,
@@ -152,7 +152,12 @@ router.get('/posts/create', function(req, res) {
     		var info = [];
     		for(var i=0; i<boards.length; i++) {
     			if(boards[i].archive==false && req.user.viewBlockedBoards.indexOf(boards[i]._id)==-1 && req.user.postBlockedBoards.indexOf(boards[i]._id)==-1) {
-    				info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
+            if(req.user.admin) {
+              info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
+            } else {
+              if(boards[i].private==false && boards[i].create==true)
+              info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
+            }
     			}
     		}
         User.findById(req.user._id).populate('adminGroups').populate('office').exec(function(err, user) {
@@ -276,7 +281,7 @@ router.get('/posts/:id/edit', function(req, res) {
 	if(req.user) {
 		Post.findById(req.params.id, function(err, post) {
 			if(err) throw err;
-			res.render('edit-post', {title: post.title, text: post.text, id: post._id, admin: req.user.admin});
+			res.render('edit-post', {title: post.text, text: post.text, id: post._id, admin: req.user.admin});
 		})
 	} else {
 		res.redirect('/');
@@ -288,7 +293,7 @@ router.post('/posts/:id/edit', function(req, res) {
 		if (error)
 			throw error;
 		if (req.body.title) {
-			post.title = req.body.title
+			post.text = req.body.title
 		}
 		if (req.body.text) {
 			post.text = req.body.text
@@ -385,7 +390,7 @@ router.post('/posts/:id/comment', function(req, res) {
 					} else if (req.user._id.toString()==post.postedBy.toString()) {
 						let notificationToFollowers = new Notification({
 							type: 'Comment on Following Post',
-							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the post \"" + post.title + "\" that you are following.",
+							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the post, \"" + post.text + "\" that you are following.",
 							routeID: {
 								kind: 'Post',
 								id: post._id,
@@ -420,7 +425,7 @@ router.post('/posts/:id/comment', function(req, res) {
 					else {
 						let notificationToPoster = new Notification({
 							type: 'Comment on Created Post',
-							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on your post titled \"" + post.title + "\".",
+							message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on your post, \"" + post.text + "\".",
 							routeID: {
 								kind: 'Post',
 								id: post._id,
@@ -434,7 +439,7 @@ router.post('/posts/:id/comment', function(req, res) {
 								} else {
 									let notificationToFollowers = new Notification({
 										type: 'Comment on Following Post',
-										message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the post \"" + post.title + "\" that you are following.",
+										message: currentUser.firstName + " " + currentUser.lastName + " " + "commented on the post, \"" + post.text + "\" that you are following.",
 										routeID: {
 											kind: 'Post',
 											id: post._id,

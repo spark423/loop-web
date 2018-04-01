@@ -7,7 +7,7 @@ var Post = require('../models/post');
 var Event = require('../models/event');
 var Notification = require('../models/notification');
 var Tag = require('../models/tag')
-var moment = require('moment');
+var moment = require('moment-timezone');
 
 function swap(items, firstIndex, secondIndex){
   var temp = items[firstIndex];
@@ -87,10 +87,11 @@ router.post('/groups/create', function(req, res) {
   }
 
   User.find({'username': addMembers}, function(err, members) {
+    console.log(members);
     for(var i=0; i<members.length; i++) {
       newGroup.members.push(members[i]._id);
     }
-    if(!req.user.admin) {
+    if(!req.user.admin && members.indexOf(req.user._id)!=-1) {
       newGroup.members.push(req.user._id);
     }
     var tagsList = req.body.tags.split(',');
@@ -338,7 +339,7 @@ router.get('/groups/:id', function(req, res) {
                     comments.push({
                       "own": req.user._id.toString() === comment.postedBy._id.toString(),
                       "id": comment._id,
-                      "createdAt": moment(comment.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                      "createdAt": moment(comment.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                       "postedBy": {
                         "id": comment.postedBy._id,
                         "firstName": comment.postedBy.firstName,
@@ -359,7 +360,7 @@ router.get('/groups/:id', function(req, res) {
                       "id": item._id,
                       "board": item.board,
                       "boardName": boardName.name,
-                      "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                      "createdAt": moment(item.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                       "postingGroup": {
                         "id": postCreator._id,
                         "name": postCreator.name
@@ -380,7 +381,7 @@ router.get('/groups/:id', function(req, res) {
                       "id": item._id,
                       "board": item.board,
                       "boardName": boardName.name,
-                      "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                      "createdAt": moment(item.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                       "postingOffice": {
                         "id": postCreator._id,
                         "name": postCreator.name
@@ -401,7 +402,7 @@ router.get('/groups/:id', function(req, res) {
                       "id": item._id,
                       "board": item.board,
                       "boardName": boardName.name,
-                      "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                      "createdAt": moment(item.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                       "postedBy": {
                         "id": postCreator._id,
                         "firstName": postCreator.firstName,
@@ -430,7 +431,7 @@ router.get('/groups/:id', function(req, res) {
                       "own": req.user.username === item.postedBy,
                       "attending": req.user.attendedEvents.indexOf(item._id) > -1,
                       "id": item._id,
-                      "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                      "createdAt": moment(item.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                       "postingGroup": {
                         "id": eventCreator._id,
                         "name": eventCreator.name,
@@ -454,7 +455,7 @@ router.get('/groups/:id', function(req, res) {
                       "own": req.user.username === item.postedBy,
                       "attending": req.user.attendedEvents.indexOf(item._id) > -1,
                       "id": item._id,
-                      "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                      "createdAt": moment(item.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                       "postingOffice": {
                         "id": eventCreator._id,
                         "name": eventCreator.name,
@@ -479,7 +480,7 @@ router.get('/groups/:id', function(req, res) {
                         "own": req.user.username === item.postedBy,
                         "attending": req.user.attendedEvents.indexOf(item._id) > -1,
                         "id": item._id,
-                        "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                        "createdAt": moment(item.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                         "postedBy": {
                           "id": eventCreator._id,
                           "firstName": eventCreator.firstName,
@@ -503,7 +504,7 @@ router.get('/groups/:id', function(req, res) {
                         "own": req.user.username === item.postedBy,
                         "attending": req.user.attendedEvents.indexOf(item._id) > -1,
                         "id": item._id,
-                        "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                        "createdAt": moment(item.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                         "postedBy": {
                           "username": item.contact,
                           "isLoopUser": false

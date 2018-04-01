@@ -1,6 +1,9 @@
 <script>
 var notifications = $('#notifications')
 $.getJSON('/notifications', function(data) {
+  if(!localStorage.notifications) {
+    localStorage.notifications = 0;
+  }
   if(data.length - localStorage.notifications>=0) {
     document.getElementById('notifications-number').innerHTML = data.length - localStorage.notifications;
   } else {
@@ -8,7 +11,11 @@ $.getJSON('/notifications', function(data) {
   }
     if(data.length > localStorage.notifications) {
       localStorage.seen = 'false';
-      localStorage.past = localStorage.time;
+      if(!localStorage.time) {
+        localStorage.past = new Date('01 January 2010 00:00 UTC').toISOString();
+      } else {
+        localStorage.past = localStorage.time;
+      }
     }
 });
 function clearNotifications() {

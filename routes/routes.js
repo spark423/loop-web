@@ -47,7 +47,15 @@ module.exports = function(passport) {
   });
 
   router.get('/student-signup', function(req, res) {
-    res.render('student-register');
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = date.getMonth();
+    if(month >= 6) {
+      var years = [year+1, year+2, year+3, year+4];
+    } else {
+      var years = [year, year+1, year+2, year+3];
+    }
+    res.render('student-register', {years: years});
   });
 
   router.post('/student-signup', function(req, res) {
@@ -145,7 +153,7 @@ module.exports = function(passport) {
             return foundTag;
           }
         }
-      } else {
+      } else if(tag!=""){
           let newTag = new Tag({
             name: tag,
             followers: [req.user._id]
@@ -191,7 +199,7 @@ module.exports = function(passport) {
           if(err) throw err;
         })
         Promise.all([boardsPromise, groupsPromise]).then(function([boards, groups]) {
-          res.render('invite-more-users', {boards: boards, groups: groups})
+          res.render('invite-more-users', {boards: boards, groups: groups, skip: true})
         })
       } else {
         res.redirect('/');
@@ -228,7 +236,20 @@ module.exports = function(passport) {
                     var viewBlockedBoards = req.body.viewBlockedBoards[iterator];
                     var postBlockedGroups = req.body.postBlockedGroups[iterator];
                     var viewBlockedGroups = req.body.viewBlockedGroups[iterator];
+                    if(!postBlockedBoards) {
+                      postBlockedBoards='';
+                    }
+                    if(!viewBlockedBoards) {
+                      viewBlockedBoards='';
+                    }
+                    if(!postBlockedGroups) {
+                      postBlockedGroups='';
+                    }
+                    if(!viewBlockedGroups) {
+                      viewBlockedGroups='';
+                    }
                     var token = postBlockedBoards.toString() + "?" + viewBlockedBoards.toString() + "?" + postBlockedGroups.toString() + "?" + viewBlockedGroups.toString();
+                    token=encrypt(token);
                   } else if(permission=="admin") {
                     var token = encrypt("admin");
                   } else if(permission=="student"){
@@ -251,24 +272,68 @@ module.exports = function(passport) {
               console.log("iterator: ", iterator);
               console.log("token: ", token);
               let client = nodemailer.createTransport(sgTransport(options));
-              var user = req.body.email[iterator];
-              let email = {
-                from: 'support@theuniversityloop.com',
-                to: user,
-                subject: ' Password Reset',
-                text: 'Link: http://localhost:3000/invited/' + token
-               };
-               console.log("email");
-               console.log(email);
-               client.sendMail(email, function(err){
-                 console.log("sent");
-                 if(err) throw err;
-               })
+              if(decrypt(token)=="admin") {
+                var user = req.body.email[iterator];
+                let email = {
+                  from: 'support@theuniversityloop.com',
+                  to: user,
+                  subject: 'Join Loop!',
+                  text: 'You are invited to join your institution\'s Community Loop on behalf of ' + req.user.firstName + ' ' + req.user.lastName + ' (' + req.user.username + ')' + '!\n\n' +
+                  'Please click on the link to sign up as an administrator.\n\n' +
+                  'Link: http://loop-web-env.us-east-2.elasticbeanstalk.com/invited/' + token
+                 };
+                 client.sendMail(email, function(err){
+                   if(err) throw err;
+                 })
+              } else if(decrypt(token)=="student") {
+                var user = req.body.email[iterator];
+                let email = {
+                  from: 'support@theuniversityloop.com',
+                  to: user,
+                  subject: 'Join Loop!',
+                  text: 'You are invited to join Haverford College\'s Community Loop!\n\n' +
+                  'Please click on the link to sign up and join your school\'s network.\n\n' +
+                  'Link: http://loop-web-env.us-east-2.elasticbeanstalk.com/invited/' + token
+                 };
+                 client.sendMail(email, function(err){
+                   if(err) throw err;
+                 })
+              } else if(decrypt(token)=="outside") {
+                var user = req.body.email[iterator];
+                let email = {
+                  from: 'support@theuniversityloop.com',
+                  to: user,
+                  subject: 'Join Loop!',
+                  text: 'You are invited to join Haverford College\'s Community Loop!\n\n' +
+                  'Please click on the link to sign up to connect your community organization with students and administrators.\n\n' +
+                  'Link: http://loop-web-env.us-east-2.elasticbeanstalk.com/invited/' + token
+                 };
+                 client.sendMail(email, function(err){
+                   if(err) throw err;
+                 })
+              } else {
+                var user = req.body.email[iterator];
+                let email = {
+                  from: 'support@theuniversityloop.com',
+                  to: user,
+                  subject: 'Join Loop!',
+                  text: 'You are invited to join Haverford College\'s Community Loop!\n\n' +
+                  'Please click on the link to sign up to connect your community organization with students and administrators.\n\n' +
+                  'Link: http://loop-web-env.us-east-2.elasticbeanstalk.com/invited/' + token
+                 };
+                 client.sendMail(email, function(err){
+                   if(err) throw err;
+                 })
+              }
             }
           ], function(err) {
             if(err) throw err;
           })
-        } res.redirect('/add-tags');
+        } if(req.body.skip) {
+          res.redirect('/');
+        } else {
+          res.redirect('/add-tags');
+        }
       } else {
         User.findOne({username: req.body.email}, function(err, user) {
           if(user) {
@@ -285,6 +350,7 @@ module.exports = function(passport) {
             if(req.body.permission=="custom") {
               console.log("custom");
               var token = req.body.postBlockedBoards.toString() + "?" + req.body.viewBlockedBoards.toString() + "?" + req.body.postBlockedGroups.toString() + "?" + req.body.viewBlockedGroups.toString();
+              console.log(token);
               token = encrypt(token);
               let email = {
                 from: 'support@theuniversityloop.com',
@@ -297,7 +363,11 @@ module.exports = function(passport) {
                client.sendMail(email, function(err){
                  console.log("here5");
                  if(err) throw err;
-                 res.redirect('/add-tags');
+                 if(req.body.skip) {
+                   res.redirect('/');
+                 } else {
+                   res.redirect('/add-tags');
+                 }
                })
             } else if(req.body.permission=="admin") {
               console.log("admin");
@@ -313,7 +383,11 @@ module.exports = function(passport) {
                client.sendMail(email, function(err){
                  console.log("here5");
                  if(err) throw err;
-                 res.redirect('/add-tags');
+                 if(req.body.skip) {
+                   res.redirect('/');
+                 } else {
+                   res.redirect('/add-tags');
+                 }
                })
             } else if(req.body.permission=="student"){
               console.log("student");
@@ -329,7 +403,11 @@ module.exports = function(passport) {
                client.sendMail(email, function(err){
                  console.log("here5");
                  if(err) throw err;
-                 res.redirect('/add-tags');
+                 if(req.body.skip) {
+                   res.redirect('/');
+                 } else {
+                   res.redirect('/add-tags');
+                 }
                })
             } else if(req.body.permission=="outside"){
               console.log("outside");
@@ -345,7 +423,11 @@ module.exports = function(passport) {
                client.sendMail(email, function(err){
                  console.log("here5");
                  if(err) throw err;
-                 res.redirect('/add-tags');
+                 if(req.body.skip) {
+                   res.redirect('/');
+                 } else {
+                   res.redirect('/add-tags');
+                 }
                })
             }
           }
@@ -361,7 +443,15 @@ module.exports = function(passport) {
     if(token=="admin") {
       res.render('invited-admin', {token: encrypt(token)});
     } else if (token=="student") {
-      res.render('student-register');
+      var date = new Date();
+      var year = date.getFullYear();
+      var month = date.getMonth();
+      if(month >= 6) {
+        var years = [year+1, year+2, year+3, year+4];
+      } else {
+        var years = [year, year+1, year+2, year+3];
+      }
+      res.render('student-register', {years: years});
     } else if (token=="outside") {
       res.render('invited-org');
     } else {
@@ -469,7 +559,7 @@ module.exports = function(passport) {
                 let foundTag = await Tag.findOne({name: tag});
                 if(foundTag) {
                   return Promise.resolve(tag);
-                } else {
+                } else if(tag!=""){
                   let newTag = new Tag({
                     name: tag
                   })

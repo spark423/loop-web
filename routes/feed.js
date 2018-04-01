@@ -7,7 +7,7 @@ var Post = require('../models/post');
 var Event = require('../models/event');
 var Notification = require('../models/notification')
 var Comment = require('../models/comment');
-var moment = require('moment')
+var moment = require('moment-timezone')
 var Office = require('../models/office');
 var Tag = require('../models/tag')
 
@@ -83,7 +83,7 @@ function quickSort(items, left, right) {
                     comments.push({
                       "own": req.user._id.toString() === comment.postedBy._id.toString(),
                       "id": comment._id,
-                      "createdAt": moment(comment.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                      "createdAt": moment(comment.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                       "postedBy": {
                         "id": comment.postedBy._id,
                         "firstName": comment.postedBy.firstName,
@@ -104,7 +104,7 @@ function quickSort(items, left, right) {
                       "id": item._id,
                       "board": item.board,
                       "boardName": boardName.name,
-                      "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                      "createdAt": moment(item.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                       "postingGroup": {
                         "id": postCreator._id,
                         "name": postCreator.name
@@ -125,7 +125,7 @@ function quickSort(items, left, right) {
                       "id": item._id,
                       "board": item.board,
                       "boardName": boardName.name,
-                      "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                      "createdAt": moment(item.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                       "postingOffice": {
                         "id": postCreator._id,
                         "name": postCreator.name
@@ -146,7 +146,7 @@ function quickSort(items, left, right) {
                       "id": item._id,
                       "board": item.board,
                       "boardName": boardName.name,
-                      "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                      "createdAt": moment(item.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                       "postedBy": {
                         "id": postCreator._id,
                         "firstName": postCreator.firstName,
@@ -175,7 +175,7 @@ function quickSort(items, left, right) {
                       "own": req.user.username === item.postedBy,
                       "attending": req.user.attendedEvents.indexOf(item._id) > -1,
                       "id": item._id,
-                      "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                      "createdAt": moment(item.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                       "postingGroup": {
                         "id": eventCreator._id,
                         "name": eventCreator.name,
@@ -199,7 +199,7 @@ function quickSort(items, left, right) {
                       "own": req.user.username === item.postedBy,
                       "attending": req.user.attendedEvents.indexOf(item._id) > -1,
                       "id": item._id,
-                      "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                      "createdAt": moment(item.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                       "postingOffice": {
                         "id": eventCreator._id,
                         "name": eventCreator.name,
@@ -224,7 +224,7 @@ function quickSort(items, left, right) {
                         "own": req.user.username === item.postedBy,
                         "attending": req.user.attendedEvents.indexOf(item._id) > -1,
                         "id": item._id,
-                        "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                        "createdAt": moment(item.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                         "postedBy": {
                           "id": eventCreator._id,
                           "firstName": eventCreator.firstName,
@@ -248,7 +248,7 @@ function quickSort(items, left, right) {
                         "own": req.user.username === item.postedBy,
                         "attending": req.user.attendedEvents.indexOf(item._id) > -1,
                         "id": item._id,
-                        "createdAt": moment(item.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                        "createdAt": moment(item.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                         "postedBy": {
                           "username": item.contact,
                           "isLoopUser": false

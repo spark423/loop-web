@@ -65,7 +65,7 @@ router.post('/comments/:id/flag', function(req, res) {
 				Post.findById(comment.source.item, function(err, post) {
 					let notificationToPoster = new Notification({
 		  			type: 'Flagged Comment',
-		  			message: "Your comment on the post titled \"" + post.title + "\" has been flagged. Please wait for the admin's review.",
+		  			message: "Your comment on the post, \"" + post.text + "\" has been flagged. Please wait for the admin's review.",
 		  			routeID: {
 		  				kind: 'Comment',
 		  				id: comment._id,
@@ -82,7 +82,7 @@ router.post('/comments/:id/flag', function(req, res) {
 		      			} else {
 		      				let notificationToAdmin = new Notification({
 		      					type: "Flagged Comment",
-		      					message: "The comment on the post titled \"" + post.title + "\" has been flagged.",
+		      					message: "The comment on the post, \"" + post.text + "\" has been flagged.",
 		      					routeID: {
 		      						kind: 'Comment',
 		      						id: comment._id,
@@ -171,7 +171,7 @@ router.post('/comments/:id/flag', function(req, res) {
 						Post.findById(parentComment.source.item, function(err, post) {
 							let notificationToPoster = new Notification({
 				  			type: 'Flagged Comment',
-				  			message: "Your comment on the post titled \"" + post.title + "\" has been flagged. Please wait for the admin's review.",
+				  			message: "Your comment on the post, \"" + post.text + "\" has been flagged. Please wait for the admin's review.",
 				  			routeID: {
 				  				kind: 'Comment',
 				  				id: comment._id,
@@ -188,7 +188,7 @@ router.post('/comments/:id/flag', function(req, res) {
 				      			} else {
 				      				let notificationToAdmin = new Notification({
 				      					type: "Flagged Comment",
-				      					message: "The comment on the post titled \"" + post.title + "\" has been flagged.",
+				      					message: "The comment on the post, \"" + post.text + "\" has been flagged.",
 				      					routeID: {
 				      						kind: 'Comment',
 				      						id: comment._id,

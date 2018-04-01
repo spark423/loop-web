@@ -8,7 +8,7 @@ var Notification = require('../models/notification')
 var Tag = require('../models/tag');
 var Office = require('../models/office');
 var Group = require('../models/group')
-var moment = require('moment');
+var moment = require('moment-timezone');
 
 function swap(items, firstIndex, secondIndex){
   var temp = items[firstIndex];
@@ -118,10 +118,15 @@ router.get('/events/calendar', function(req, res) {
         if(err) throw err;
         var info = [];
         for(var i=0; i<boards.length; i++) {
-          if(boards[i].archive==false && req.user.viewBlockedBoards.indexOf(boards[i]._id)==-1 && req.user.postBlockedBoards.indexOf(boards[i]._id)==-1) {
-            info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
-          }
-        }
+    			if(boards[i].archive==false && req.user.viewBlockedBoards.indexOf(boards[i]._id)==-1 && req.user.postBlockedBoards.indexOf(boards[i]._id)==-1) {
+            if(req.user.admin) {
+              info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
+            } else {
+              if(boards[i].private==false && boards[i].create==true)
+              info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
+            }
+    			}
+    		}
         User.findById(req.user._id).populate('adminGroups').populate('office').exec(function(err, user) {
           if(err) throw err;
           var adminGroups = []
@@ -132,7 +137,7 @@ router.get('/events/calendar', function(req, res) {
       		}
           Tag.find({}, function(err, tags) {
             if(err) throw err;
-            res.render('events-calendar-view', {blocked: req.user.blocked, tags: tags, boards: info, groups: adminGroups, office: user.office, admin: req.user.admin, events: sortedEvents, month: months[moment().month()], year: moment().local().year(), thisMonth: moment().local().daysInMonth(), lastMonth: moment().local().add(-1, 'month').daysInMonth(), lastMonthStart: moment().local().startOf('month').add(0-moment().startOf('month').day(), 'days').date()});
+            res.render('events-calendar-view', {blocked: req.user.blocked, tags: tags, boards: info, groups: adminGroups, office: user.office, admin: req.user.admin, events: sortedEvents, month: months[moment().month()], year: moment().tz("America/New_York").year(), thisMonth: moment().tz("America/New_York").daysInMonth(), lastMonth: moment().tz("America/New_York").add(-1, 'month').daysInMonth(), lastMonthStart: moment().tz("America/New_York").startOf('month').add(0-moment().startOf('month').day(), 'days').date()});
           })
         })
       })
@@ -176,7 +181,7 @@ router.get('/boardinfo', function(req, res) {
 
 router.get('/events/past', function(req, res) {
   if(req.user) {
-    Event.find({$and: [{date: {$lte: moment(Date.now()).local().startOf('day').format().slice(0,-6) + '.000Z'}, archive: false}]}).populate('board').exec(function(err, events) {
+    Event.find({$and: [{date: {$lte: moment(Date.now()).tz("America/New_York").startOf('day').format().slice(0,-6) + '.000Z'}, archive: false}]}).populate('board').exec(function(err, events) {
       let sortedEvents = quickSort(events, 0, events.length-1).reverse();
       console.log(sortedEvents);
       let eventObjects = sortedEvents.filter(function(event) {
@@ -185,7 +190,7 @@ router.get('/events/past', function(req, res) {
         } else {
           var endTime = "";
         }
-        if(moment(Date.now()).local().format('MMMM D, YYYY')==moment(event.date).utc().format('MMMM D, YYYY') && (endTime > moment(Date.now()).local().format('h:mm a') || moment(event.startTime).utc().format('h:mm a') > moment(Date.now()).local().format('h:mm a'))) {
+        if(moment(Date.now()).tz("America/New_York").format('MMMM D, YYYY')==moment(event.date).utc().format('MMMM D, YYYY') && (endTime > moment(Date.now()).tz("America/New_York").format('h:mm a') || moment(event.startTime).utc().format('h:mm a') > moment(Date.now()).tz("America/New_York").format('h:mm a'))) {
           return false;
         }
         return true;
@@ -199,7 +204,7 @@ router.get('/events/past', function(req, res) {
           var user = await Group.findById(event.postingGroup);
               let eventObject= {
                   "id": event._id,
-                  "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                  "createdAt": moment(event.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                   "title": event.title,
                   "postingGroup": {
                     "id": user._id,
@@ -216,15 +221,15 @@ router.get('/events/past', function(req, res) {
                   "startTime": moment(event.startTime).utc().format('h:mm a'),
                   "endTime": endTime,
                   "location": event.location,
-                  "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
-                  "currentTime": moment(Date.now()).local().format('h:mm a')
+                  "currentDate": moment(Date.now()).tz("America/New_York").format('MMMM D, YYYY'),
+                  "currentTime": moment(Date.now()).tz("America/New_York").format('h:mm a')
                 }
                 return Promise.resolve(eventObject);
         } else if(event.postingOffice) {
           var user = await Office.findById(event.postingOffice);
               let eventObject= {
                   "id": event._id,
-                  "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                  "createdAt": moment(event.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                   "title": event.title,
                   "postingOffice": {
                     "id": user._id,
@@ -241,8 +246,8 @@ router.get('/events/past', function(req, res) {
                   "startTime": moment(event.startTime).utc().format('h:mm a'),
                   "endTime": endTime,
                   "location": event.location,
-                  "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
-                  "currentTime": moment(Date.now()).local().format('h:mm a')
+                  "currentDate": moment(Date.now()).tz("America/New_York").format('MMMM D, YYYY'),
+                  "currentTime": moment(Date.now()).tz("America/New_York").format('h:mm a')
                 }
                 return Promise.resolve(eventObject);
         } else {
@@ -250,7 +255,7 @@ router.get('/events/past', function(req, res) {
           if(user) {
               let eventObject= {
                   "id": event._id,
-                  "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                  "createdAt": moment(event.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                   "title": event.title,
                   "postedBy": {
                     "id": user._id,
@@ -268,14 +273,14 @@ router.get('/events/past', function(req, res) {
                   "startTime": moment(event.startTime).utc().format('h:mm a'),
                   "endTime": endTime,
                   "location": event.location,
-                  "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
-                  "currentTime": moment(Date.now()).local().format('h:mm a')
+                  "currentDate": moment(Date.now()).tz("America/New_York").format('MMMM D, YYYY'),
+                  "currentTime": moment(Date.now()).tz("America/New_York").format('h:mm a')
                 }
                 return Promise.resolve(eventObject);
           } else {
             let eventObject= {
               "id": event._id,
-              "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+              "createdAt": moment(event.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
               "title": event.title,
               "postedBy": {
                 "id": "",
@@ -294,8 +299,8 @@ router.get('/events/past', function(req, res) {
               "startTime": moment(event.startTime).utc().format('h:mm a'),
               "endTime": endTime,
               "location": event.location,
-              "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
-              "currentTime": moment(Date.now()).local().format('h:mm a')
+              "currentDate": moment(Date.now()).tz("America/New_York").format('MMMM D, YYYY'),
+              "currentTime": moment(Date.now()).tz("America/New_York").format('h:mm a')
             }
             return Promise.resolve(eventObject);
           }
@@ -348,10 +353,15 @@ router.get('/events/create', function(req, res) {
         if(err) throw err;
         var info = [];
         for(var i=0; i<boards.length; i++) {
-          if(boards[i].archive==false && req.user.viewBlockedBoards.indexOf(boards[i]._id)==-1 && req.user.postBlockedBoards.indexOf(boards[i]._id)==-1) {
-            info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
-          }
-        }
+    			if(boards[i].archive==false && req.user.viewBlockedBoards.indexOf(boards[i]._id)==-1 && req.user.postBlockedBoards.indexOf(boards[i]._id)==-1) {
+            if(req.user.admin) {
+              info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
+            } else {
+              if(boards[i].private==false && boards[i].create==true)
+              info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
+            }
+    			}
+    		}
         User.findById(req.user._id).populate('adminGroups').populate('office').exec(function(err, user) {
           if(err) throw err;
           var adminGroups = []
@@ -406,11 +416,11 @@ router.get('/create-a-new-event-invite', function(req, res) {
 })
 //Create a new event
 router.post('/events/create', function(req, res) {
-  var start = moment(req.body.startTime, "HH:mm").local();
-  var end = moment(req.body.endTime, "HH:mm").local();
+  var start = moment(req.body.startTime, "HH:mm").tz("America/New_York");
+  var end = moment(req.body.endTime, "HH:mm").tz("America/New_York");
   var startTime = moment(req.body.date).utc().add(start.get('hour'), 'hour').add(start.get('minute'), 'minute');
   var endTime = moment(req.body.date).utc().add(end.get('hour'), 'hour').add(end.get('minute'), 'minute');
-  var difference = moment(req.body.date).utc().get('hour') - moment(req.body.date).local().get('hour');
+  var difference = moment(req.body.date).utc().get('hour') - moment(req.body.date).tz("America/New_York").get('hour');
   startTime.add(-difference, 'hour');
   endTime.add(-difference, 'hour');
   var addMembers = req.body.addMembers.split(',');
@@ -597,7 +607,7 @@ router.get('/event/:id', function(req, res) {
             var attending = false;
           }
           let comments = event.comments.map(function(comment) {
-            return {"own": comment.postedBy._id.toString() === req.user._id.toString(), "id": comment._id, "createdAt": moment(comment.createdAt).local().format('MMMM D, YYYY, h:mm a'), "postedBy": {"id": comment.postedBy._id, "firstName": comment.postedBy.firstName, "lastName": comment.postedBy.lastName}, "text": comment.text, "flagged": comment.flagged}
+            return {"own": comment.postedBy._id.toString() === req.user._id.toString(), "id": comment._id, "createdAt": moment(comment.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'), "postedBy": {"id": comment.postedBy._id, "firstName": comment.postedBy.firstName, "lastName": comment.postedBy.lastName}, "text": comment.text, "flagged": comment.flagged}
           })
           if(event.endTime) {
             var endTime = moment(event.endTime).utc().format('h:mm a');
@@ -611,7 +621,7 @@ router.get('/event/:id', function(req, res) {
                 var eventObject = {
                   "own": event.contact.toString() === req.user.username.toString(),
                   "id": event._id,
-                  "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                  "createdAt": moment(event.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                   "postingGroup": {
                     "id": user._id,
                     "name": user.name,
@@ -669,7 +679,7 @@ router.get('/event/:id', function(req, res) {
                 var eventObject = {
                   "own": event.contact.toString() === req.user.username.toString(),
                   "id": event._id,
-                  "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                  "createdAt": moment(event.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                   "postingOffice": {
                     "id": user._id,
                     "name": user.name,
@@ -727,7 +737,7 @@ router.get('/event/:id', function(req, res) {
                 var eventObject = {
                   "own": user._id.toString() === req.user._id.toString(),
                   "id": event._id,
-                  "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                  "createdAt": moment(event.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                   "postedBy": {
                     "id": user._id,
                     "firstName": user.firstName,
@@ -750,7 +760,7 @@ router.get('/event/:id', function(req, res) {
               } else {
                 var eventObject = {
                   "id": event._id,
-                  "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                  "createdAt": moment(event.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                   "postedBy": {
                     "username": event.contact,
                     "isLoopUser": false
@@ -812,7 +822,7 @@ router.get('/event/:id', function(req, res) {
 //Render all events
 router.get('/events', function(req, res) {
 	if(req.user) {
-    Event.find({$and: [{date: {$gte: moment(Date.now()).local().startOf('day').format().slice(0,-6) + '.000Z'}, archive: false}]}).populate('board').exec(function(err, events) {
+    Event.find({$and: [{date: {$gte: moment(Date.now()).tz("America/New_York").startOf('day').format().slice(0,-6) + '.000Z'}, archive: false}]}).populate('board').exec(function(err, events) {
       if(err) throw err;
   			let sortedEvents = quickSort(events, 0, events.length-1);
   			let eventObjects = sortedEvents.map(async function(event) {
@@ -826,7 +836,7 @@ router.get('/events', function(req, res) {
             var user = await Group.findById(event.postingGroup);
                 let eventObject= {
                     "id": event._id,
-                    "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                    "createdAt": moment(event.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                     "title": event.title,
                     "postingGroup": {
                       "id": user._id,
@@ -843,15 +853,15 @@ router.get('/events', function(req, res) {
                     "startTime": moment(event.startTime).utc().format('h:mm a'),
                     "endTime": endTime,
                     "location": event.location,
-                    "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
-                    "currentTime": moment(Date.now()).local().format('h:mm a')
+                    "currentDate": moment(Date.now()).tz("America/New_York").format('MMMM D, YYYY'),
+                    "currentTime": moment(Date.now()).tz("America/New_York").format('h:mm a')
                   }
                   return Promise.resolve(eventObject);
           } else if(event.postingOffice) {
             var user = await Office.findById(event.postingOffice);
                 let eventObject= {
                     "id": event._id,
-                    "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                    "createdAt": moment(event.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                     "title": event.title,
                     "postingOffice": {
                       "id": user._id,
@@ -868,8 +878,8 @@ router.get('/events', function(req, res) {
                     "startTime": moment(event.startTime).utc().format('h:mm a'),
                     "endTime": endTime,
                     "location": event.location,
-                    "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
-                    "currentTime": moment(Date.now()).local().format('h:mm a')
+                    "currentDate": moment(Date.now()).tz("America/New_York").format('MMMM D, YYYY'),
+                    "currentTime": moment(Date.now()).tz("America/New_York").format('h:mm a')
                   }
                   return Promise.resolve(eventObject);
           } else {
@@ -877,7 +887,7 @@ router.get('/events', function(req, res) {
             if(user) {
                 let eventObject= {
                     "id": event._id,
-                    "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                    "createdAt": moment(event.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                     "title": event.title,
                     "postedBy": {
                       "id": user._id,
@@ -895,14 +905,14 @@ router.get('/events', function(req, res) {
                     "startTime": moment(event.startTime).utc().format('h:mm a'),
                     "endTime": endTime,
                     "location": event.location,
-                    "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
-                    "currentTime": moment(Date.now()).local().format('h:mm a')
+                    "currentDate": moment(Date.now()).tz("America/New_York").format('MMMM D, YYYY'),
+                    "currentTime": moment(Date.now()).tz("America/New_York").format('h:mm a')
                   }
                   return Promise.resolve(eventObject);
             } else {
               let eventObject= {
                 "id": event._id,
-                "createdAt": moment(event.createdAt).local().format('MMMM D, YYYY, h:mm a'),
+                "createdAt": moment(event.createdAt).tz("America/New_York").format('MMMM D, YYYY, h:mm a'),
                 "title": event.title,
                 "postedBy": {
                   "id": "",
@@ -921,8 +931,8 @@ router.get('/events', function(req, res) {
                 "startTime": moment(event.startTime).utc().format('h:mm a'),
                 "endTime": endTime,
                 "location": event.location,
-                "currentDate": moment(Date.now()).local().format('MMMM D, YYYY'),
-                "currentTime": moment(Date.now()).local().format('h:mm a')
+                "currentDate": moment(Date.now()).tz("America/New_York").format('MMMM D, YYYY'),
+                "currentTime": moment(Date.now()).tz("America/New_York").format('h:mm a')
               }
               return Promise.resolve(eventObject);
             }
@@ -934,10 +944,15 @@ router.get('/events', function(req, res) {
               if(err) throw err;
               var info = [];
               for(var i=0; i<boards.length; i++) {
-                if(boards[i].archive==false && req.user.viewBlockedBoards.indexOf(boards[i]._id)==-1 && req.user.postBlockedBoards.indexOf(boards[i]._id)==-1) {
-                  info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
-                }
-              }
+          			if(boards[i].archive==false && req.user.viewBlockedBoards.indexOf(boards[i]._id)==-1 && req.user.postBlockedBoards.indexOf(boards[i]._id)==-1) {
+                  if(req.user.admin) {
+                    info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
+                  } else {
+                    if(boards[i].private==false && boards[i].create==true)
+                    info.push({"name": boards[i].name, "_id": boards[i]._id, "active": boards[i].active});
+                  }
+          			}
+          		}
               User.findById(req.user._id).populate('adminGroups').populate('office').exec(function(err, user) {
                 if(err) throw err;
                 var adminGroups = []

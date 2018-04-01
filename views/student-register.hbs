@@ -35,10 +35,46 @@
                 <input style="padding: 0 15px;" class="uk-input uk-form-width-medium" type="" name="username" placeholder="Email" required>
             </div>
             <div class="uk-margin">
-                <input style="padding: 0 15px;" class="uk-input uk-form-width-medium" type="" name="major" placeholder="Major" required>
+              <select style="padding: 0 15px;" class="uk-select" name="major">
+                  <option value="">Select your major</option>
+                  <option value="Anthropology">Anthropology</option>
+                  <option value="Archaeology">Archaeology</option>
+                  <option value="Astronomy">Astronomy</option>
+                  <option value="Biology">Biology</option>
+                  <option value="Chemistry">Chemistry</option>
+                  <option value="Classics">Classics</option>
+                  <option value="Computer Science">Computer Science</option>
+                  <option value="East Asian Language and Culture">East Asian Language and Culture</option>
+                  <option value="Economics">Economics</option>
+                  <option value="English">English</option>
+                  <option value="Fine Arts">Fine Arts</option>
+                  <option value="French">French</option>
+                  <option value="Geology">Geology</option>
+                  <option value="German">German</option>
+                  <option value="Growth and Structure of Cities">Growth and Structure of Cities</option>
+                  <option value="History">History</option>
+                  <option value="History of Art">History of Art</option>
+                  <option value="Italian">Italian</option>
+                  <option value="Linguistics">Linguistics</option>
+                  <option value="Mathematics and Statistics">Mathematics and Statistics</option>
+                  <option value="Music">Music</option>
+                  <option value="Philosophy">Philosophy</option>
+                  <option value="Physics">Physics</option>
+                  <option value="Political Science">Political Science</option>
+                  <option value="Psychology">Psychology</option>
+                  <option value="Religion">Religion</option>
+                  <option value="Russian">Russian</option>
+                  <option value="Sociology">Sociology</option>
+                  <option value="Spanish">Spanish</option>
+              </select>
             </div>
             <div class="uk-margin">
-                <input style="padding: 0 15px;" class="uk-input uk-form-width-medium" type="" name="class" placeholder="Class Year" required>
+              <select style="padding: 0 15px;" class="uk-select" name="class">
+                  <option value="">Select your year</option>
+                  {{#each years}}
+                  <option value="{{this}}">{{this}}</option>
+                  {{/each}}
+              </select>
             </div>
             <a type="button" class="uk-button uk-button-default" onclick="document.getElementById('submitbutton').click();">
                 Next

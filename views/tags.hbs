@@ -10,7 +10,7 @@ $(function(){
     })
     var list = []
     {{#each userTags}}
-    list.push('{{name}} ({{followers.length}} Followers)');
+    list.push('{{name}}');
     {{/each}}
     console.log(list)
     $('#tags').dropdown('set selected', list);

@@ -3,7 +3,7 @@ var router = express.Router();
 var User = require('../models/user');
 var Group = require('../models/group');
 var Board = require('../models/board');
-var moment = require('moment')
+var moment = require('moment-timezone')
 var Post = require('../models/post');
 var Event = require('../models/event');
 var Time = require('../models/time');
@@ -154,7 +154,7 @@ router.get('/home', function(req, res) {
 										if(subscriptions_percent==Infinity) {
 											subscriptions_percent=0;
 										}
-										res.render('home', {admin: req.user.admin, user: req.user, date: moment(Date.now()).local().format('dddd, MMMM D, YYYY'), groups: group_counter, users: user_counter, posts: post_counter, events: event_counter, follows: follow_counter, subscriptions: subscription_counter, post_percent: post_percent, event_percent: event_percent, follow_percent: follow_percent, group_percent: group_percent, user_percent: user_percent, subscriptions_percent: subscriptions_percent, helpers: {
+										res.render('home', {admin: req.user.admin, user: req.user, date: moment(Date.now()).tz("America/New_York").format('dddd, MMMM D, YYYY'), groups: group_counter, users: user_counter, posts: post_counter, events: event_counter, follows: follow_counter, subscriptions: subscription_counter, post_percent: post_percent, event_percent: event_percent, follow_percent: follow_percent, group_percent: group_percent, user_percent: user_percent, subscriptions_percent: subscriptions_percent, helpers: {
 			              		compare: function(lvalue, rvalue, options) {
 			              			if (arguments.length < 3)
 			              					throw new Error("Handlerbars Helper 'compare' needs 2 parameters");
