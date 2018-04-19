@@ -53,7 +53,10 @@ function quickSort(items, left, right) {
 
 //Render feed page
   router.get('/feed', function(req, res) {
-    if(req.user) {
+    if(req.user && !req.user.verified) {
+      res.redirect('/not-verified');
+    }
+    else if(req.user) {
       User.findById(req.user._id, function(err, user) {
         if (err) {
           throw err;
@@ -311,7 +314,10 @@ function quickSort(items, left, right) {
   });
 
 router.get('/feed-settings', function(req, res) {
-  if(req.user) {
+  if(req.user && !req.user.verified) {
+    res.redirect('/not-verified');
+  }
+  else if(req.user) {
     Board.find({"active": true}, function(err, allBoards) {
       let boards = allBoards.map(function(board) {
         return {"id": board._id, "name": board.name, "description": board.description, "subscribed": req.user.subscribedBoards.indexOf(board._id) > -1};

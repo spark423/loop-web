@@ -32,7 +32,8 @@ var userSchema = new mongoose.Schema({
   notifications: [{type: mongoose.Schema.Types.ObjectId, ref: 'Notification'}],
   resetPasswordToken: {type: String},
   resetPasswordExpires: {type: Date},
-  tags: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tag'}]
+  tags: [{type: mongoose.Schema.Types.ObjectId, ref: 'Tag'}],
+  verified: {type: Boolean, default: false}
 });
 
 // Define methods ====================================================================================================================================================================

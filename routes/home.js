@@ -16,7 +16,10 @@ Bottom 3:
 5. Total number of Profiles
 6. Total number of Board Subscriptions*/
 router.get('/home', function(req, res) {
-	if(req.user) {
+	if(req.user && !req.user.verified) {
+		res.redirect('/not-verified');
+	}
+	else if(req.user) {
 		if(req.user.admin) {
 
 				var post_counter = 0;

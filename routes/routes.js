@@ -16,6 +16,8 @@ var Post = require('../models/post');
 var Event = require('../models/event');
 var Office = require('../models/office');
 var Tag = require('../models/tag');
+var Comment = require('../models/comment');
+var request = require('request');
 
 var crypto = require('crypto'),
     algorithm = 'aes192',
@@ -55,42 +57,70 @@ module.exports = function(passport) {
     } else {
       var years = [year, year+1, year+2, year+3];
     }
-    res.render('student-register', {years: years});
+    res.render('student-register', {years: years, message: req.query.message});
   });
 
   router.post('/student-signup', function(req, res) {
-    User.findOne({'username': req.body.username}, function(err, user) {
-      if (err)
-        return done(err);
-      if (user) {
-        var message = encodeURIComponent('That email is already taken');
-        res.redirect('/student-signup/?message=' + message)
-      } else {
-        res.redirect('/student-signup-password/?username=' + req.body.username + '&firstName=' + req.body.firstName + '&lastName=' + req.body.lastName + '&major=' + req.body.major + '&class=' + req.body.class);
-      }
+    var url = 'https://bpi.briteverify.com/emails.json?address=' + req.body.username + '&amp;apikey=6646849e-f04d-4293-9919-9bafd0fca283';
+    request({
+      url: url,
+      json: true
+      }, function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+          console.log(body);
+          if(body.status=="valid") {
+            User.findOne({'username': req.body.username}, function(err, user) {
+              if (err)
+                return done(err);
+              if (user) {
+                var message = encodeURIComponent('That email is already taken');
+                res.redirect('/student-signup/?message=' + message)
+              } else {
+                res.redirect('/student-signup-password/?username=' + req.body.username + '&firstName=' + req.body.firstName + '&lastName=' + req.body.lastName + '&major=' + req.body.major + '&class=' + req.body.class);
+              }
+            })
+          } else {
+            var message = encodeURIComponent('Please enter a valid email address.');
+            res.redirect('/student-signup/?message=' + message)
+          }
+        }
     })
   });
 
   router.post('/signup', function(req, res) {
-    User.findOne({'username': req.body.username}, function(err, user) {
-      if (err)
-        return done(err);
-      if (user) {
-        var message = encodeURIComponent('That email is already taken');
-        if(req.body.token) {
-          res.redirect('/invited/' + req.body.token + '/?message=' + message)
-        } else {
-          res.redirect('/signup/?message=' + message)
+    var url = 'https://bpi.briteverify.com/emails.json?address=' + req.body.username + '&amp;apikey=6646849e-f04d-4293-9919-9bafd0fca283';
+    request({
+      url: url,
+      json: true
+      }, function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+          console.log(body);
+          if(body.status=="valid") {
+            User.findOne({'username': req.body.username}, function(err, user) {
+              if (err)
+                return done(err);
+              if (user) {
+                var message = encodeURIComponent('That email is already taken');
+                if(req.body.token) {
+                  res.redirect('/invited/' + req.body.token + '/?message=' + message)
+                } else {
+                  res.redirect('/signup/?message=' + message)
+                }
+              } else if(req.body.adminID != 100 && !req.body.token) {
+                var message = encodeURIComponent('You must enter a valid Administrator ID.');
+                res.redirect('/signup/?message=' + message)
+              /*} else if(!req.body.username.includes("@haverford.edu")) {
+                var message = encodeURIComponent('Your username must be a valid Haverford email address.');
+                res.redirect('/signup/?message=' + message)*/
+              } else {
+                res.redirect('/signup-password/?username=' + req.body.username + '&firstName=' + req.body.firstName + '&lastName=' + req.body.lastName);
+              }
+            })
+          } else {
+            var message = encodeURIComponent('Please enter a valid email address.');
+            res.redirect('/student-signup/?message=' + message)
+          }
         }
-      } else if(req.body.adminID != 100 && !req.body.token) {
-        var message = encodeURIComponent('You must enter a valid Administrator ID.');
-        res.redirect('/signup/?message=' + message)
-      /*} else if(!req.body.username.includes("@haverford.edu")) {
-        var message = encodeURIComponent('Your username must be a valid Haverford email address.');
-        res.redirect('/signup/?message=' + message)*/
-      } else {
-        res.redirect('/signup-password/?username=' + req.body.username + '&firstName=' + req.body.firstName + '&lastName=' + req.body.lastName);
-      }
     })
   });
 
@@ -104,7 +134,7 @@ module.exports = function(passport) {
   });
 
   router.post('/student-signup-password', passport.authenticate('local-student-signup', {
-      successRedirect : '/add-tags',
+      successRedirect : '/success',
       failureRedirect : '/student-signup-password',
       failureFlash : true // allow flash messages
     })
@@ -120,14 +150,101 @@ module.exports = function(passport) {
   });
 
   router.post('/signup-password', passport.authenticate('local-signup', {
-      successRedirect : '/add-office',
+      successRedirect : '/success',
       failureRedirect : '/signup-password',
       failureFlash : true // allow flash messages
     })
   );
 
-  router.get('/add-tags', function(req, res) {
+  router.get('/success', function(req, res) {
     if(req.user) {
+      res.render('verify', {user: req.user})
+    } else {
+      res.redirect('/');
+    }
+  })
+
+  router.get('/not-verified', function(req, res) {
+    if(req.user) {
+      res.render('not-verified', {user: req.user});
+    } else {
+      res.redirect('/');
+    }
+  })
+
+  router.get('/verify/:token', function(req, res) {
+    if(req.user) {
+      var token = decrypt(req.params.token);
+      if(token == req.user.username) {
+        User.findOne({username: req.user.username}, function(err, user) {
+          user.verified = true;
+          user.save(function(err, savedUser) {
+            if(err) throw err;
+            res.render('verified', {user: req.user})
+          });
+        })
+      } else {
+        res.redirect('/');
+      }
+    } else {
+      res.redirect('/');
+    }
+  })
+
+  router.post('/verify-email', function(req, res) {
+    if(req.user) {
+      async.waterfall([
+        function(done) {
+          var token = encrypt(req.user.username);
+          done(null, token);
+        },
+        function(token, done) {
+          User.findOne({ username: req.user.username }, function(err, user) {
+            if (!user) {
+              console.log("no account");
+              //res.send(401, {success: false, message: 'No account with that email address exists.'});
+             return;
+            }
+            user.save(function(err) {
+              done(null, token, user);
+            });
+          });
+        },
+        function(token, user, done) {
+          let options = {
+            auth: {
+              api_user: username,
+              api_key: password
+            }
+          }
+          let client = nodemailer.createTransport(sgTransport(options));
+
+          let email = {
+            from: 'support@theuniversityloop.com',
+            to: user.username,
+            subject: 'Verify Loop Account',
+            text: 'Please verify your email address for your school\'s Community Loop by clicking on the link below:\n\n'
+               + 'http://loop-web-env.us-east-2.elasticbeanstalk.com/verify/' + token
+           };
+          client.sendMail(email, function(err){
+            done(err)
+          });
+        }
+      ], function(err) {
+        if (err) throw err;
+        console.log("success");
+        res.send({success: true})
+      });
+    } else {
+        res.redirect('/');
+    }
+  })
+
+  router.get('/add-tags', function(req, res) {
+    if(req.user && !req.user.verified) {
+      res.redirect('/not-verified');
+    }
+    else if(req.user) {
       User.findById(req.user._id).populate('tags').exec(function(err, user) {
         Tag.find({}, function(err, tags) {
           console.log(user.tags);
@@ -170,7 +287,10 @@ module.exports = function(passport) {
   })
 
   router.get('/invite-users', function(req, res) {
-    if(req.user) {
+    if(req.user && !req.user.verified) {
+      res.redirect('/not-verified');
+    }
+    else if(req.user) {
       if(req.user.admin) {
         let boardsPromise = Board.find({'archive': false, 'active': true}, function(err, boards) {
           if(err) throw err;
@@ -190,7 +310,9 @@ module.exports = function(passport) {
   })
 
   router.get('/invite-more-users', function(req, res) {
-    if(req.user) {
+    if(req.user && !req.user.verified) {
+      res.redirect('/not-verified');
+    } else if(req.user) {
       if(req.user.admin) {
         let boardsPromise = Board.find({'archive': false, 'active': true}, function(err, boards) {
           if(err) throw err;
@@ -486,14 +608,17 @@ module.exports = function(passport) {
   })
 
   router.post('/outside-signup-password', passport.authenticate('local-outside-signup', {
-      successRedirect : '/add-tags',
+      successRedirect : '/success',
       failureRedirect : '/invited-password',
       failureFlash : true // allow flash messages
     })
   );
 
   router.get('/add-office', function(req, res) {
-    if(req.user) {
+    if(req.user && !req.user.verified) {
+      res.redirect('/not-verified');
+    }
+    else if(req.user) {
       if(req.user.admin) {
         Office.find({private: 'false'}).populate('tags').exec(function(err, offices) {
           Tag.find({}, function(err, tags) {
@@ -619,7 +744,11 @@ module.exports = function(passport) {
 
   // Retrieve login page
   router.get('/', function(req, res) {
-    if(req.user) {
+    if(req.user && !req.user.verified) {
+      res.redirect('/not-verified');
+    }
+    else if(req.user) {
+      console.log(req.user.verified);
       res.redirect('/home');
     }
     else {
@@ -639,9 +768,39 @@ module.exports = function(passport) {
     res.redirect('/');
   });
 
+  router.post('/delete', function(req, res) {
+    Tag.update({$pull: {followers: {_id: req.user._id}}}, function(err) {
+      Post.find({postedBy: req.user._id}, function(err, posts) {
+        posts = posts.map(posts => posts._id);
+        console.log(posts);
+        Event.find({contact: req.user.username}, function(err, events) {
+          events = events.map(events => events._id)
+          console.log(events);
+          Board.update({$pull: {contents: {item: {$in: posts}}}}, function(err) {
+            Board.update({$pull: {contents: {item: {$in: events}}}}, function(err) {
+              Comment.remove({postedBy: req.user._id}, function(err) {
+                Post.remove({postedBy: req.user._id}, function(err) {
+                  Event.remove({contact: req.username}, function(err) {
+                    User.remove({_id: req.user._id}, function(err) {
+                      req.logout();
+                      res.redirect('/');
+                    })
+                  })
+                })
+              })
+            })
+          })
+        })
+      })
+    })
+  })
+
   // Retrieve settings page
   router.get('/settings', function(req, res) {
-    if(req.user) {
+    if(req.user && !req.user.verified) {
+      res.redirect('/not-verified');
+    }
+    else if(req.user) {
         Board.find({}, function(err, boards){
           if(err) throw err;
           Group.find({}, function(err, groups) {

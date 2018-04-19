@@ -221,7 +221,10 @@ router.post('/boards/:id/delete', function(req, res) {
 
 //Retrieving a board page
 router.get('/boards/:id', function(req, res) {
-  if(req.user) {
+  if(req.user && !req.user.verified) {
+    res.redirect('/not-verified');
+  }
+  else if(req.user) {
     if(req.user.viewBlockedBoards.indexOf(req.params.id)!=-1) {
       res.redirect('/');
     } else {

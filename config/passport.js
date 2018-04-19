@@ -2,6 +2,11 @@ var passport = require('passport');
 var LocalStrategy   = require('passport-local').Strategy;
 var User = require('../models/user');
 var Group = require('../models/group');
+var async = require('async');
+var nodemailer = require('nodemailer');
+var sgTransport = require('nodemailer-sendgrid-transport');
+var apiusername = process.env.api_user;
+var apipassword = process.env.api_key;
 //Passport session setup ============================================================================================================================================================
 var crypto = require('crypto'),
     algorithm = 'aes192',
@@ -94,8 +99,48 @@ passport.use('local-signup', new LocalStrategy({
             newUser.major= "",
             newUser.blocked = false
             newUser.save(function(err) {
-              if (err)
-                throw err;
+              if (err) throw err;
+              async.waterfall([
+                function(done) {
+                  var token = encrypt(req.body.username);
+                  done(null, token);
+                },
+                function(token, done) {
+                  User.findOne({ username: req.body.username }, function(err, user) {
+                    if (!user) {
+                      console.log("no account");
+                      //res.send(401, {success: false, message: 'No account with that email address exists.'});
+                     return;
+                    }
+                    user.save(function(err) {
+                      done(null, token, user);
+                    });
+                  });
+                },
+                function(token, user, done) {
+                  let options = {
+                    auth: {
+                      api_user: apiusername,
+                      api_key: apipassword
+                    }
+                  }
+                  let client = nodemailer.createTransport(sgTransport(options));
+
+                  let email = {
+                    from: 'support@theuniversityloop.com',
+                    to: user.username,
+                    subject: 'Verify Loop Account',
+                    text: 'Please verify your email address for your school\'s Community Loop by clicking on the link below:\n\n'
+                       + 'http://loop-web-env.us-east-2.elasticbeanstalk.com/verify/' + token
+                   };
+                  client.sendMail(email, function(err){
+                    done(err)
+                  });
+                }
+              ], function(err) {
+                if (err) throw err;
+                console.log("success");
+              });
               return done(null, newUser);
           });
         }
@@ -127,6 +172,47 @@ passport.use('local-student-signup', new LocalStrategy({
             newUser.save(function(err) {
               if (err)
                 throw err;
+                async.waterfall([
+                  function(done) {
+                    var token = encrypt(req.body.username);
+                    done(null, token);
+                  },
+                  function(token, done) {
+                    User.findOne({ username: req.body.username }, function(err, user) {
+                      if (!user) {
+                        console.log("no account");
+                        //res.send(401, {success: false, message: 'No account with that email address exists.'});
+                       return;
+                      }
+                      user.save(function(err) {
+                        done(null, token, user);
+                      });
+                    });
+                  },
+                  function(token, user, done) {
+                    let options = {
+                      auth: {
+                        api_user: apiusername,
+                        api_key: apipassword
+                      }
+                    }
+                    let client = nodemailer.createTransport(sgTransport(options));
+
+                    let email = {
+                      from: 'support@theuniversityloop.com',
+                      to: user.username,
+                      subject: 'Verify Loop Account',
+                      text: 'Please verify your email address for your school\'s Community Loop by clicking on the link below:\n\n'
+                         + 'http://loop-web-env.us-east-2.elasticbeanstalk.com/verify/' + token
+                     };
+                    client.sendMail(email, function(err){
+                      done(err)
+                    });
+                  }
+                ], function(err) {
+                  if (err) throw err;
+                  console.log("success");
+                });
               return done(null, newUser);
           });
         }
@@ -177,6 +263,47 @@ passport.use('local-outside-signup', new LocalStrategy({
             newUser.save(function(err) {
               if (err)
                 throw err;
+                async.waterfall([
+                  function(done) {
+                    var token = encrypt(req.body.username);
+                    done(null, token);
+                  },
+                  function(token, done) {
+                    User.findOne({ username: req.body.username }, function(err, user) {
+                      if (!user) {
+                        console.log("no account");
+                        //res.send(401, {success: false, message: 'No account with that email address exists.'});
+                       return;
+                      }
+                      user.save(function(err) {
+                        done(null, token, user);
+                      });
+                    });
+                  },
+                  function(token, user, done) {
+                    let options = {
+                      auth: {
+                        api_user: apiusername,
+                        api_key: apipassword
+                      }
+                    }
+                    let client = nodemailer.createTransport(sgTransport(options));
+
+                    let email = {
+                      from: 'support@theuniversityloop.com',
+                      to: user.username,
+                      subject: 'Verify Loop Account',
+                      text: 'Please verify your email address for your school\'s Community Loop by clicking on the link below:\n\n'
+                         + 'http://loop-web-env.us-east-2.elasticbeanstalk.com/verify/' + token
+                     };
+                    client.sendMail(email, function(err){
+                      done(err)
+                    });
+                  }
+                ], function(err) {
+                  if (err) throw err;
+                  console.log("success");
+                });
               return done(null, newUser);
           });
         }

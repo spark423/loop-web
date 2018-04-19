@@ -68,7 +68,10 @@ router.get('/notifications', function(req, res) {
 
 //Render page for all notifications
 router.get('/all-notifications', function(req, res) {
-	if(req.user) {
+  if(req.user && !req.user.verified) {
+    res.redirect('/not-verified');
+  }
+  else if(req.user) {
 		User.findById(req.user._id).populate('notifications').exec(function(err, user) {
 			if (err) {
 				throw err;

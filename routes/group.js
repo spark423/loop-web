@@ -152,7 +152,10 @@ router.post('/groups/create', function(req, res) {
 
 //Page for creating group
 router.get('/create-a-new-org', function(req, res) {
-  if(req.user) {
+  if(req.user && !req.user.verified) {
+    res.redirect('/not-verified');
+  }
+  else if(req.user) {
     if(req.user.blocked) {
       res.redirect('/');
     } else {
@@ -184,7 +187,10 @@ router.post('/group-invite', function(req, res) {
 
 //Render invite page
 router.get('/create-a-new-org-invite', function(req, res) {
-  if(req.user) {
+  if(req.user && !req.user.verified) {
+    res.redirect('/not-verified');
+  }
+  else if(req.user) {
     if(req.user.blocked) {
       res.redirect('/');
     } else {
@@ -205,7 +211,10 @@ router.get('/create-a-new-org-invite', function(req, res) {
 })
 
 router.get('/organizations', function(req, res) {
-  if(req.user) {
+  if(req.user && !req.user.verified) {
+    res.redirect('/not-verified');
+  }
+  else if(req.user) {
     Group.find({'archive': false, '_id': {$nin: req.user.viewBlockedGroups}}, function(err, groups) {
       console.log(groups);
       res.render('org-list', {groups: groups, admin: req.user.admin});
@@ -305,7 +314,10 @@ router.get('/groupinfo', function(req, res) {
 
 //Retrieve group page
 router.get('/groups/:id', function(req, res) {
-  if(req.user) {
+  if(req.user && !req.user.verified) {
+    res.redirect('/not-verified');
+  }
+  else if(req.user) {
     if(req.user.viewBlockedGroups.indexOf(req.params.id)!=-1) {
       res.redirect('/');
     } else {
@@ -632,7 +644,10 @@ router.get('/groups/:id', function(req, res) {
 
 //Render edit group page
 router.get('/groups/:id/edit', function(req, res) {
-  if(req.user) {
+  if(req.user && !req.user.verified) {
+    res.redirect('/not-verified');
+  }
+  else if(req.user) {
     Group.findById(req.params.id, function(err, group) {
       if(err) throw err;
       User.find({}, function(err, users) {

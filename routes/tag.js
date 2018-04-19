@@ -53,7 +53,10 @@ function quickSort(items, left, right) {
 }
 
 router.get('/tag/:id', function(req, res) {
-  if(req.user) {
+  if(req.user && !req.user.verified) {
+    res.redirect('/not-verified');
+  }
+  else if(req.user) {
           Post.find({tags: req.params.id}).populate([{path: 'attendees'}, {path: 'comments', populate: [{path: 'postedBy'},{path: 'comments', populate: [{path: 'postedBy'}]}]}]).populate('tags').exec(function(err, posts) {
             if(err) throw err;
             Event.find({tags: req.params.id}).populate([{path: 'attendees'}, {path: 'comments', populate: [{path: 'postedBy'},{path: 'comments', populate: [{path: 'postedBy'}]}]}]).populate('tags').exec(function(err, events) {

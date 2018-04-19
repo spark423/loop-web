@@ -105,7 +105,10 @@ router.post('/events/:id/flag', function(req, res) {
   })
 
 router.get('/events/calendar', function(req, res) {
-  if(req.user) {
+  if(req.user && !req.user.verified) {
+    res.redirect('/not-verified');
+  }
+  else if(req.user) {
     var afterDay = moment(Date.now()).endOf('month').add(6-moment(Date.now()).endOf('month').day(), 'days').format().slice(0,-6) + '.000Z';
     var beforeDay = moment(Date.now()).startOf('month').add(0-moment(Date.now()).startOf('month').day(),'days').format().slice(0,-6) + '.000Z';
     console.log(afterDay);
@@ -180,7 +183,10 @@ router.get('/boardinfo', function(req, res) {
 });
 
 router.get('/events/past', function(req, res) {
-  if(req.user) {
+  if(req.user && !req.user.verified) {
+    res.redirect('/not-verified');
+  }
+  else if(req.user) {
     Event.find({$and: [{date: {$lte: moment(Date.now()).tz("America/New_York").startOf('day').format().slice(0,-6) + '.000Z'}, archive: false}]}).populate('board').exec(function(err, events) {
       let sortedEvents = quickSort(events, 0, events.length-1).reverse();
       console.log(sortedEvents);
@@ -345,7 +351,10 @@ router.get('/events/past', function(req, res) {
 })
 //Render event creation page
 router.get('/events/create', function(req, res) {
-  if(req.user) {
+  if(req.user && !req.user.verified) {
+    res.redirect('/not-verified');
+  }
+  else if(req.user) {
     if(req.user.blocked) {
       res.redirect('/');
     } else {
@@ -397,7 +406,10 @@ router.post('/event-invite', function(req, res) {
 })
 
 router.get('/create-a-new-event-invite', function(req, res) {
-  if(req.user) {
+  if(req.user && !req.user.verified) {
+    res.redirect('/not-verified');
+  }
+  else if(req.user) {
     User.find({}, function(err, users) {
       if(err) throw err;
       var user_info = [];
@@ -593,7 +605,10 @@ router.post('/events/create', function(req, res) {
 
 //Render Event page
 router.get('/event/:id', function(req, res) {
-  if(req.user) {
+  if(req.user && !req.user.verified) {
+    res.redirect('/not-verified');
+  }
+  else if(req.user) {
     Event.findById(req.params.id).populate([{path: 'comments', populate: [{path: 'postedBy'}]}]).exec(function(err, event) {
       if(err) throw err;
       Board.findById(event.board, function(err, board) {
@@ -821,7 +836,10 @@ router.get('/event/:id', function(req, res) {
 
 //Render all events
 router.get('/events', function(req, res) {
-	if(req.user) {
+  if(req.user && !req.user.verified) {
+    res.redirect('/not-verified');
+  }
+  else if(req.user) {
     Event.find({$and: [{date: {$gte: moment(Date.now()).tz("America/New_York").startOf('day').format().slice(0,-6) + '.000Z'}, archive: false}]}).populate('board').exec(function(err, events) {
       if(err) throw err;
   			let sortedEvents = quickSort(events, 0, events.length-1);
@@ -1007,7 +1025,10 @@ router.get('/events', function(req, res) {
 
 //Render edit event page
 router.get('/event/:id/edit', function(req, res) {
-  if(req.user) {
+  if(req.user && !req.user.verified) {
+    res.redirect('/not-verified');
+  }
+  else if(req.user) {
     Event.findById(req.params.id, function(err, event) {
       if(err) throw err;
       var date = moment(event.date).utc().format("YYYY-MM-DD");

@@ -143,7 +143,10 @@ router.post('/posts/:id/delete-flagged/:notification', function(req, res) {
 
 //Render create a post page
 router.get('/posts/create', function(req, res) {
-  if(req.user) {
+  if(req.user && !req.user.verified) {
+    res.redirect('/not-verified');
+  }
+  else if(req.user) {
     if(req.user.blocked) {
       res.redirect('/');
     } else {
@@ -278,7 +281,10 @@ router.get('/post/:id', function(req, res) {
 })
 
 router.get('/posts/:id/edit', function(req, res) {
-	if(req.user) {
+  if(req.user && !req.user.verified) {
+    res.redirect('/not-verified');
+  }
+  else if(req.user) {
 		Post.findById(req.params.id, function(err, post) {
 			if(err) throw err;
 			res.render('edit-post', {title: post.text, text: post.text, id: post._id, admin: req.user.admin});
